@@ -1,0 +1,56 @@
+.MG-010-01 .label{
+    font-family: Noto Sans JP;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 12px;
+    letter-spacing: 0em;
+    text-align: left;
+    color:rgba(0, 21, 42, 0.64)
+}
+
+.MG-010-01 .content {
+    font-family: Noto Sans JP;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #001521;
+}
+
+.MG-010-01 .content-link {
+    font-family: Noto Sans JP;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 17px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #1F8DDD;
+}
+.MG-010-01 .column-container {
+   width: 100%;
+   height: 32px;
+   display: flex;
+   align-items: center;
+   margin-bottom: 12px;
+}
+
+.MG-010-01 .thumbnail{
+    width: 160px;
+    height:  160px;
+    background-color: #DBDBDB;
+}
+
+.MG-010-01 .pamphlet-container {
+    height: 64px;
+    width: 592px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border: 1px solid #CED4DA;
+}
+
+.MG-010-01 .footer{
+    height: 62px;
+}

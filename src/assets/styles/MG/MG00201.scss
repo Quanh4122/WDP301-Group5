@@ -1,0 +1,47 @@
+.header-table-font{
+    //styleName: 12px/Regular(項目);
+font-family: Noto Sans JP;
+font-size: 12px;
+font-weight: 400;
+line-height: 12px;
+letter-spacing: 0em;
+text-align: left;
+
+}
+
+.record-row-container{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    background-color: #fff;
+    margin-bottom: 12px;
+    border: 1px solid #DBDBDB;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+}
+
+.disappear-close .ant-drawer-close{
+    display: none !important;
+}
+
+
+.drawer-title{
+    font-family: Noto Sans JP;
+font-size: 18px;
+font-weight: 700;
+line-height: 18px;
+letter-spacing: 0em;
+text-align: left;
+color: #212529;
+}
+
+.form-label{
+    font-family: Noto Sans JP;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 14px;
+        letter-spacing: 0em;
+        text-align: left;
+        color: #000000;
+}

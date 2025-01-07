@@ -1,0 +1,89 @@
+.gardient-color {
+  background: linear-gradient(to right, #30cfd0 0%, #330867 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.p-header {
+  width: 100%;
+  padding-right: 17px;
+  background-color: #062991;
+
+  #p-header-inner-quick{
+    padding-right: 0;
+    width: 100%;
+    max-width: 1410px;
+    margin: 0 auto;
+    height: 58px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    #logo-area-quick {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      height: 100%;
+      width: 40%;
+      
+      #content-quick {
+        width: 55%;
+        font-size: 11px;
+        padding-top: 3%;
+        font-weight: 300;
+        font-family: 'Noto San JP';
+        letter-spacing: 5px;
+      }
+    }
+
+    #p-header-tools {
+      width: 40%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    #p-header-btns{
+      width: 17%;
+      margin-left: 3%;
+      height: 90%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .btn {
+        font-size: 12px;
+        font-weight: 700;
+      }
+    }
+
+  }
+}
+
+#menu-footer {
+  width: 100%;
+  background-color: #EEE;
+  display: block;
+
+  #body-footer {
+    padding: 0px 50px 0px 50px;
+    width: 100%;
+
+    #footer-head {
+      width: 100%;
+      display: flex; 
+    }
+
+    #footer-list-screen {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+
+  a:hover {
+    text-decoration: none;
+  }
+  
+}

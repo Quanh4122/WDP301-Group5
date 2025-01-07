@@ -1,0 +1,79 @@
+.height-full-screen {
+    height: 100vh;
+}
+
+.width-full-screen {
+    width: 100wh;
+}
+
+.border-radius-4 {
+    border-radius: 4px;
+}
+
+.border-radius-6 {
+    border-radius: 6px;
+}
+
+.border-radius-8 {
+    border-radius: 8px;
+}
+
+.center-inside{
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+.logo-font{
+    font-family: Noto Sans JP;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 16px;
+        letter-spacing: 0em;
+        text-align: center;
+}
+
+::placeholder {
+    font-family: Noto Sans JP !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 26px !important;
+    letter-spacing: 0em !important;
+    text-align: left !important;
+    color: #6C757D !important;
+}
+
+.clickable { 
+    cursor: pointer;
+}
+
+.menu-label {
+    color: #fff;
+    font-family: Noto Sans JP ;
+    font-size: 14px;
+    font-weight: 500; 
+    line-height: 20px; 
+    letter-spacing: 0px; 
+    text-align: left ;
+}
+
+.label-menu-2{
+    font-family: Noto Sans;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 16px;
+        letter-spacing: 0px;
+        text-align: left;
+        color: #ABB3C0;
+}
+
+.button-style{
+    cursor: pointer;
+}
+
+.pagination-component .ant-input-number-input{
+    height: 24px !important;
+    text-align: center !important;
+
+}
