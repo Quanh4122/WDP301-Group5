@@ -56,10 +56,6 @@ const LayoutContainer = ({ children }: props) => {
                     autoComplete="off"
 
                 >
-                    <Form.Item name="phoneNumber">
-                        <Input placeholder="enter your phone number to view your bill " />
-                    </Form.Item>
-                    <Button icon={<ZoomInOutlined />} htmlType="submit" />
                 </Form>
             </Header>
             <Content className="py-10">
