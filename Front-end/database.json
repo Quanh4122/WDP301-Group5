@@ -1,0 +1,88 @@
+{
+  "students": [
+    { "id": 1, "name": "Ronaldo De Lima", "email": "ronaldo@example.com" },
+    { "id": 2, "name": "Jane Smith", "email": "janesmith@example.com" },
+    { "id": 3, "name": "Emily Johnson", "email": "emilyj@example.com" },
+    { "id": 4, "name": "Michael Brown", "email": "michaelb@example.com" },
+    { "id": 5, "name": "Emma Wilson", "email": "emmaw@example.com" },
+    { "id": 6, "name": "Chris Lee", "email": "chrislee@example.com" },
+    { "id": 7, "name": "Olivia Davis", "email": "oliviad@example.com" },
+    { "id": 8, "name": "James White", "email": "jamesw@example.com" },
+    { "id": 9, "name": "Sophia Hall", "email": "sophiah@example.com" },
+    { "id": 10, "name": "David Clark", "email": "davidc@example.com" }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "title": "React for Beginners",
+      "description": "Learn React from scratch"
+    },
+    {
+      "id": 2,
+      "title": "Advanced Node.js",
+      "description": "Master the Node.js framework"
+    },
+    {
+      "id": 3,
+      "title": "MongoDB Basics",
+      "description": "Introduction to MongoDB and NoSQL"
+    },
+    {
+      "id": 4,
+      "title": "JavaScript Fundamentals",
+      "description": "The foundation of JavaScript programming"
+    },
+    {
+      "id": 5,
+      "title": "Frontend Development with Vue.js",
+      "description": "Building interactive UIs with Vue.js"
+    },
+    {
+      "id": 6,
+      "title": "Express.js Masterclass",
+      "description": "Learn backend development with Express.js"
+    },
+    {
+      "id": 7,
+      "title": "Full Stack Web Development",
+      "description": "From frontend to backend development"
+    },
+    {
+      "id": 8,
+      "title": "TypeScript for Professionals",
+      "description": "Master TypeScript for large-scale applications"
+    },
+    {
+      "id": 9,
+      "title": "GraphQL in Practice",
+      "description": "Learn how to build efficient GraphQL APIs"
+    },
+    {
+      "id": 10,
+      "title": "Next.js and React",
+      "description": "Building production-ready applications with Next.js"
+    }
+  ],
+  "enrollments": [
+    { "id": 1, "studentId": 1, "courseId": 1 },
+    { "id": 2, "studentId": 1, "courseId": 2 },
+    { "id": 3, "studentId": 2, "courseId": 1 },
+    { "id": 4, "studentId": 2, "courseId": 3 },
+    { "id": 5, "studentId": 3, "courseId": 2 },
+    { "id": 6, "studentId": 3, "courseId": 4 },
+    { "id": 7, "studentId": 4, "courseId": 1 },
+    { "id": 8, "studentId": 4, "courseId": 5 },
+    { "id": 9, "studentId": 5, "courseId": 6 },
+    { "id": 10, "studentId": 5, "courseId": 3 },
+    { "id": 11, "studentId": 6, "courseId": 7 },
+    { "id": 12, "studentId": 6, "courseId": 2 },
+    { "id": 13, "studentId": 7, "courseId": 4 },
+    { "id": 14, "studentId": 7, "courseId": 8 },
+    { "id": 15, "studentId": 8, "courseId": 9 },
+    { "id": 16, "studentId": 8, "courseId": 10 },
+    { "id": 17, "studentId": 9, "courseId": 6 },
+    { "id": 18, "studentId": 9, "courseId": 1 },
+    { "id": 19, "studentId": 10, "courseId": 7 },
+    { "id": 20, "studentId": 10, "courseId": 9 }
+  ]
+}
