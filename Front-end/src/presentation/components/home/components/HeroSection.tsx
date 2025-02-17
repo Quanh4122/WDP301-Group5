@@ -5,8 +5,8 @@ const HeroSection = () => {
       <h1 className="text-4xl sm:text-6xl lg:text-7xl text-center tracking-wide">
         Hãy chọn phòng và đặt cơ sở vật chất
         <span className='bg-gradient-to-r from-orange-500 to-orange-800 text-transparent bg-clip-text'>
-         {" "}
-         bạn mong muốn
+          {" "}
+          bạn mong muốn
         </span>
       </h1>
       <p className='mt-10 text-lg text-center text-neutral-500 max-w-4xl'>

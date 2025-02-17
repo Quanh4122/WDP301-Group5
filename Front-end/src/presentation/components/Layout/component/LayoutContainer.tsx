@@ -18,17 +18,17 @@ interface props {
     children?: string | JSX.Element | JSX.Element[];
 }
 
+const { Header } = Layout
+
 const LayoutContainer = ({ children }: props) => {
 
     return (
-        <>
+        <Layout>
             <Navbar />
-            <HeroSection />
-            <FeatureSection />
-            <Blog />
-            <Pricing />
-            <Footer />
-        </>
+            <Layout>
+                {children}
+            </Layout>
+        </Layout>
     )
 }
 

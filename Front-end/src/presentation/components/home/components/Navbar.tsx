@@ -1,6 +1,7 @@
 import { useState } from "react";
 import logo from "../../../assets/logo.png"
 import { navItems } from "../../../../constants";
+import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -50,8 +51,8 @@ const Navbar = () => {
                 </div>
 
                 <div className="flex-1 flex flex-col items-center gap-4">
-                  <a href="/" className="w-full text-center py-2 px-3 border rounded-md">Đăng nhập</a>
-                  <a href="/" className="w-full text-center py-2 px-3 rounded-md bg-gradient-to-r from-orange-500 to-orange-800">
+                  <a href={PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN} className="w-full text-center py-2 px-3 border rounded-md">Đăng nhập</a>
+                  <a href={PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN} className="w-full text-center py-2 px-3 rounded-md bg-gradient-to-r from-orange-500 to-orange-800">
                     Tạo tài khoản
                   </a>
                 </div>
