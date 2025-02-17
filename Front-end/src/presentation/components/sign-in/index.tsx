@@ -47,6 +47,7 @@ export default function SignIn() {
     const [open, setOpen] = React.useState(false);
     const navigate = useNavigate();
 
+
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
@@ -86,6 +87,7 @@ export default function SignIn() {
             const response = await login({ email, password });
             console.log(response);
             navigate('/');
+            window.location.reload();
         } catch (error: any) {
             setServerError(error.response?.data?.message || 'Login failed. Please try again.');
         }
