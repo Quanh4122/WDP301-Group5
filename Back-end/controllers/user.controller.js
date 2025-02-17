@@ -30,13 +30,20 @@ const getUserById = async(req, res) => {
 };
 
 const register = async (req, res) => {
-  const { username, phoneNumber, email, password } = req.body;
+  const { userName, phoneNumber, email, password } = req.body;
+  console.log(req.body);
   await bcrypt.hash(password, 10)
     .then(hash => {
-      UserModel.create({ username, phoneNumber, email, password: hash })
+      UserModel.create({ userName, phoneNumber, email, password: hash })
         .then(user => {
           console.log(user);
-          return res.json(user);
+          return res.json({
+            _id: user._id,
+            email: user.email,
+            userName: user.userName,
+            phoneNumber: user.phoneNumber,
+            role: user.role
+          });
         })
         .catch(err => {
           console.log(err);
@@ -60,7 +67,7 @@ const login = async (req, res) => {
               _id: user._id,
               email: user.email,
               username: user.userName,
-              role: user.roleId,
+              role: user.role,
               fullname: user.fullName,
               phoneNumber: user.phoneNumber
             }, JWT_SECRET, { expiresIn: '1h' })

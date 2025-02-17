@@ -10,6 +10,8 @@ const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const { user } = useContext(userContext);
+  console.log(user);
+  
   const navigate = useNavigate();
 
   const handleLogout = () => {

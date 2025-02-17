@@ -15,6 +15,7 @@ const LayoutContainer = ({ children }: props) => {
 
     return (
         <>
+            
             <Navbar />
             <>
                 {children}
