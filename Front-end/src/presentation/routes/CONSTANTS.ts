@@ -7,6 +7,9 @@ export const PRIVATE_ROUTES = {
             PRODUCT_DETAIL : 'product-detail',
             SIGN_IN : 'sign-in',
             DASH_BOARD: 'dashboard',
-            CHECK_OUT: 'checkout'
+            CHECK_OUT: 'checkout',
+            REGISTER: 'register',
+            NOT_AUTHENTICATION: 'not-authentication',
+            AUTHORIZATION: 'authorization'
         }
 }
