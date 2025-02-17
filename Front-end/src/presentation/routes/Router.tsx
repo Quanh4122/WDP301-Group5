@@ -9,13 +9,14 @@ import path from "path";
 import SignIn from "../components/sign-in";
 import Dashboard from "../components/dashboard/Dashboard";
 import Checkout from "../components/checkout/Checkout";
+import HomePage from "../components/home";
 
 const Router = () => {
 
     const privateRoutes: any[] = [
         {
             path: ROOT,
-            element: <ListAll />
+            element: <HomePage />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PRODUCT_DETAIL,
