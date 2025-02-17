@@ -1,13 +1,12 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 import { ConfigProvider } from 'antd';
-import AppTheme from './presentation/assets/themes';
 import Router from './presentation/routes/Router';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 function App() {
   return (
-    <ConfigProvider theme={AppTheme}>
+    <ConfigProvider>
       <Router />
     </ConfigProvider>
   );
