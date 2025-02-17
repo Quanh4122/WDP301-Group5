@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 import { navItems } from "../../../../constants";
@@ -10,7 +10,12 @@ const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const { user } = useContext(userContext);
+  const [isLogin, setIsLogin] = useState(false);
   console.log(user);
+
+  useEffect(() => {
+    setIsLogin(user.username ? true : false);
+  }, [user]);
   
   const navigate = useNavigate();
 
@@ -45,7 +50,7 @@ const Navbar = () => {
           </ul>
 
           <div className="hidden lg:flex justify-center space-x-6 items-center">
-            {user.userName ? (
+            {isLogin ? (
               <button onClick={handleLogout} className="py-2 px-3 border rounded-md">
                 Đăng xuất
               </button>
@@ -77,7 +82,7 @@ const Navbar = () => {
               </div>
 
               <div className="flex-1 flex flex-col items-center gap-4">
-                {user.userName ? (
+                {user.username ? (
                   <button onClick={handleLogout} className="w-full text-center py-2 px-3 border rounded-md">
                     Đăng xuất
                   </button>
