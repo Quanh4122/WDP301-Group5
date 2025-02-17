@@ -23,7 +23,7 @@ db.user = User;
 
 db.connectDB = () => {
   mongoose
-    .connect(process.env.URL, { dbName: process.env.DBNAME })
+    .connect(process.env.MONGO_URL, { dbName: process.env.DB_NAME })
     .then(console.log("Connect to mongoDB"))
     .catch((err) => {
       console.log("Connect fail : " + err);

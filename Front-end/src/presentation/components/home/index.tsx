@@ -12,7 +12,6 @@ const HomePage = () => {
             <FeatureSection />
             <Blog />
             <Pricing />
-            <Footer />
         </>
     )
 }
