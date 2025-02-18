@@ -87,7 +87,7 @@ export default function SignIn() {
             const response = await login({ email, password });
             console.log(response);
             navigate('/');
-            window.location.reload();
+            // window.location.reload();
         } catch (error: any) {
             setServerError(error.response?.data?.message || 'Login failed. Please try again.');
         }

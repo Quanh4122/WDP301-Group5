@@ -16,7 +16,7 @@ const Navbar = () => {
   useEffect(() => {
     setIsLogin(user.username ? true : false);
   }, [user]);
-  
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
