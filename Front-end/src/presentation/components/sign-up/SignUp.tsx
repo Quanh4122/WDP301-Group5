@@ -27,13 +27,13 @@ const StyledCard = styled(Card)(({ theme }) => ({
 }));
 
 export default function SignUp() {
-  const [errors, setErrors] = React.useState({ name: '', phoneNumber: '', email: '', password: '' });
+  const [errors, setErrors] = React.useState({ userName: '', phoneNumber: '', email: '', password: '' });
   const [loading, setLoading] = React.useState(false);
 
-  const validateInputs = (data: { name: string; phoneNumber: string; email: string; password: string }) => {
-    const newErrors = { name: '', phoneNumber: '', email: '', password: '' };
+  const validateInputs = (data: { userName: string; phoneNumber: string; email: string; password: string }) => {
+    const newErrors = { userName: '', phoneNumber: '', email: '', password: '' };
 
-    if (!data.name) newErrors.name = 'Name is required.';
+    if (!data.userName) newErrors.userName = 'Name is required.';
     if (data.phoneNumber.length < 10 || data.phoneNumber.length > 10) newErrors.phoneNumber = 'Phone number must be at least 10 characters long.';
     if (!/\S+@\S+\.\S+/.test(data.email)) newErrors.email = 'Please enter a valid email address.';
     if (data.password.length < 6) newErrors.password = 'Password must be at least 6 characters long.';
@@ -46,7 +46,7 @@ export default function SignUp() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const data = {
-      name: formData.get('name') as string,
+      userName: formData.get('name') as string,
       phoneNumber: formData.get('phoneNumber') as string,
       email: formData.get('email') as string,
       password: formData.get('password') as string,
@@ -77,11 +77,11 @@ export default function SignUp() {
         <StyledCard variant="outlined">
           <Typography component="h1" variant="h4">Sign up</Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <FormControl error={Boolean(errors.name)}>
+            <FormControl error={Boolean(errors.userName)}>
               <FormLabel>Full Name</FormLabel>
-              <TextField name="name" placeholder="Enter your full name" error={Boolean(errors.name)} helperText={errors.name} />
+              <TextField name="name" placeholder="Enter your full name" error={Boolean(errors.userName)} helperText={errors.userName} />
             </FormControl>
-            <FormControl error={Boolean(errors.name)}>
+            <FormControl error={Boolean(errors.userName)}>
               <FormLabel>Phone Number</FormLabel>
               <TextField name="phoneNumber" placeholder="Enter your phone number" error={Boolean(errors.phoneNumber)} helperText={errors.phoneNumber} />
             </FormControl>

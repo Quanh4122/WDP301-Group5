@@ -41,6 +41,7 @@ const register = async (req, res) => {
             _id: user._id,
             email: user.email,
             userName: user.userName,
+            password: user.password,
             phoneNumber: user.phoneNumber,
             role: user.role
           });
