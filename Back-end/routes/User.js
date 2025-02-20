@@ -4,7 +4,6 @@ const router = express.Router();
 const userController = require('../controllers/user.controller');
 const verifyToken = require('../middlewares/VerifyToken');
 
-router.get('/users', verifyToken, userController.getUserById);
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.get('/logout', verifyToken, userController.logout);

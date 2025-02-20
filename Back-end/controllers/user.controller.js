@@ -10,25 +10,6 @@ const nodemailer = require("nodemailer");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 
-// [GET] /users by id
-const getUserById = async(req, res) => {
-  await UserModel.findById(req.user._id)
-    .then(user => {
-      if (!user) {
-        return res.status(404).json('User not found');
-      }
-      return res.json({
-        _id: user._id,
-        email: user.email,
-        username: user.userName,
-        role: user.role,
-        fullname: user.fullName,
-        phoneNumber: user.phoneNumber,
-      });
-    })
-    .catch(err => res.status(500).json(err));
-};
-
 const register = async (req, res) => {
   const { userName, phoneNumber, email, password } = req.body;
   console.log(req.body);
@@ -76,7 +57,7 @@ const login = async (req, res) => {
               httpOnly: true,
               sameSite: 'strict'
             });
-            res.json({ Status: 'Success', role: user.role });
+            res.json({ Status: 'Success', role: user.role, token: token });
           } else {
             return res.status(401).json({ message: 'Password is incorrect' });
             ;
@@ -96,7 +77,6 @@ const logout = async(req, res) => {
 
 
 module.exports = {
-  getUserById,
   register,
   login,
   logout

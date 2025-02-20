@@ -9,9 +9,7 @@ import HomePage from "../components/home";
 import SignUp from "../components/sign-up/SignUp";
 import NotAuthenticated from "../components/services/NotAuthenticated";
 import Authorization from "../components/services/Authorization";
-import { UserProvider } from "../components/context/UserContext";
 import Booking from "../components/customer/Booking";
-import { UserRoute } from "./PrivateRoute";
 
 
 const Router = () => {
@@ -51,29 +49,27 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/booking",
-            element: <UserRoute><Booking /></UserRoute>
+            element: <Booking />
         }
     ]
 
     return (
-        <UserProvider>
-            <Routes>
-                <Route
-                    path={ROOT}
-                    element={<PrivateRoute />}
-                >
-                    {
-                        privateRoutes.map((element: any, index) => (
-                            <Route
-                                key={index}
-                                path={element.path}
-                                element={element.element}
-                            />
-                        ))
-                    }
-                </Route>
-            </Routes>
-        </UserProvider>
+        <Routes>
+            <Route
+                path={ROOT}
+                element={<PrivateRoute />}
+            >
+                {
+                    privateRoutes.map((element: any, index) => (
+                        <Route
+                            key={index}
+                            path={element.path}
+                            element={element.element}
+                        />
+                    ))
+                }
+            </Route>
+        </Routes>
     )
 }
 
