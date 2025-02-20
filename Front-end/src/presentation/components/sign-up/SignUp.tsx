@@ -62,6 +62,7 @@ export default function SignUp() {
     const formData = new FormData(event.currentTarget);
     const data: FormDataType = {
       userName: formData.get('userName') as string,
+
       phoneNumber: formData.get('phoneNumber') as string,
       email: formData.get('email') as string,
       password: formData.get('password') as string,

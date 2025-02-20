@@ -9,7 +9,9 @@ import { AppDispatch, RootState } from "../../redux/Store"; // Import kiểu dis
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
   const dispatch = useDispatch<AppDispatch>(); // Fix lỗi TypeScript bằng cách khai báo kiểu dispatch
+
   const navigate = useNavigate();
 
   // Lấy trạng thái từ Redux với kiểu an toàn
