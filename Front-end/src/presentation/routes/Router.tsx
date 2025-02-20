@@ -69,22 +69,22 @@ const Router = () => {
     ]
 
     return (
-            <Routes>
-                <Route
-                    path={ROOT}
-                    element={<PrivateRoute />}
-                >
-                    {
-                        privateRoutes.map((element: any, index) => (
-                            <Route
-                                key={index}
-                                path={element.path}
-                                element={element.element}
-                            />
-                        ))
-                    }
-                </Route>
-            </Routes>
+        <Routes>
+            <Route
+                path={ROOT}
+                element={<PrivateRoute />}
+            >
+                {
+                    privateRoutes.map((element: any, index) => (
+                        <Route
+                            key={index}
+                            path={element.path}
+                            element={element.element}
+                        />
+                    ))
+                }
+            </Route>
+        </Routes>
     )
 }
 

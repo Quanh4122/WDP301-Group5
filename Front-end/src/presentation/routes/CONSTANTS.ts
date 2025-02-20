@@ -13,6 +13,6 @@ export const PRIVATE_ROUTES = {
             CHECK_OUT: 'checkout',
             REGISTER: 'register',
             NOT_AUTHENTICATION: 'not-authentication',
-            AUTHORIZATION: 'authorization'
+            AUTHORIZATION: 'authorization',
         }
 }
