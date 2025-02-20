@@ -12,11 +12,10 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { Divider } from '@mui/material';
 import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
-import { ToastContainer } from 'react-toastify';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -86,12 +85,14 @@ export default function SignIn() {
 
     try {
       await dispatch(LoginUser({ email, password }));
-      toast.success('Login successful!');
+      toast.success('Login successful!')
       navigate('/');
     } catch (error: any) {
-      setServerError(error.response?.data?.message || 'Login failed. Please try again.');
+      toast.error('errol!')
+      console.log(error)
     }
   };
+
 
 
   return (
@@ -141,8 +142,7 @@ export default function SignIn() {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <Button type="submit" fullWidth variant="contained" onClick={() => toast.success('Login successful!')
-            } disabled={isLoading}>
+            <Button type="submit" fullWidth variant="contained" disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
             <Link to={'/app/forgot-password'}>
