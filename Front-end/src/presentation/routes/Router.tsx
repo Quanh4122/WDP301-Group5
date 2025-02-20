@@ -52,7 +52,7 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/booking",
             element: <UserRoute><Booking /></UserRoute>
-        }
+        },
     ]
 
     return (
