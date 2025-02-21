@@ -16,7 +16,8 @@ import { ToastContainer } from 'react-toastify';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
-import { toast } from "react-toastify";
+import toast, { Toaster } from "react-hot-toast";
+
 
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -86,8 +87,10 @@ export default function SignIn() {
 
     try {
       await dispatch(LoginUser({ email, password }));
-      toast.success('Login successful!');
-      navigate('/');
+      setTimeout(() => {
+        toast.success('Login successful!');
+        navigate('/');
+      }, 3000);
     } catch (error: any) {
       setServerError(error.response?.data?.message || 'Login failed. Please try again.');
     }
@@ -97,7 +100,7 @@ export default function SignIn() {
   return (
     <>
       <CssBaseline />
-      <ToastContainer />
+      <Toaster position="top-right" />
       <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
@@ -141,8 +144,8 @@ export default function SignIn() {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <Button type="submit" fullWidth variant="contained" onClick={() => toast.success('Login successful!')
-            } disabled={isLoading}>
+            <Button type="submit" fullWidth variant="contained" 
+             disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
             <Link to={'/app/forgot-password'}>
