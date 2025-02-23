@@ -22,6 +22,10 @@ const BlogSchema = new mongoose.Schema({
     type: String, 
     require: true 
   },
+  content: { 
+    type: String, 
+    require: true 
+  }
 });
 
 const BlogModel = mongoose.model("Blog", BlogSchema);
