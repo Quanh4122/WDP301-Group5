@@ -8,6 +8,7 @@ const initialState = {
   email: '',
   error: false,
   isRegister: false,
+  isVerify: false,
   user: null, 
 };
 
@@ -23,7 +24,6 @@ const slice = createSlice({
       state.isLoggedIn = true;
       state.token = action.payload.token;
       state.user = action.payload.user;
-      // Khi đăng nhập, cập nhật email từ payload và reset isRegister
       state.email = action.payload.email;
       state.isRegister = false;
     },
@@ -31,7 +31,7 @@ const slice = createSlice({
       state.isLoggedIn = false;
       state.token = '';
       state.user = null;
-      state.email = ''; // reset email khi đăng xuất
+      state.email = ''; 
       state.isRegister = false;
     },
     updateRegisterEmail(state, action) {
@@ -40,12 +40,14 @@ const slice = createSlice({
     setRegisterStatus(state, action) {
       state.isRegister = action.payload;
     },
+    setVerifyStatus(state, action) {
+      state.isVerify = action.payload;
+    },
   },
 });
 
 export default slice.reducer;
 
-// Action đăng nhập
 export function LoginUser(formValues) {
   return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
@@ -59,7 +61,6 @@ export function LoginUser(formValues) {
         }
       );
       console.log("Login response:", response.data);
-      // Giả sử response.data chứa token, role và email của user
       dispatch(
         slice.actions.login({
           isLoggedIn: true,
@@ -79,35 +80,86 @@ export function LoginUser(formValues) {
 
 // Action đăng ký
 export function RegisterUser(formValues) {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     try {
-      const response = await axios.post(
-        '/register',
-        { ...formValues },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      const response = await axios.post('/register', formValues, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
       console.log("Register response:", response.data);
-      // Lưu email đã đăng ký và đặt isRegister là true
+      
       dispatch(slice.actions.updateRegisterEmail({ email: formValues.email }));
-      dispatch(slice.actions.setRegisterStatus(true));
       dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+
+      window.location.href = '/app/verify';
     } catch (error) {
       console.error("Register error:", error);
       dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
       dispatch(slice.actions.setRegisterStatus(false));
       throw error;
-    } finally {
-      if (!getState().auth.error) {
-        window.location.href = '/app/sign-in';
-      }
     }
   };
 }
 
-// Action đăng xuất
+// Action xác minh email
+export function VerifyEmail(formValues) {
+  return async (dispatch) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+    try {
+      const response = await axios.post('/verify', formValues, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      console.log("Verify response:", response.data);
+
+      dispatch(slice.actions.setRegisterStatus(true));
+      dispatch(slice.actions.setVerifyStatus(true));
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+
+      window.location.href = '/app/sign-in';
+    } catch (error) {
+      console.error("Verify error:", error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      throw error;
+    }
+  };
+}
+
+export function ForgotPassword(formValues) {
+  return async (dispatch, getState) => {
+    await axios.post('/forgotPassword', {
+      ...formValues
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => {
+      console.log(response);
+    }).catch((error) => {
+      console.log(error);
+    })
+  };
+};
+
+export function NewPassword(formValues) {
+  return async (dispatch, getState) => {
+    await axios.post('/resetPassword', {
+      ...formValues
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }).then((response) => {
+      console.log(response);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+    }).catch((error) => {
+      console.log(error);
+    });
+  };
+};
+
+
 export function LogoutUser() {
   return async (dispatch) => {
     try {

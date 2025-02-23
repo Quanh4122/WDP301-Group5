@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink, Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,12 +11,12 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { Divider } from '@mui/material';
-import { GoogleIcon, FacebookIcon } from './components/CustomIcons';
-import ForgotPassword from './components/ForgotPassword';
-import { ToastContainer } from 'react-toastify';
-import { useDispatch, useSelector } from '../redux/Store'; // Sử dụng hooks tùy chỉnh của bạn
-import { LoginUser } from '../redux/slices/Authentication'; // Điều chỉnh đường dẫn theo dự án của bạn
+import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
+import { useDispatch, useSelector } from '../redux/Store';
+import { LoginUser } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
+import { ToastContainer, toast } from "react-toastify";
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -45,15 +45,11 @@ export default function SignIn() {
   const [emailError, setEmailError] = React.useState('');
   const [passwordError, setPasswordError] = React.useState('');
   const [serverError, setServerError] = React.useState('');
-  const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Lấy thông tin trạng thái từ Redux
   const { isLoading } = useSelector((state: RootState) => state.auth);
 
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const validateInputs = () => {
     const email = (document.getElementById('email') as HTMLInputElement).value;
@@ -88,14 +84,15 @@ export default function SignIn() {
     const password = formData.get('password') as string;
 
     try {
-      // Dispatch action LoginUser qua Redux
       await dispatch(LoginUser({ email, password }));
-      // Nếu đăng nhập thành công, chuyển hướng đến trang chủ
+      toast.success('Login successful!')
       navigate('/');
     } catch (error: any) {
-      setServerError(error.response?.data?.message || 'Login failed. Please try again.');
+      toast.error('errol!')
+      console.log(error)
     }
   };
+
 
 
   return (
@@ -145,13 +142,14 @@ export default function SignIn() {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <ForgotPassword open={open} handleClose={handleClose} />
             <Button type="submit" fullWidth variant="contained" disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
-            <Button component="button" onClick={handleClickOpen} variant="text" sx={{ alignSelf: 'center' }}>
-              Forgot your password?
-            </Button>
+            <Link to={'/app/forgot-password'}>
+              <Button component="button" variant="text" sx={{ alignSelf: 'center' }}>
+                Forgot your password?
+              </Button>
+            </Link>
           </Box>
           <Typography textAlign="center" color="error">
             {serverError}

@@ -2,15 +2,18 @@ import { PRIVATE_ROUTES, ROOT } from "./CONSTANTS";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../components/Layout/PrivateRoute";
 import ProductDetai from "../components/list_all/components/ProductDetail";
-import SignIn from "../components/sign-in";
+import SignIn from "../components/auth/SignIn";
 import Dashboard from "../components/dashboard/Dashboard";
 import Checkout from "../components/checkout/Checkout";
 import HomePage from "../components/home";
-import SignUp from "../components/sign-up/SignUp";
+import SignUp from "../components/auth/SignUp";
 import NotAuthenticated from "../components/services/NotAuthenticated";
 import Authorization from "../components/services/Authorization";
 import Booking from "../components/customer/Booking";
 import CreateBlog from "../components/blog/createBlog";
+import Verify from "../components/auth/Verify";
+import ResetPassword from "../components/auth/ResetPassword";
+import ForgotPassword from "../components/auth/ForgotPassword";
 
 
 const Router = () => {
@@ -27,6 +30,18 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN,
             element: <SignIn />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.VERIFY,
+            element: <Verify />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.FORGOT_PASSWORD,
+            element: <ForgotPassword />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.RESET_PASSWORD,
+            element: <ResetPassword />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
