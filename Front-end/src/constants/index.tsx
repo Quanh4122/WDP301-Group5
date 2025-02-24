@@ -21,7 +21,7 @@ import { PRIVATE_ROUTES } from "../presentation/routes/CONSTANTS";
 
 export const navItems = [
   { label: "Car List", href: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST },
-  { label: "Blog", href: "#" },
+  { label: "Blog", href: "app/blog" },
   { label: "Dashboard", href: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DASH_BOARD },
 ];
 
