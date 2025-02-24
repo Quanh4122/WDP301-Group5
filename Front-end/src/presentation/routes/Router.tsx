@@ -10,6 +10,7 @@ import SignUp from "../components/sign-up/SignUp";
 import NotAuthenticated from "../components/services/NotAuthenticated";
 import Authorization from "../components/services/Authorization";
 import Booking from "../components/customer/Booking";
+import CarList from "../components/car_list";
 
 
 const Router = () => {
@@ -48,8 +49,12 @@ const Router = () => {
             element: <Checkout />
         },
         {
-            path: PRIVATE_ROUTES.PATH + "/booking",
+            path: PRIVATE_ROUTES.PATH + PRIVATE_ROUTES.SUB.BOOKING,
             element: <Booking />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + PRIVATE_ROUTES.SUB.CAR_LIST,
+            element: <CarList />
         }
     ]
 
