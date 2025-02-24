@@ -15,6 +15,7 @@ export const PRIVATE_ROUTES = {
             NOT_AUTHENTICATION: 'not-authentication',
             AUTHORIZATION: 'authorization',
             CAR_LIST : 'car-lists',
-            BOOKING : 'booking'
+            BOOKING : 'booking',
+            CAR_DETAIL : 'car-detail',
         }
 }

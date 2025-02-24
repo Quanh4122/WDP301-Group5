@@ -1,10 +1,10 @@
-import { Card, CardContent, CardMedia, Icon, Typography } from "@mui/material";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import React from "react";
 import Carimage from "../../../assets/car-image1.png"
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import PersonIcon from '@mui/icons-material/Person';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import UsbIcon from '@mui/icons-material/Usb';
 
 const CarItem = () => {
     return (
@@ -38,7 +38,7 @@ const CarItem = () => {
                             </Typography>
                         </div>
                         <div className="flex items-center text-sky-500">
-                            <DirectionsCarIcon />
+                            <UsbIcon />
                             <Typography variant="body2" color="textSecondary">
                                 Số tự động
                             </Typography>

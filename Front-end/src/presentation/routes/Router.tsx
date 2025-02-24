@@ -14,6 +14,7 @@ import Verify from "../components/auth/Verify";
 import ResetPassword from "../components/auth/ResetPassword";
 import ForgotPassword from "../components/auth/ForgotPassword";
 import CarList from "../components/car_list";
+import CarDetail from "../components/car_detail";
 
 
 const Router = () => {
@@ -64,12 +65,16 @@ const Router = () => {
             element: <Checkout />
         },
         {
-            path: PRIVATE_ROUTES.PATH + PRIVATE_ROUTES.SUB.BOOKING,
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING,
             element: <Booking />
         },
         {
-            path: PRIVATE_ROUTES.PATH + PRIVATE_ROUTES.SUB.CAR_LIST,
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST,
             element: <CarList />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_DETAIL,
+            element: <CarDetail />
         }
     ]
 
