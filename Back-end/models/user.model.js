@@ -10,21 +10,17 @@ const UserSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  fullName: {
+  passwordConfirm: {
     type: String,
-    require: true,
   },
-  email: {
-    type: String,
-    require: true,
+  passwordChangedAt: {
+    type: Date,
   },
-  avatar: {
+  passwordResetToken: {
     type: String,
-    require: true,
   },
-  phoneNumber: {
-    type: String,
-    require: true,
+  passwordResetExpires: {
+    type: Date,
   },
   fullName: {
     type: String,

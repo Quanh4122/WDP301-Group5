@@ -2,12 +2,12 @@ import * as React from 'react';
 import { Box, Button, CssBaseline, Divider, FormLabel, FormControl, TextField, Typography, Stack, Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { GoogleIcon, FacebookIcon } from './components/CustomIcons';
+import { GoogleIcon, FacebookIcon } from './CustomIcons';
 import { toast, ToastContainer } from 'react-toastify';
 import { Link as RouterLink } from 'react-router-dom';
-import { useDispatch, useSelector } from '../redux/Store'; // Sử dụng hooks tùy chỉnh từ file store của bạn
-import { RegisterUser } from '../redux/slices/Authentication'; // Điều chỉnh đường dẫn theo dự án của bạn
-import { RootState } from '../redux/Store'; // Để có kiểu RootState
+import { useDispatch, useSelector } from '../redux/Store'; 
+import { RegisterUser } from '../redux/slices/Authentication';
+import { RootState } from '../redux/Store'; 
 
 const SignUpContainer = styled(Stack)(({ theme }) => ({
   minHeight: '100vh',
@@ -74,7 +74,7 @@ export default function SignUp() {
         await dispatch(RegisterUser(data));
         if (!error) {
           toast.success('Sign up successful!');
-          window.location.href = '/app/sign-in';
+          window.location.href = '/app/verify';
         }
       } catch (err) {
         console.error(err);
