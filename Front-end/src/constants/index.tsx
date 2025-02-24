@@ -20,10 +20,9 @@ import { PRIVATE_ROUTES } from "../presentation/routes/CONSTANTS";
 
 
 export const navItems = [
-  { label: "Features", href: "#" },
+  { label: "Car List", href: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST },
   { label: "Blog", href: "#" },
   { label: "Dashboard", href: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DASH_BOARD },
-  { label: "DXLAB", href: "#" },
 ];
 
 export const testimonials = [
