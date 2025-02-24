@@ -11,9 +11,11 @@ import NotAuthenticated from "../components/services/NotAuthenticated";
 import Authorization from "../components/services/Authorization";
 import Booking from "../components/customer/Booking";
 import CreateBlog from "../components/blog/createBlog";
+import BlogDetail from "../components/blog/BlogDetail";
 import Verify from "../components/auth/Verify";
 import ResetPassword from "../components/auth/ResetPassword";
 import ForgotPassword from "../components/auth/ForgotPassword";
+import BlogList from "../components/blog/BlogList";
 
 
 const Router = () => {
@@ -70,7 +72,16 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/createBlog",
             element: <CreateBlog />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/blog/:postId",
+            element: <BlogDetail />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/blog",
+            element: <BlogList />
         }
+        
     ]
 
     return (

@@ -3,7 +3,7 @@ import { ClassicEditor, Autoformat, AutoImage, Autosave, BlockQuote, Bold, CKBox
 
 import 'ckeditor5/ckeditor5.css';
 import { useState, ChangeEvent, FormEvent } from 'react';
-import postBlog from '../blog/blogAPI'
+import {postBlog} from '../blog/blogAPI'
 
 const CreateBlog = () => {
 
