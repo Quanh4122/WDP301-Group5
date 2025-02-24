@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
 
 const CarTypeSchema = new mongoose.Schema({
-  numberOfSeats: { 
-    type: Number, 
-    require: true 
+  bunkBed: {
+    type: Boolean,
+    require: true,
   },
-  carVersion: { 
-    type: Number, 
-    require: true 
+  flue: {
+    type: Boolean,
+    require: true,
   },
-  bunkBed: { 
-    type: Boolean, 
-    require: true 
+  transmissionType: {
+    type: Boolean,
+    require: true,
   },
 });
 

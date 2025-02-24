@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
-const RoleModel = require('./role.model');
+const RoleModel = require("./role.model");
 
 const UserSchema = new mongoose.Schema({
   userName: {
     type: String,
-    require: true
+    require: true,
   },
   password: {
     type: String,
-    require: true
+    require: true,
   },
   passwordConfirm: {
     type: String,
@@ -24,19 +24,19 @@ const UserSchema = new mongoose.Schema({
   },
   fullName: {
     type: String,
-    require: true
+    require: true,
   },
   email: {
     type: String,
-    require: true
+    require: true,
   },
   avatar: {
     type: String,
-    require: true
+    require: true,
   },
   phoneNumber: {
     type: String,
-    require: true
+    require: true,
   },
   verified: {
     type: Boolean,
@@ -44,7 +44,7 @@ const UserSchema = new mongoose.Schema({
   },
   otp: {
     type: String,
-    require: true
+    require: true,
   },
   otp_expiry_time: {
     type: Date,
@@ -52,7 +52,7 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Role",
-    require: true
+    require: true,
   },
   createdAt: {
     type: Date,
@@ -63,7 +63,7 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.pre('save', async function (next) {
+UserSchema.pre("save", async function (next) {
   if (!this.role) {
     try {
       let defaultRole = await RoleModel.findOne({ roleName: "user" });
