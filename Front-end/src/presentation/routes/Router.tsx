@@ -10,9 +10,12 @@ import SignUp from "../components/auth/SignUp";
 import NotAuthenticated from "../components/services/NotAuthenticated";
 import Authorization from "../components/services/Authorization";
 import Booking from "../components/customer/Booking";
+import CreateBlog from "../components/blog/createBlog";
+import BlogDetail from "../components/blog/BlogDetail";
 import Verify from "../components/auth/Verify";
 import ResetPassword from "../components/auth/ResetPassword";
 import ForgotPassword from "../components/auth/ForgotPassword";
+import BlogList from "../components/blog/BlogList";
 import CarList from "../components/car_list";
 import CarDetail from "../components/car_detail";
 
@@ -69,6 +72,18 @@ const Router = () => {
             element: <Booking />
         },
         {
+            path: PRIVATE_ROUTES.PATH + "/createBlog",
+            element: <CreateBlog />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/blog/:postId",
+            element: <BlogDetail />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/blog",
+            element: <BlogList />
+        },
+        {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST,
             element: <CarList />
         },
@@ -76,6 +91,7 @@ const Router = () => {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_DETAIL,
             element: <CarDetail />
         }
+        
     ]
 
     return (
