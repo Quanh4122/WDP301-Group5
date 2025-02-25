@@ -21,7 +21,7 @@ const CarDetail = () => {
     return (
         <section className="w-ful h-auto bg-gray-100">
             <div className="w-full h-20 bg-black mb-8">
-                <img src={MapBanner} className="w-40 h-20" />
+                <img src={MapBanner} className="w-40 h-20" alt="Banner" />
             </div>
             <div className="flex items-center px-36">
                 <div className="flex items-center px-2">
