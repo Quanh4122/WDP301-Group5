@@ -14,10 +14,10 @@ import CreateBlog from "../components/blog/createBlog";
 import Verify from "../components/auth/Verify";
 import ResetPassword from "../components/auth/ResetPassword";
 import ForgotPassword from "../components/auth/ForgotPassword";
-import BlogList from "../components/blog/BlogList";
 import CarList from "../components/car_list";
 import CarDetail from "../components/car_detail";
 import BlogDetail from "../components/blog/BlogDetail";
+import BlogList from "../components/blog/BlogList";
 
 
 const Router = () => {

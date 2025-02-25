@@ -6,7 +6,7 @@ const CarTypeSchema = new mongoose.Schema({
     require: true,
   },
   flue: {
-    type: Boolean,
+    type: Number,
     require: true,
   },
   transmissionType: {

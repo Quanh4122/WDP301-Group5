@@ -34,7 +34,7 @@ const CarSchema = new mongoose.Schema({
     ref: "CarType",
     require: true,
   },
-  numberOfSeats: {
+  numberOfSeat: {
     type: Number,
     require: true,
   },

@@ -63,7 +63,7 @@ const CarItem = ({ carModel }: props) => {
                             <div className="flex items-center text-sky-500">
                                 <LocalGasStationIcon />
                                 <Typography variant="body2" color="textSecondary">
-                                    {carModel?.carType.flue ? "Xăng" : "Điện"}
+                                    {carModel?.carType.flue == 1 ? "Xăng" : carModel?.carType.flue == 2 ? "Dầu" : "Điện"}
                                 </Typography>
                             </div>
                         </div>

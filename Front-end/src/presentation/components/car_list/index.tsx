@@ -3,18 +3,31 @@ import CarItem from "./components/CarItem";
 import axiosInstance from "../utils/axios";
 import MapBanner from "../../assets/map-banner.png"
 import { CarModels } from "./model";
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import UsbIcon from '@mui/icons-material/Usb';
+import CarFilterModals from "./components/CarFilterModals";
+import PersonIcon from '@mui/icons-material/Person';
 
 const CarList = () => {
 
-    const Item = [
-        { id: 1 },
-        { id: 1 },
-        { id: 1 },
-        { id: 1 },
-        { id: 1 },
-    ]
-
     const [carList, setCarList] = useState<CarModels[]>()
+    const [isOpenModalNumberOfSeat, setIsOpenModalNumberOfSeat] = useState(false)
+    const [isOpenModalTransmissionType, setIsOpenModalTransmissionType] = useState(false)
+    const [isOpenModalFlue, setIsOpenModalFlue] = useState(false)
+    const filterNumberOfSeat = [
+        { label: '5 chỗ', value: 5 },
+        { label: '7 chỗ', value: 7 },
+        { label: '9 chỗ', value: 9 }
+    ]
+    const filterTransmissionType = [
+        { label: 'Số tự động', value: true },
+        { label: 'Số sàn', value: false },
+    ]
+    const filterFlue = [
+        { label: 'Máy Xăng', value: 1 },
+        { label: 'Máy Dầu', value: 2 },
+        { label: 'Máy Điện', value: 3 }
+    ]
 
     useEffect(() => {
         onGetData()
@@ -27,15 +40,90 @@ const CarList = () => {
             .catch(err => console.log(err))
     }
 
+    const onSetListDataNumberOfSeat = async (list: any[]) => {
+        if (list && list.length > 0) {
+            await axiosInstance.post('/car/filterCarByNumberOfSeat', list)
+                .then(res => setCarList(res.data))
+                .catch(err => console.log(err))
+        } else {
+            onGetData()
+        }
+
+    }
+
+    const onSetListDataTransmissionType = async (list: any[]) => {
+        if (list && list.length > 0) {
+            await axiosInstance.post('/car/filterCarByTransmissionType', list)
+                .then(res => setCarList(res.data))
+                .catch(err => console.log(err))
+        } else {
+            onGetData()
+        }
+    }
+
+    const onSetListDataFlue = async (list: any[]) => {
+        if (list && list.length > 0) {
+            await axiosInstance.post('/car/filterCarByFlue', list)
+                .then(res => setCarList(res.data))
+                .catch(err => console.log(err))
+        } else {
+            onGetData()
+        }
+    }
+
     return (
         <div className="w-full">
             <div className="w-full h-20 bg-black">
                 <img src={MapBanner} className="w-40 h-20" />
             </div>
+            <div className="w-2/3 px-24 h-24 flex flex-wrap items-center">
+                <div className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 text-sky-500 border-sky-500 border-solid flex items-center justify-center hover:bg-sky-500 hover:text-white">
+                    Tất cả
+                </div>
+                <div
+                    className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
+                    onClick={() => setIsOpenModalNumberOfSeat(!isOpenModalNumberOfSeat)}
+                >
+                    <PersonIcon className="500" /><span>Số chỗ</span>
+                    <CarFilterModals
+                        isOpen={isOpenModalNumberOfSeat}
+                        onCancel={() => setIsOpenModalNumberOfSeat(false)}
+                        option={filterNumberOfSeat}
+                        title="Số chỗ"
+                        onSetListData={onSetListDataNumberOfSeat}
+                    />
+                </div>
+                <div
+                    className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
+                    onClick={() => setIsOpenModalTransmissionType(!isOpenModalTransmissionType)}
+                >
+                    <UsbIcon /><span>Loại xe</span>
+                    <CarFilterModals
+                        isOpen={isOpenModalTransmissionType}
+                        onCancel={() => setIsOpenModalTransmissionType(false)}
+                        option={filterTransmissionType}
+                        title="Loại xe"
+                        onSetListData={onSetListDataTransmissionType}
+                    />
+                </div>
+                <div
+                    className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
+                    onClick={() => setIsOpenModalFlue(!isOpenModalFlue)}
+                >
+                    <LocalGasStationIcon /><span>Nhiên liệu</span>
+                </div>
+                <CarFilterModals
+                    isOpen={isOpenModalFlue}
+                    onCancel={() => setIsOpenModalFlue(false)}
+                    option={filterFlue}
+                    title="Nhiên liệu"
+                    onSetListData={onSetListDataFlue}
+                />
+            </div>
             <div className=" flex flex-wrap items-center py-10 px-20">
                 {
-                    carList && carList.map((item) => (
-                        <CarItem carModel={item} />
+                    carList && carList.map((item, index) => (
+                        <CarItem carModel={item} key={index} />
                     ))
                 }
             </div>
