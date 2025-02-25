@@ -1,5 +1,5 @@
 import { Button, Image } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import Carimage from "../../assets/car-image1.png"
 import MapBanner from "../../assets/map-banner.png"
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
@@ -9,19 +9,28 @@ import MapIcon from '@mui/icons-material/Map';
 import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import FilterCenterFocusIcon from '@mui/icons-material/FilterCenterFocus';
 import ErrorIcon from '@mui/icons-material/Error';
-import { Typography } from "@mui/material";
+import { Icon, Typography } from "@mui/material";
 import UsbIcon from '@mui/icons-material/Usb';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CableIcon from '@mui/icons-material/Cable';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import AddHomeIcon from '@mui/icons-material/AddHome';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import CarRentalFeeModal from "./component/CarRentalFeeModal";
 
 const CarDetail = () => {
+
+    const [isOpenModal, setIsOpenModal] = useState(false)
+
+    const handleCancel = () => {
+        setIsOpenModal(false);
+    };
+
     return (
         <section className="w-ful h-auto bg-gray-100">
             <div className="w-full h-20 bg-black mb-8">
-                <img src={MapBanner} className="w-40 h-20" />
+                <img src={MapBanner} className="w-40 h-20" alt="Banner" />
             </div>
             <div className="flex items-center px-36">
                 <div className="flex items-center px-2">
@@ -179,7 +188,8 @@ const CarDetail = () => {
                         <div className="mt-5 flex justify-between border-b-2 h-10">
                             <p className="font-semibold text-sm text-gray-600">
                                 Phí thuê xe
-                                <span></span>
+                                <span onClick={() => setIsOpenModal(!isOpenModal)}><Icon><InfoOutlinedIcon style={{ fontSize: 15 }} /></Icon></span>
+                                <CarRentalFeeModal isOpen={isOpenModal} onCancel={handleCancel} />
                             </p>
                             <div className="font-semibold text-sm text-gray-700">2.700.000₫</div>
                         </div>
