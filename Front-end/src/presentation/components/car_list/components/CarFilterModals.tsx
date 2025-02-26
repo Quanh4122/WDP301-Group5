@@ -1,5 +1,5 @@
 import { Checkbox, Modal } from "antd";
-import React, { useState } from "react";
+import React from "react";
 
 interface props {
     title: string,

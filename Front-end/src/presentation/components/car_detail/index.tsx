@@ -19,11 +19,24 @@ import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CarRentalFeeModal from "./component/CarRentalFeeModal";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import CalendarDateRangeModal from "./component/CalendarDateRangeModal";
+import CarModal from "./component/CarModal";
+import CarCalendar from "./component/CarCalendar";
+import { DateRange } from "@mui/x-date-pickers-pro/models";
+import dayjs, { Dayjs } from "dayjs";
 
 const CarDetail = () => {
 
     const [isOpenModal, setIsOpenModal] = useState(false)
+    const [isOpenModalN, setIsOpenModalN] = useState(false)
+
+    const [value, setValue] = React.useState<DateRange<Dayjs>>([
+        dayjs('2022-04-17'),
+        dayjs('2022-04-21'),
+    ]);
+
+    const getDateValue = (value: DateRange<Dayjs>) => {
+        console.log("ok")
+    }
 
     return (
         <section className="w-ful h-auto bg-gray-100">
@@ -185,9 +198,12 @@ const CarDetail = () => {
                         </p>
                         <div
                             className="w-full border-2 h-16  rounded-md flex items-center"
-                            onClick={() => setIsOpenModal(true)}
+
                         >
-                            <div className="h-full w-12 flex items-center justify-center text-sky-500">
+                            <div
+                                className="h-full w-12 flex items-center justify-center text-sky-500"
+                                onClick={() => setIsOpenModalN(true)}
+                            >
                                 <CalendarMonthIcon />
                             </div>
                             <div className="h-full w-auto flex items-center">
@@ -196,18 +212,22 @@ const CarDetail = () => {
                                     <div className="text-sm font-semibold">15h00, 27/02/2025 đến 19h00, 28/02/2025</div>
                                 </div>
                             </div>
-                            <CalendarDateRangeModal
-                                isOpen={isOpenModal}
-                                onCancel={() => setIsOpenModal(false)}
+                            <CarModal
+                                isOpen={isOpenModalN}
+                                onCancel={() => setIsOpenModalN(false)}
+                                title={"Thời gian thuê xe"}
+                                element={<CarCalendar setValue={getDateValue} />}
                             />
                         </div>
                         <div className="mt-5 flex justify-between border-b-2 h-10">
                             <p className="font-semibold text-sm text-gray-600">
                                 Phí thuê xe
                                 <span onClick={() => setIsOpenModal(true)}><Icon><InfoOutlinedIcon style={{ fontSize: 15 }} /></Icon></span>
-                                <CarRentalFeeModal
+                                <CarModal
                                     isOpen={isOpenModal}
                                     onCancel={() => setIsOpenModal(false)}
+                                    title={"Chi tiết phí thuê xe"}
+                                    element={<CarRentalFeeModal />}
                                 />
                             </p>
                             <div className="font-semibold text-sm text-gray-700">2.700.000₫</div>
@@ -225,7 +245,7 @@ const CarDetail = () => {
                             </p>
                             <div className="font-semibold text-sm text-gray-700">2.592.000₫</div>
                         </div>
-                        <div className="flex justify-between h-5 items-end">
+                        <div className="flex justify-between h-10 items-end">
                             <p className="font-semibold text-sm text-gray-600">
                                 Tiền giữ chỗ
                                 <span></span>
