@@ -22,7 +22,7 @@ server.use(cors({
 server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
-server.use(express.static('public'));
+server.use("/images", express.static("public/images"));
 
 route(server);
 

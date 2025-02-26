@@ -3,18 +3,17 @@ const router = express.Router();
 
 const userController = require('../controllers/user.controller');
 const verifyToken = require('../middlewares/VerifyToken');
+const upload = require('../middlewares/Upload');
 
-router.get('/users', verifyToken, userController.getUserById);
 router.post('/register', userController.register);
+router.post("/verify", userController.verifyOTP);
+// router.post('/sendOtp', verifyToken, userController.sendOTP);
 router.post('/login', userController.login);
 router.get('/logout', verifyToken, userController.logout);
-// router.post('/forgotPassword', userController.forgotPassword);
-// router.post('/resetPassword/:token', verifyToken, userController.resetPassword);
-// router.get('/logout', verifyToken, userController.logout);
-// router.post('/changePassword/:id', verifyToken, userController.changePassword);
-// router.put('/editProfile/:userId', verifyToken, userController.updateUser);
-
-
+router.post('/forgotPassword', userController.forgotPassword);
+router.post('/resetPassword', userController.resetPassword);
+router.post('/changePassword/:userId', userController.changePassword);
+router.put('/editProfile/:userId', verifyToken, upload.single("avatar"), userController.editProfile);
 
 
 module.exports = router;

@@ -2,14 +2,13 @@ import { PRIVATE_ROUTES, ROOT } from "./CONSTANTS";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../components/Layout/PrivateRoute";
 import ProductDetai from "../components/list_all/components/ProductDetail";
-import SignIn from "../components/sign-in";
+import SignIn from "../components/auth/SignIn";
 import Dashboard from "../components/dashboard/Dashboard";
 import Checkout from "../components/checkout/Checkout";
 import HomePage from "../components/home";
-import SignUp from "../components/sign-up/SignUp";
+import SignUp from "../components/auth/SignUp";
 import NotAuthenticated from "../components/services/NotAuthenticated";
 import Authorization from "../components/services/Authorization";
-import { UserProvider } from "../components/context/UserContext";
 import Booking from "../components/customer/Booking";
 import CreateBlog from "../components/blog/createBlog";
 import Verify from "../components/auth/Verify";
@@ -22,7 +21,7 @@ import CarDetail from "../components/car_detail";
 import BlogDetail from "../components/blog/BlogDetail";
 import BlogList from "../components/blog/BlogList";
 import ChangePassword from "../components/auth/ChangePassword";
-import DriverList from "../components/driverlist/DriverList";
+import CarCreate from "../components/car_create";
 
 
 const Router = () => {
@@ -39,6 +38,30 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN,
             element: <SignIn />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.VERIFY,
+            element: <Verify />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.FORGOT_PASSWORD,
+            element: <ForgotPassword />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.RESET_PASSWORD,
+            element: <ResetPassword />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PROFILE + "/:userId",
+            element: <UserProfile />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.EDIT_PROFILE + "/:userId",
+            element: <EditProfile />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_PASSWORD + "/:userId",
+            element: <ChangePassword />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
@@ -85,30 +108,29 @@ const Router = () => {
             element: <CarDetail />
         },
         {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_LIST,
-            element: <DriverList />
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_CREATE,
+            element: <CarCreate />
         }
+
     ]
 
     return (
-        <UserProvider>
-            <Routes>
-                <Route
-                    path={ROOT}
-                    element={<PrivateRoute />}
-                >
-                    {
-                        privateRoutes.map((element: any, index) => (
-                            <Route
-                                key={index}
-                                path={element.path}
-                                element={element.element}
-                            />
-                        ))
-                    }
-                </Route>
-            </Routes>
-        </UserProvider>
+        <Routes>
+            <Route
+                path={ROOT}
+                element={<PrivateRoute />}
+            >
+                {
+                    privateRoutes.map((element: any, index) => (
+                        <Route
+                            key={index}
+                            path={element.path}
+                            element={element.element}
+                        />
+                    ))
+                }
+            </Route>
+        </Routes>
     )
 }
 
