@@ -73,7 +73,7 @@ export default function SignUp() {
         // Dispatch action đăng ký thông qua Redux
         await dispatch(RegisterUser(data));
         if (!error) {
-          toast.success('Sign up successful!');
+          toast.success('Send OTP successfully. Please check your email.');
           window.location.href = '/app/verify';
         }
       } catch (err) {

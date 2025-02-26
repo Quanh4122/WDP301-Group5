@@ -14,10 +14,13 @@ import CreateBlog from "../components/blog/createBlog";
 import Verify from "../components/auth/Verify";
 import ResetPassword from "../components/auth/ResetPassword";
 import ForgotPassword from "../components/auth/ForgotPassword";
+import UserProfile from "../components/auth/UserProfile";
+import EditProfile from "../components/auth/EditProfile";
 import CarList from "../components/car_list";
 import CarDetail from "../components/car_detail";
 import BlogDetail from "../components/blog/BlogDetail";
 import BlogList from "../components/blog/BlogList";
+import ChangePassword from "../components/auth/ChangePassword";
 
 
 const Router = () => {
@@ -46,6 +49,18 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.RESET_PASSWORD,
             element: <ResetPassword />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PROFILE + "/:userId",
+            element: <UserProfile />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.EDIT_PROFILE + "/:userId",
+            element: <EditProfile />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_PASSWORD + "/:userId",
+            element: <ChangePassword />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,

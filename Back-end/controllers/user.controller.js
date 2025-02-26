@@ -136,14 +136,23 @@ const login = async (req, res) => {
               email: user.email,
               username: user.userName,
               role: user.role,
-              fullname: user.fullName,
-              phoneNumber: user.phoneNumber
+              phoneNumber: user.phoneNumber,
             }, JWT_SECRET, { expiresIn: '1h' })
             res.cookie('token', token, {
               httpOnly: true,
               sameSite: 'strict'
             });
-            res.json({ Status: 'Success', role: user.role, token: token });
+            res.json({
+              Status: 'Success',
+              userId: user._id,
+              userName: user.userName,
+              fullName: user.fullName,
+              phoneNumber: user.phoneNumber,
+              avatar: user.avatar,
+              address: user.address,
+              role: user.role,
+              token: token
+            });
           } else {
             return res.status(401).json({ message: 'Password is incorrect' });
             ;
@@ -214,7 +223,7 @@ const resetPassword = async (req, res) => {
 
   const user = await UserModel.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }, 
+    passwordResetExpires: { $gt: Date.now() },
   });
 
   if (!user) {
@@ -242,6 +251,84 @@ const resetPassword = async (req, res) => {
 };
 
 
+// [PUT] /editProfile/:userId
+const editProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("🔥 userId nhận được:", userId);
+    console.log("🔥 req.params:", req.params);
+
+    console.log("🔥 Dữ liệu nhận được từ body:", req.body);
+    console.log("🔥 File nhận được:", req.file);
+
+    if (!userId) {
+      return res.status(400).json({ message: "Thiếu userId!" });
+    }
+
+    let updateData = {
+      userName: req.body.userName,
+      fullName: req.body.fullName,
+      phoneNumber: req.body.phoneNumber,
+      address: req.body.address,
+    };
+
+    if (req.file) {
+      updateData.avatar = `/images/${req.file.filename}`;
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Không tìm thấy user!" });
+    }
+
+    res.status(200).json({
+      message: "Cập nhật thành công!",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("🔥 Lỗi cập nhật hồ sơ:", error);
+    res.status(500).json({ message: "Lỗi server!" });
+  }
+};
+
+// [PUT] /changePassword/:userId
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const { userId } = req.params; 
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin!" });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Mật khẩu mới và xác nhận không khớp!" });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Mật khẩu hiện tại không chính xác!" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.passwordChangedAt = new Date();
+    await user.save();
+
+    return res.status(200).json({ message: "Thay đổi mật khẩu thành công!" });
+  } catch (error) {
+    console.error("Lỗi đổi mật khẩu:", error);
+    return res.status(500).json({ message: "Lỗi máy chủ, vui lòng thử lại!" });
+  }
+};
+
 
 module.exports = {
   register,
@@ -249,5 +336,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   login,
-  logout
+  logout,
+  editProfile,
+  changePassword
 };

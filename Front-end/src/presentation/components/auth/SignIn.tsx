@@ -15,6 +15,8 @@ import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
+
+
 import { ToastContainer, toast } from "react-toastify";
 
 
@@ -85,8 +87,9 @@ export default function SignIn() {
 
     try {
       await dispatch(LoginUser({ email, password }));
-      toast.success('Login successful!')
-      navigate('/');
+        toast.success('Login successful!');
+        navigate('/');
+
     } catch (error: any) {
       toast.error('errol!')
       console.log(error)
@@ -98,7 +101,7 @@ export default function SignIn() {
   return (
     <>
       <CssBaseline />
-      <ToastContainer />
+      <ToastContainer position="top-right" />
       <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
@@ -142,6 +145,7 @@ export default function SignIn() {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
+
             <Button type="submit" fullWidth variant="contained" disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
