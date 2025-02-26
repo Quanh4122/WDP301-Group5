@@ -10,6 +10,11 @@ export const PRIVATE_ROUTES = {
             CHECK_OUT: 'checkout',
             REGISTER: 'register',
             NOT_AUTHENTICATION: 'not-authentication',
-            AUTHORIZATION: 'authorization'
+            AUTHORIZATION: 'authorization',
+            CAR_LIST : 'car-lists',
+            BOOKING : 'booking',
+            CAR_DETAIL : 'car-detail',
+            DRIVER_LIST: 'driver-list',
+            DRIVER_DETAIL: 'driver-detail',
         }
 }
