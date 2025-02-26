@@ -1,6 +1,6 @@
 import { Button, Form, Input } from "antd";
 import React from "react";
-import BannerCreateCar from '../../assets/banner-created-car.png'
+import BannerCreateCar from '../../assets/banner-created-car.jpg'
 
 const CarCreate = () => {
     return (

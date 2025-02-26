@@ -22,6 +22,8 @@ import BlogDetail from "../components/blog/BlogDetail";
 import BlogList from "../components/blog/BlogList";
 import ChangePassword from "../components/auth/ChangePassword";
 import CarCreate from "../components/car_create";
+import path from "path";
+import DriverList from "../components/driverlist/DriverList";
 
 
 const Router = () => {
@@ -110,6 +112,10 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_CREATE,
             element: <CarCreate />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_LIST,
+            element: <DriverList />
         }
 
     ]
