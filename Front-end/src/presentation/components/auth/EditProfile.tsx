@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "../redux/Store";
 import { RootState } from "../redux/Store";
 import { UpdateProfile } from "../redux/slices/Authentication";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const EditProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,7 +30,7 @@ const EditProfile: React.FC = () => {
 
   useEffect(() => {
     if (user?.avatar) {
-      setAvatarPreview(`http://localhost:3030${user.avatar}`); 
+      setAvatarPreview(`http://localhost:3030${user.avatar}`);
     }
   }, [user]);
 
@@ -83,6 +83,22 @@ const EditProfile: React.FC = () => {
       <h2 className="text-2xl font-bold mb-4 text-center">Chỉnh sửa hồ sơ</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
+          {avatarPreview && (
+            <img
+              src={avatarPreview}
+              alt="Avatar Preview"
+              className="w-32 h-32 mx-auto rounded-full border object-cover"
+            />
+          )}
+          <label className="block font-semibold">Avatar</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
+          />
+        </div>
+        <div>
           <label className="block font-semibold">Username</label>
           <input
             type="text"
@@ -123,27 +139,12 @@ const EditProfile: React.FC = () => {
           />
         </div>
         <div>
-          {avatarPreview && (
-            <img
-              src={avatarPreview}
-              alt="Avatar Preview"
-              className="w-32 h-32 mx-auto rounded-full border object-cover"
-            />
-          )}
-          <label className="block font-semibold">Avatar</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
-          />
+          <button type="submit"
+            className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
+              Save
+          </button>
+          {' '}
         </div>
-        <button
-          type="submit"
-          className="w-full px-4 py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-        >
-          Cập nhật
-        </button>
       </form>
     </div>
   );

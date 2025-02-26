@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo1.png";
 import { navItems } from "../../../../constants";
@@ -15,7 +15,15 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   // Lấy trạng thái từ Redux với kiểu an toàn
-  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth) as { isLoggedIn: boolean; user: { userName: string, userId: string } | null };
+  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth) as { isLoggedIn: boolean; user: { userName: string, userId: string, avatar: string } | null };
+
+  const [avatarPreview, setAvatarPreview] = useState("");
+
+  useEffect(() => {
+    if (user?.avatar) {
+      setAvatarPreview(`http://localhost:3030${user.avatar}`);
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await dispatch(LogoutUser()); // Dispatch logout action
@@ -30,15 +38,17 @@ const Navbar = () => {
           <div className="flex items-center flex-shrink-0">
             <img className="h-10 w-10 mr-2" src={logo} alt="logo" />
             <Link to="/" className="text-xl tracking-tight">
-              B-Car
+              <button>B-Car</button>
             </Link>
           </div>
 
           {/* Menu Desktop */}
-          <ul className="hidden lg:flex ml-14 space-x-12">
+          <ul className="hidden lg:flex ml-14 mt-3 space-x-12">
             {navItems.map((item, index) => (
               <li key={index}>
-                <Link to={item.href}>{item.label}</Link>
+                <Link to={item.href}>
+                  <button>{item.label}</button>
+                </Link>
               </li>
             ))}
           </ul>
@@ -47,7 +57,15 @@ const Navbar = () => {
           <div className="hidden lg:flex justify-center space-x-6 items-center">
             {isLoggedIn ? (
               <>
-                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">{user?.userName || "Người dùng"}</Link>
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">
+                  {avatarPreview && (
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar Preview"
+                      className="w-10 h-10 mx-auto rounded-full border object-cover"
+                    />
+                  )}
+                </Link>
                 <button onClick={handleLogout} className="py-2 px-3 border rounded-md">
                   Đăng xuất
                 </button>

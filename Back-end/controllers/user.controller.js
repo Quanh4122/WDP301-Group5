@@ -250,22 +250,8 @@ const resetPassword = async (req, res) => {
   });
 };
 
-// const userProfile = async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-//     const user = await UserModel.findById(userId).select("-password");
 
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     res.status(200).json(user);
-//   } catch (error) {
-//     console.error("Error fetching user profile:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
-
+// [PUT] /editProfile/:userId
 const editProfile = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -286,7 +272,6 @@ const editProfile = async (req, res) => {
       address: req.body.address,
     };
 
-    // Nếu có file ảnh, cập nhật đường dẫn
     if (req.file) {
       updateData.avatar = `/images/${req.file.filename}`;
     }
@@ -307,6 +292,43 @@ const editProfile = async (req, res) => {
   }
 };
 
+// [PUT] /changePassword/:userId
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const { userId } = req.params; 
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin!" });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Mật khẩu mới và xác nhận không khớp!" });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Mật khẩu hiện tại không chính xác!" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.passwordChangedAt = new Date();
+    await user.save();
+
+    return res.status(200).json({ message: "Thay đổi mật khẩu thành công!" });
+  } catch (error) {
+    console.error("Lỗi đổi mật khẩu:", error);
+    return res.status(500).json({ message: "Lỗi máy chủ, vui lòng thử lại!" });
+  }
+};
+
 
 module.exports = {
   register,
@@ -315,5 +337,6 @@ module.exports = {
   resetPassword,
   login,
   logout,
-  editProfile
+  editProfile,
+  changePassword
 };

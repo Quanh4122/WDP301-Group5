@@ -88,7 +88,6 @@ export function LoginUser(formValues) {
   };
 }
 
-// Action đăng ký
 export function RegisterUser(formValues) {
   return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
@@ -112,7 +111,6 @@ export function RegisterUser(formValues) {
   };
 }
 
-// Action xác minh email
 export function VerifyEmail(formValues) {
   return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
@@ -192,7 +190,32 @@ export function UpdateProfile(userId, formData) {
       throw error;
     }
   };
+};
+
+export function EditPassword(userId, formValues) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+
+    try {
+      const { token } = getState().auth;
+
+      const response = await axios.post(`/changePassword/${userId}`, formValues, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Change Password response:", response.data);
+
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+    } catch (error) {
+      console.error("Change Password error:", error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+    }
+  };
 }
+
 
 
 export function LogoutUser() {

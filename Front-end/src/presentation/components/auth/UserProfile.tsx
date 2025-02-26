@@ -9,7 +9,7 @@ const UserProfile: React.FC = () => {
       user: { userId: string; userName: string; avatar?: string; fullName?: string; phoneNumber?: string; address?: string } | null;
       email: string | null;
     };
-    
+
 
   if (!user) {
     return (
@@ -28,10 +28,10 @@ const UserProfile: React.FC = () => {
 
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-20 mb-20">
       <h2 className="text-2xl font-bold mb-4">Hồ sơ người dùng</h2>
       <div className="flex items-center space-x-4">
-      <img src={`http://localhost:3030${user.avatar}`} alt="Avatar" />
+        <img src={`http://localhost:3030${user.avatar}`} alt="Avatar" />
 
         <div>
           <p className="text-xl font-semibold">{user.userName}</p>
@@ -49,7 +49,16 @@ const UserProfile: React.FC = () => {
       </div>
 
       <div className="mt-6 flex space-x-4">
-        <Link to={`/app/edit-profile/${user.userId}`} className="px-4 py-2 bg-green-500 text-white rounded-md">Chỉnh sửa</Link>
+        <Link to={`/app/edit-profile/${user.userId}`} className="px-4 py-2 bg-green-500 text-white rounded-md">
+          <button>Edit Profile</button>
+        </Link>
+        <Link
+          to={`/app/change-password/${user.userId}`}
+          type="submit"
+          className=" px-4 py-2 bg-violet-400 text-white rounded-md hover:bg-violet-500 transition"
+        >
+          <button>Change Password</button>
+        </Link>
       </div>
     </div>
   );
