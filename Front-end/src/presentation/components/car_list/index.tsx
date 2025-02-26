@@ -11,9 +11,7 @@ import PersonIcon from '@mui/icons-material/Person';
 const CarList = () => {
 
     const [carList, setCarList] = useState<CarModels[]>()
-    const [isOpenModalNumberOfSeat, setIsOpenModalNumberOfSeat] = useState(false)
-    const [isOpenModalTransmissionType, setIsOpenModalTransmissionType] = useState(false)
-    const [isOpenModalFlue, setIsOpenModalFlue] = useState(false)
+    const [isOpenModal, setIsOpenModal] = useState(false)
     const filterNumberOfSeat = [
         { label: '5 chỗ', value: 5 },
         { label: '7 chỗ', value: 7 },
@@ -82,12 +80,12 @@ const CarList = () => {
                 </div>
                 <div
                     className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
-                    onClick={() => setIsOpenModalNumberOfSeat(!isOpenModalNumberOfSeat)}
+                    onClick={() => setIsOpenModal(true)}
                 >
                     <PersonIcon className="500" /><span>Số chỗ</span>
                     <CarFilterModals
-                        isOpen={isOpenModalNumberOfSeat}
-                        onCancel={() => setIsOpenModalNumberOfSeat(false)}
+                        isOpen={isOpenModal}
+                        onCancel={() => setIsOpenModal(false)}
                         option={filterNumberOfSeat}
                         title="Số chỗ"
                         onSetListData={onSetListDataNumberOfSeat}
@@ -95,12 +93,12 @@ const CarList = () => {
                 </div>
                 <div
                     className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
-                    onClick={() => setIsOpenModalTransmissionType(!isOpenModalTransmissionType)}
+                    onClick={() => setIsOpenModal(true)}
                 >
                     <UsbIcon /><span>Loại xe</span>
                     <CarFilterModals
-                        isOpen={isOpenModalTransmissionType}
-                        onCancel={() => setIsOpenModalTransmissionType(false)}
+                        isOpen={isOpenModal}
+                        onCancel={() => setIsOpenModal(false)}
                         option={filterTransmissionType}
                         title="Loại xe"
                         onSetListData={onSetListDataTransmissionType}
@@ -108,13 +106,13 @@ const CarList = () => {
                 </div>
                 <div
                     className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
-                    onClick={() => setIsOpenModalFlue(!isOpenModalFlue)}
+                    onClick={() => setIsOpenModal(true)}
                 >
                     <LocalGasStationIcon /><span>Nhiên liệu</span>
                 </div>
                 <CarFilterModals
-                    isOpen={isOpenModalFlue}
-                    onCancel={() => setIsOpenModalFlue(false)}
+                    isOpen={isOpenModal}
+                    onCancel={() => setIsOpenModal(false)}
                     option={filterFlue}
                     title="Nhiên liệu"
                     onSetListData={onSetListDataFlue}

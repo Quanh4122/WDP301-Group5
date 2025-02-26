@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -13,9 +14,9 @@ const HeroSection = () => {
         Lựa chọn chiếc xe yêu thích cùng bàn đồng hành trên mọi nẻo đường
       </p>
       <div className="flex justify-center my-10">
-        <a href="#" className="bg-gradient-to-r from-sky-500 to-sky-800 py-3 px-4 mx-3 rounded-md">
+        <button className="bg-gradient-to-r text-white from-sky-500 to-sky-800 py-3 px-4 mx-3 rounded-md">
           Trải nghiệm dịch vụ ngay
-        </a>
+        </button>
       </div>
     </div>
   );

@@ -18,14 +18,12 @@ import AddHomeIcon from '@mui/icons-material/AddHome';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CarRentalFeeModal from "./component/CarRentalFeeModal";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import CalendarDateRangeModal from "./component/CalendarDateRangeModal";
 
 const CarDetail = () => {
 
     const [isOpenModal, setIsOpenModal] = useState(false)
-
-    const handleCancel = () => {
-        setIsOpenModal(false);
-    };
 
     return (
         <section className="w-ful h-auto bg-gray-100">
@@ -185,11 +183,32 @@ const CarDetail = () => {
                         <p className="text-xs text-gray-500 mt-5">
                             Đơn giá gói chỉ áp dụng cho ngày thường. Giá ngày Lễ/Tết có thể điều chỉnh theo nhu cầu.
                         </p>
+                        <div
+                            className="w-full border-2 h-16  rounded-md flex items-center"
+                            onClick={() => setIsOpenModal(true)}
+                        >
+                            <div className="h-full w-12 flex items-center justify-center text-sky-500">
+                                <CalendarMonthIcon />
+                            </div>
+                            <div className="h-full w-auto flex items-center">
+                                <div>
+                                    <div className="text-xs text-gray-500">Thời gian thuê</div>
+                                    <div className="text-sm font-semibold">15h00, 27/02/2025 đến 19h00, 28/02/2025</div>
+                                </div>
+                            </div>
+                            <CalendarDateRangeModal
+                                isOpen={isOpenModal}
+                                onCancel={() => setIsOpenModal(false)}
+                            />
+                        </div>
                         <div className="mt-5 flex justify-between border-b-2 h-10">
                             <p className="font-semibold text-sm text-gray-600">
                                 Phí thuê xe
-                                <span onClick={() => setIsOpenModal(!isOpenModal)}><Icon><InfoOutlinedIcon style={{ fontSize: 15 }} /></Icon></span>
-                                <CarRentalFeeModal isOpen={isOpenModal} onCancel={handleCancel} />
+                                <span onClick={() => setIsOpenModal(true)}><Icon><InfoOutlinedIcon style={{ fontSize: 15 }} /></Icon></span>
+                                <CarRentalFeeModal
+                                    isOpen={isOpenModal}
+                                    onCancel={() => setIsOpenModal(false)}
+                                />
                             </p>
                             <div className="font-semibold text-sm text-gray-700">2.700.000₫</div>
                         </div>
@@ -259,7 +278,7 @@ const CarDetail = () => {
                     </div>
                 </div>
             </div>
-        </section>
+        </section >
     )
 }
 

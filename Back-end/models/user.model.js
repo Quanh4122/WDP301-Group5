@@ -38,6 +38,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  address: {
+    type: String,
+  },
   verified: {
     type: Boolean,
     default: false,

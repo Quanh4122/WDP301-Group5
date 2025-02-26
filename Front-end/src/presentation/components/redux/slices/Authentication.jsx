@@ -43,6 +43,9 @@ const slice = createSlice({
     setVerifyStatus(state, action) {
       state.isVerify = action.payload;
     },
+    updateProfile(state, action) {
+      state.user = { ...state.user, ...action.payload };
+    },
   },
 });
 
@@ -65,7 +68,14 @@ export function LoginUser(formValues) {
         slice.actions.login({
           isLoggedIn: true,
           token: response.data.token, 
-          user: { role: response.data.role },
+          user: { 
+            userId: response.data.userId,
+            userName: response.data.userName, 
+            fullName: response.data.fullName,
+            phoneNumber: response.data.phoneNumber,
+            avatar: response.data.avatar,
+            address: response.data.address,
+            role: response.data.role },
           email: response.data.email || formValues.email, 
         })
       );
@@ -78,7 +88,6 @@ export function LoginUser(formValues) {
   };
 }
 
-// Action đăng ký
 export function RegisterUser(formValues) {
   return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
@@ -102,7 +111,6 @@ export function RegisterUser(formValues) {
   };
 }
 
-// Action xác minh email
 export function VerifyEmail(formValues) {
   return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
@@ -158,6 +166,56 @@ export function NewPassword(formValues) {
     });
   };
 };
+
+export function UpdateProfile(userId, formData) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+
+    try {
+      const { token } = getState().auth;
+
+      const response = await axios.put(`/editProfile/${userId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("🔥 Update Profile response:", response.data);
+      dispatch(slice.actions.updateProfile(response.data.user));
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+    } catch (error) {
+      console.error("🔥 Update Profile error:", error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      throw error;
+    }
+  };
+};
+
+export function EditPassword(userId, formValues) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+
+    try {
+      const { token } = getState().auth;
+
+      const response = await axios.post(`/changePassword/${userId}`, formValues, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Change Password response:", response.data);
+
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+    } catch (error) {
+      console.error("Change Password error:", error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+    }
+  };
+}
+
 
 
 export function LogoutUser() {
