@@ -87,10 +87,8 @@ export default function SignIn() {
 
     try {
       await dispatch(LoginUser({ email, password }));
-      setTimeout(() => {
         toast.success('Login successful!');
         navigate('/');
-      }, 3000);
     } catch (error: any) {
       setServerError(error.response?.data?.message || 'Login failed. Please try again.');
     }

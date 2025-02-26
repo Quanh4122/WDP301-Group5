@@ -13,6 +13,8 @@ import Booking from "../components/customer/Booking";
 import Verify from "../components/auth/Verify";
 import ResetPassword from "../components/auth/ResetPassword";
 import ForgotPassword from "../components/auth/ForgotPassword";
+import UserProfile from "../components/auth/UserProfile";
+import EditProfile from "../components/auth/EditProfile";
 
 
 const Router = () => {
@@ -41,6 +43,14 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.RESET_PASSWORD,
             element: <ResetPassword />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PROFILE + "/:userId",
+            element: <UserProfile />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.EDIT_PROFILE + "/:userId",
+            element: <EditProfile />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,

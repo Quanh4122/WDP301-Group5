@@ -15,7 +15,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   // Lấy trạng thái từ Redux với kiểu an toàn
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth) as { isLoggedIn: boolean; user: { userName: string, userId: string } | null };
 
   const handleLogout = async () => {
     await dispatch(LogoutUser()); // Dispatch logout action
@@ -46,9 +46,12 @@ const Navbar = () => {
           {/* Buttons Desktop */}
           <div className="hidden lg:flex justify-center space-x-6 items-center">
             {isLoggedIn ? (
-              <button onClick={handleLogout} className="py-2 px-3 border rounded-md">
-                Đăng xuất
-              </button>
+              <>
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">{user?.userName || "Người dùng"}</Link>
+                <button onClick={handleLogout} className="py-2 px-3 border rounded-md">
+                  Đăng xuất
+                </button>
+              </>
             ) : (
               <>
                 <Link

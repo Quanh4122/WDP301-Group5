@@ -136,14 +136,23 @@ const login = async (req, res) => {
               email: user.email,
               username: user.userName,
               role: user.role,
-              fullname: user.fullName,
-              phoneNumber: user.phoneNumber
+              phoneNumber: user.phoneNumber,
             }, JWT_SECRET, { expiresIn: '1h' })
             res.cookie('token', token, {
               httpOnly: true,
               sameSite: 'strict'
             });
-            res.json({ Status: 'Success', role: user.role, token: token });
+            res.json({
+              Status: 'Success',
+              userId: user._id,
+              userName: user.userName,
+              fullName: user.fullName,
+              phoneNumber: user.phoneNumber,
+              avatar: user.avatar,
+              address: user.address,
+              role: user.role,
+              token: token
+            });
           } else {
             return res.status(401).json({ message: 'Password is incorrect' });
             ;
@@ -214,7 +223,7 @@ const resetPassword = async (req, res) => {
 
   const user = await UserModel.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }, 
+    passwordResetExpires: { $gt: Date.now() },
   });
 
   if (!user) {
@@ -241,6 +250,62 @@ const resetPassword = async (req, res) => {
   });
 };
 
+// const userProfile = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     const user = await UserModel.findById(userId).select("-password");
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     res.status(200).json(user);
+//   } catch (error) {
+//     console.error("Error fetching user profile:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
+const editProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("🔥 userId nhận được:", userId);
+    console.log("🔥 req.params:", req.params);
+
+    console.log("🔥 Dữ liệu nhận được từ body:", req.body);
+    console.log("🔥 File nhận được:", req.file);
+
+    if (!userId) {
+      return res.status(400).json({ message: "Thiếu userId!" });
+    }
+
+    let updateData = {
+      userName: req.body.userName,
+      fullName: req.body.fullName,
+      phoneNumber: req.body.phoneNumber,
+      address: req.body.address,
+    };
+
+    // Nếu có file ảnh, cập nhật đường dẫn
+    if (req.file) {
+      updateData.avatar = `/images/${req.file.filename}`;
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Không tìm thấy user!" });
+    }
+
+    res.status(200).json({
+      message: "Cập nhật thành công!",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("🔥 Lỗi cập nhật hồ sơ:", error);
+    res.status(500).json({ message: "Lỗi server!" });
+  }
+};
 
 
 module.exports = {
@@ -249,5 +314,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   login,
-  logout
+  logout,
+  editProfile
 };

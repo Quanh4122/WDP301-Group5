@@ -9,6 +9,8 @@ export const PRIVATE_ROUTES = {
             VERIFY: 'verify',
             FORGOT_PASSWORD: 'forgot-password',
             RESET_PASSWORD: 'reset-password',
+            PROFILE: 'profile',
+            EDIT_PROFILE: 'edit-profile',
             DASH_BOARD: 'dashboard',
             CHECK_OUT: 'checkout',
             REGISTER: 'register',
