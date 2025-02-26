@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-import { Divider } from '@mui/material';
+import { Divider, IconButton, InputAdornment } from '@mui/material';
 import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser } from '../redux/slices/Authentication';
@@ -18,6 +18,7 @@ import { RootState } from '../redux/Store';
 
 
 import { ToastContainer, toast } from "react-toastify";
+import { Eye, EyeOff } from 'lucide-react';
 
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -47,6 +48,8 @@ export default function SignIn() {
   const [emailError, setEmailError] = React.useState('');
   const [passwordError, setPasswordError] = React.useState('');
   const [serverError, setServerError] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -87,8 +90,8 @@ export default function SignIn() {
 
     try {
       await dispatch(LoginUser({ email, password }));
-        toast.success('Login successful!');
-        navigate('/');
+      toast.success('Login successful!');
+      navigate('/');
 
     } catch (error: any) {
       toast.error('errol!')
@@ -136,13 +139,22 @@ export default function SignIn() {
                 helperText={passwordError}
                 name="password"
                 placeholder="Enter your password"
-                type="password"
+                type={showPassword ? "text" : "password"} // Cập nhật kiểu input dựa vào showPassword
                 id="password"
                 autoComplete="current-password"
                 required
                 fullWidth
                 variant="outlined"
                 color={passwordError ? 'error' : 'primary'}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </FormControl>
 

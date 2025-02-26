@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { Box, Button, CssBaseline, Divider, FormLabel, FormControl, TextField, Typography, Stack, Card } from '@mui/material';
+import { Box, Button, CssBaseline, Divider, FormLabel, FormControl, TextField, Typography, Stack, Card, InputAdornment, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import { GoogleIcon, FacebookIcon } from './CustomIcons';
 import { toast, ToastContainer } from 'react-toastify';
 import { Link as RouterLink } from 'react-router-dom';
-import { useDispatch, useSelector } from '../redux/Store'; 
+import { useDispatch, useSelector } from '../redux/Store';
 import { RegisterUser } from '../redux/slices/Authentication';
-import { RootState } from '../redux/Store'; 
+import { RootState } from '../redux/Store';
+import { Eye, EyeOff } from 'lucide-react';
 
 const SignUpContainer = styled(Stack)(({ theme }) => ({
   minHeight: '100vh',
@@ -42,6 +43,8 @@ export default function SignUp() {
     password: '',
   });
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = React.useState(false);
+
   // Lấy trạng thái từ Redux theo kiểu an toàn
   const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
@@ -108,7 +111,22 @@ export default function SignUp() {
             </FormControl>
             <FormControl error={Boolean(errors.password)}>
               <FormLabel>Password</FormLabel>
-              <TextField name="password" type="password" placeholder="Enter your password" error={Boolean(errors.password)} helperText={errors.password} />
+              <TextField
+                name="password"
+                placeholder="Enter your password"
+                type={showPassword ? "text" : "password"} // Thay đổi giữa password và text
+                error={Boolean(errors.password)}
+                helperText={errors.password}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             </FormControl>
             <Button type="submit" variant="contained" disabled={isLoading}>
               {isLoading ? 'Signing up...' : 'Sign up'}

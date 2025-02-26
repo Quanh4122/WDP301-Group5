@@ -9,7 +9,7 @@ const initialState = {
   error: false,
   isRegister: false,
   isVerify: false,
-  user: null, 
+  user: null,
 };
 
 const slice = createSlice({
@@ -31,7 +31,7 @@ const slice = createSlice({
       state.isLoggedIn = false;
       state.token = '';
       state.user = null;
-      state.email = ''; 
+      state.email = '';
       state.isRegister = false;
     },
     updateRegisterEmail(state, action) {
@@ -67,16 +67,17 @@ export function LoginUser(formValues) {
       dispatch(
         slice.actions.login({
           isLoggedIn: true,
-          token: response.data.token, 
-          user: { 
+          token: response.data.token,
+          user: {
             userId: response.data.userId,
-            userName: response.data.userName, 
+            userName: response.data.userName,
             fullName: response.data.fullName,
             phoneNumber: response.data.phoneNumber,
             avatar: response.data.avatar,
             address: response.data.address,
-            role: response.data.role },
-          email: response.data.email || formValues.email, 
+            role: response.data.role
+          },
+          email: response.data.email || formValues.email,
         })
       );
       dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
@@ -97,7 +98,7 @@ export function RegisterUser(formValues) {
       });
 
       console.log("Register response:", response.data);
-      
+
       dispatch(slice.actions.updateRegisterEmail({ email: formValues.email }));
       dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
 
@@ -150,22 +151,30 @@ export function ForgotPassword(formValues) {
   };
 };
 
-export function NewPassword(formValues) {
-  return async (dispatch, getState) => {
-    await axios.post('/resetPassword', {
-      ...formValues
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }).then((response) => {
-      console.log(response);
+export function NewPassword({ token, password, passwordConfirm }) {
+  return async (dispatch) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+    try {
+      const response = await axios.post(
+        "/resetPassword",
+        { token, password, passwordConfirm }, 
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Reset Password response:", response.data);
       dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
-    }).catch((error) => {
-      console.log(error);
-    });
+    } catch (error) {
+      console.error("Reset Password error:", error.response?.data || error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      throw new Error(error.response?.data?.message || "Có lỗi xảy ra");
+    }
   };
 };
+
+
 
 export function UpdateProfile(userId, formData) {
   return async (dispatch, getState) => {
@@ -187,7 +196,6 @@ export function UpdateProfile(userId, formData) {
     } catch (error) {
       console.error("🔥 Update Profile error:", error);
       dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
-      throw error;
     }
   };
 };
