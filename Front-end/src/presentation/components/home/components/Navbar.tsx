@@ -76,10 +76,10 @@ const Navbar = () => {
                   to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.SIGN_IN}`}
                   className="py-2 px-3 border rounded-md"
                 >
-                  Đăng nhập
+                  <button>Đăng nhập</button>
                 </Link>
-                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.REGISTER}`} className="bg-gradient-to-r from-sky-500 to-sky-800 py-2 px-3 rounded-md">
-                  Tạo tài khoản
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.REGISTER}`} className="bg-gradient-to-r from-sky-500 to-sky-800 text-white py-2 px-3 rounded-md">
+                  <button>Tạo tài khoản</button>
                 </Link>
               </>
             )}
