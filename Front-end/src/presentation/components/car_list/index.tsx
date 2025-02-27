@@ -12,6 +12,8 @@ const CarList = () => {
 
     const [carList, setCarList] = useState<CarModels[]>()
     const [isOpenModal, setIsOpenModal] = useState(false)
+    const [isOpenModalT, setIsOpenModalT] = useState(false)
+    const [isOpenModalF, setIsOpenModalF] = useState(false)
     const filterNumberOfSeat = [
         { label: '5 chỗ', value: 5 },
         { label: '7 chỗ', value: 7 },
@@ -62,7 +64,7 @@ const CarList = () => {
     const onSetListDataFlue = async (list: any[]) => {
         if (list && list.length > 0) {
             await axiosInstance.post('/car/filterCarByFlue', list)
-                .then(res => setCarList(res.data))
+                .then(res => (setCarList(res.data), console.log(res.data)))
                 .catch(err => console.log(err))
         } else {
             onGetData()
@@ -93,12 +95,12 @@ const CarList = () => {
                 </div>
                 <div
                     className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
-                    onClick={() => setIsOpenModal(true)}
+                    onClick={() => setIsOpenModalT(true)}
                 >
                     <UsbIcon /><span>Loại xe</span>
                     <CarFilterModals
-                        isOpen={isOpenModal}
-                        onCancel={() => setIsOpenModal(false)}
+                        isOpen={isOpenModalT}
+                        onCancel={() => setIsOpenModalT(false)}
                         option={filterTransmissionType}
                         title="Loại xe"
                         onSetListData={onSetListDataTransmissionType}
@@ -106,13 +108,13 @@ const CarList = () => {
                 </div>
                 <div
                     className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
-                    onClick={() => setIsOpenModal(true)}
+                    onClick={() => setIsOpenModalF(true)}
                 >
                     <LocalGasStationIcon /><span>Nhiên liệu</span>
                 </div>
                 <CarFilterModals
-                    isOpen={isOpenModal}
-                    onCancel={() => setIsOpenModal(false)}
+                    isOpen={isOpenModalF}
+                    onCancel={() => setIsOpenModalF(false)}
                     option={filterFlue}
                     title="Nhiên liệu"
                     onSetListData={onSetListDataFlue}
