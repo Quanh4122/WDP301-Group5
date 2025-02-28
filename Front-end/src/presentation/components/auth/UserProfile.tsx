@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
 import { Link } from "react-router-dom";
+import PersonIcon from '@mui/icons-material/Person';
 
 const UserProfile: React.FC = () => {
   const { user, email } = useSelector((state: RootState) => state.auth) as
@@ -31,7 +32,9 @@ const UserProfile: React.FC = () => {
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-20 mb-20">
       <h2 className="text-2xl font-bold mb-4">Hồ sơ người dùng</h2>
       <div className="flex items-center space-x-4">
-        <img src={`http://localhost:3030${user.avatar}`} alt="Avatar" />
+      {
+          user.avatar ? <img src={`http://localhost:3030${user.avatar}`} alt="Avatar" className="w-36 h-36" /> : <PersonIcon width={50} height={50} />
+        }
 
         <div>
           <p className="text-xl font-semibold">{user.userName}</p>

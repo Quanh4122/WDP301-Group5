@@ -6,6 +6,7 @@ import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoutUser } from "../../redux/slices/Authentication";
 import { AppDispatch, RootState } from "../../redux/Store"; // Import kiểu dispatch và state
+import PersonIcon from '@mui/icons-material/Person';
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -58,13 +59,13 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">
-                  {avatarPreview && (
+                  {avatarPreview ? (
                     <img
                       src={avatarPreview}
                       alt="Avatar Preview"
                       className="w-10 h-10 mx-auto rounded-full border object-cover"
                     />
-                  )}
+                  ) :<PersonIcon />}
                 </Link>
                 <button onClick={handleLogout} className="py-2 px-3 border rounded-md">
                   Đăng xuất

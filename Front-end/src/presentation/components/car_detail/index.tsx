@@ -1,5 +1,5 @@
 import { Button, Image } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Carimage from "../../assets/car-image1.png"
 import MapBanner from "../../assets/map-banner.png"
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
@@ -23,11 +23,31 @@ import CarModal from "./component/CarModal";
 import CarCalendar from "./component/CarCalendar";
 import { DateRange } from "@mui/x-date-pickers-pro/models";
 import dayjs, { Dayjs } from "dayjs";
+import axiosInstance from "../utils/axios";
+import { useLocation } from "react-router-dom";
+import { CarModels } from "../car_list/model";
 
 const CarDetail = () => {
 
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [isOpenModalN, setIsOpenModalN] = useState(false)
+    const location = useLocation()
+    const [carDetail, setCarDetail] = useState<CarModels>()
+
+    useEffect(() => {
+        console.log(location.state._id)
+        getCarById()
+    }, [])
+
+    const getCarById = async () => {
+        await axiosInstance.get("/car/getCarById", {
+            params: {
+                key: location.state._id
+            }
+        })
+            .then(res => setCarDetail(res.data))
+            .catch(err => console.log(err))
+    }
 
     const [value, setValue] = React.useState<DateRange<Dayjs>>([
         dayjs('2022-04-17'),
