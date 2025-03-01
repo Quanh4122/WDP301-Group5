@@ -5,36 +5,44 @@ import { navItems } from "../../../../constants";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoutUser } from "../../redux/slices/Authentication";
-import { AppDispatch, RootState } from "../../redux/Store"; // Import kiểu dispatch và state
+import { AppDispatch, RootState } from "../../redux/Store"; 
+import PersonIcon from '@mui/icons-material/Person';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
-  const dispatch = useDispatch<AppDispatch>(); // Fix lỗi TypeScript bằng cách khai báo kiểu dispatch
+  const dispatch = useDispatch<AppDispatch>(); 
 
-  const navigate = useNavigate();
-
-  // Lấy trạng thái từ Redux với kiểu an toàn
-  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth) as { isLoggedIn: boolean; user: { userName: string, userId: string, avatar: string } | null };
+  const { isLoggedIn, user, photoURL, userId } = useSelector((state: RootState) => state.auth) as { 
+    isLoggedIn: boolean; 
+    user: { userName: string, userId: string, avatar: string } | null;
+    photoURL: string;
+    userId: string;
+  };
 
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [userIdPreview, setUserIdPreview] = useState("");
 
   useEffect(() => {
-    if (user?.avatar) {
+    if (user?.avatar && user?.userId) {
       setAvatarPreview(`http://localhost:3030${user.avatar}`);
+      setUserIdPreview(user.userId);
+    } else if (photoURL && userId) {
+      setAvatarPreview(photoURL);
+      setUserIdPreview(userId);
     }
-  }, [user]);
+  }, [user, photoURL, userId]);
 
   const handleLogout = async () => {
-    await dispatch(LogoutUser()); // Dispatch logout action
-    navigate(0); // Reload trang sau khi logout
+    await dispatch(LogoutUser()); 
   };
 
   return (
-    <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-b border-neutral-700/80 px-32">
-      <div className="container px-4 mx-auto relative text-sm">
+    <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-b border-neutral-700/80 px-4 md:px-32">
+      <div className="container mx-auto relative text-sm">
         <div className="flex justify-between items-center">
-          {/* Logo */}
           <div className="flex items-center flex-shrink-0">
             <img className="h-10 w-10 mr-2" src={logo} alt="logo" />
             <Link to="/" className="text-xl tracking-tight">
@@ -42,7 +50,11 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Menu Desktop */}
+          {/* Mobile Menu Button */}
+          <button className="lg:hidden" onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}>
+            {mobileDrawerOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+
           <ul className="hidden lg:flex ml-14 mt-3 space-x-12">
             {navItems.map((item, index) => (
               <li key={index}>
@@ -53,22 +65,22 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Buttons Desktop */}
           <div className="hidden lg:flex justify-center space-x-6 items-center">
             {isLoggedIn ? (
               <>
-                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">
-                  {avatarPreview && (
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${userIdPreview}`} className="text-black font-medium">
+                  {avatarPreview ? (
                     <img
                       src={avatarPreview}
                       alt="Avatar Preview"
                       className="w-10 h-10 mx-auto rounded-full border object-cover"
                     />
-                  )}
+
+                  ) : <PersonIcon />}
                 </Link>
-                <button onClick={handleLogout} className="py-2 px-3 border rounded-md">
-                  Đăng xuất
-                </button>
+                <Link to={'/'} onClick={handleLogout} className="py-2 px-3 border rounded-md">
+                  <button>Đăng xuất</button>
+                </Link>
               </>
             ) : (
               <>
@@ -86,43 +98,36 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Menu Mobile */}
+        {/* Mobile Menu */}
         {mobileDrawerOpen && (
-          <div className="fixed right-0 z-20 w-full p-12 flex flex-col justify-center items-center lg:hidden transition-colors">
-            <div className="flex flex-col md:flex-row h-85 p-6 gap-6 -mt-10">
-              <div className="flex-1 flex flex-col items-center gap-6">
-                <ul className="space-y-4">
-                  {navItems.map((item, index) => (
-                    <li key={index} className="text-lg">
-                      <Link to={item.href}>{item.label}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex-1 flex flex-col items-center gap-4">
-                {isLoggedIn ? (
-                  <button onClick={handleLogout} className="w-full text-center py-2 px-3 border rounded-md">
-                    Đăng xuất
-                  </button>
-                ) : (
-                  <>
-                    <Link
-                      to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.SIGN_IN}`}
-                      className="w-full text-center py-2 px-3 border rounded-md"
-                    >
-                      Đăng nhập
-                    </Link>
-                    <Link
-                      to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.REGISTER}`}
-                      className="w-full text-center py-2 px-3 rounded-md bg-gradient-to-r from-orange-500 to-orange-800"
-                    >
-                      Tạo tài khoản
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
+          <div className="lg:hidden mt-4 flex flex-col space-y-4 border-t pt-4">
+            {navItems.map((item, index) => (
+              <Link key={index} to={item.href} onClick={() => setMobileDrawerOpen(false)}>
+                <button className=" w-full text-left px-4 py-2">{item.label}</button>
+              </Link>
+            ))}
+            {isLoggedIn ? (
+              <>
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${userIdPreview}`} className="flex items-center px-4 py-2">
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Avatar Preview" className="w-8 h-8 rounded-full mr-2" />
+                  ) : <PersonIcon className="mr-2" />}
+                  <span>Hồ sơ</span>
+                </Link>
+                <Link to={'/'} onClick={handleLogout} className="block text-left w-full px-4 py-2 border-t">
+                  <button>Đăng xuất</button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.SIGN_IN}`} className="block w-full text-left px-4 py-2 border-t">
+                  <button>Đăng nhập</button>
+                </Link>
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.REGISTER}`} className="block w-full text-left px-4 py-2">
+                  <button>Tạo tài khoản</button>
+                </Link>
+              </>
+            )}
           </div>
         )}
       </div>

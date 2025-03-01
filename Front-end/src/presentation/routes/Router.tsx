@@ -22,8 +22,11 @@ import BlogDetail from "../components/blog/BlogDetail";
 import BlogList from "../components/blog/BlogList";
 import ChangePassword from "../components/auth/ChangePassword";
 import CarCreate from "../components/car_create";
-import path from "path";
 import DriverList from "../components/driverlist/DriverList";
+import NotFound from "../components/auth/NotFound";
+import NotAuthentication from "../components/auth/NotAuthentication";
+import NotAuthorization from "../components/auth/NotAuthorization";
+import ProtectedRoute from "./PrivateRoute";
 
 
 const Router = () => {
@@ -46,6 +49,18 @@ const Router = () => {
             element: <Verify />
         },
         {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_FOUND,
+            element: <NotFound />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHENTICATION,
+            element: <NotAuthentication />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHORIZATION,
+            element: <NotAuthorization />
+        },
+        {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.FORGOT_PASSWORD,
             element: <ForgotPassword />
         },
@@ -55,15 +70,15 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PROFILE + "/:userId",
-            element: <UserProfile />
+            element: <ProtectedRoute><UserProfile /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.EDIT_PROFILE + "/:userId",
-            element: <EditProfile />
+            element: <ProtectedRoute><EditProfile /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_PASSWORD + "/:userId",
-            element: <ChangePassword />
+            element: <ProtectedRoute><ChangePassword /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
@@ -116,6 +131,10 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_LIST,
             element: <DriverList />
+        },
+        {
+            path: "*",
+            element: <NotFound />
         }
 
     ]

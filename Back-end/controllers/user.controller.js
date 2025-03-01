@@ -127,6 +127,7 @@ const login = async (req, res) => {
   };
 
   await UserModel.findOne({ email: email })
+    .populate('role')
     .then(user => {
       if (user) {
         bcrypt.compare(password, user.password, (err, response) => {
@@ -150,7 +151,7 @@ const login = async (req, res) => {
               phoneNumber: user.phoneNumber,
               avatar: user.avatar,
               address: user.address,
-              role: user.role,
+              role: user.role.roleName,
               token: token
             });
           } else {
