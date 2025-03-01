@@ -22,7 +22,7 @@ const CarSchema = new mongoose.Schema({
     require: true,
   },
   price: {
-    type: [Number],
+    type: Number,
     require: true,
   },
   carVersion: {

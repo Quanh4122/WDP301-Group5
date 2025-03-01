@@ -10,6 +10,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 
+
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
@@ -68,14 +69,13 @@ const Navbar = () => {
           <div className="hidden lg:flex justify-center space-x-6 items-center">
             {isLoggedIn ? (
               <>
-                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${userIdPreview}`} className="text-black font-medium">
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">
                   {avatarPreview ? (
                     <img
                       src={avatarPreview}
                       alt="Avatar Preview"
                       className="w-10 h-10 mx-auto rounded-full border object-cover"
                     />
-
                   ) : <PersonIcon />}
                 </Link>
                 <Link to={'/'} onClick={handleLogout} className="py-2 px-3 border rounded-md">
