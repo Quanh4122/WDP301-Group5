@@ -1,11 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
-import axios from '../../utils/axios';
+import { createSlice } from "@reduxjs/toolkit";
+import axios from "../../utils/axios";
 
 const initialState = {
   isLoading: false,
   isLoggedIn: false,
-  token: '',
-  email: '',
+  token: "",
+  email: "",
   error: false,
   isRegister: false,
   isVerify: false,
@@ -13,7 +13,7 @@ const initialState = {
 };
 
 const slice = createSlice({
-  name: 'Authentication',
+  name: "Authentication",
   initialState,
   reducers: {
     updateIsLoading(state, action) {
@@ -29,9 +29,9 @@ const slice = createSlice({
     },
     signOut(state) {
       state.isLoggedIn = false;
-      state.token = '';
+      state.token = "";
       state.user = null;
-      state.email = '';
+      state.email = "";
       state.isRegister = false;
     },
     updateRegisterEmail(state, action) {
@@ -56,7 +56,7 @@ export function LoginUser(formValues) {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     try {
       const response = await axios.post(
-        '/login',
+        "/login",
         { ...formValues },
         {
           headers: { "Content-Type": "application/json" },
@@ -75,15 +75,19 @@ export function LoginUser(formValues) {
             phoneNumber: response.data.phoneNumber,
             avatar: response.data.avatar,
             address: response.data.address,
-            role: response.data.role
+            role: response.data.role,
           },
           email: response.data.email || formValues.email,
         })
       );
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: false })
+      );
     } catch (error) {
       console.error("Login error:", error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
       throw error;
     }
   };
@@ -93,19 +97,23 @@ export function RegisterUser(formValues) {
   return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     try {
-      const response = await axios.post('/register', formValues, {
-        headers: { 'Content-Type': 'application/json' },
+      const response = await axios.post("/register", formValues, {
+        headers: { "Content-Type": "application/json" },
       });
 
       console.log("Register response:", response.data);
 
       dispatch(slice.actions.updateRegisterEmail({ email: formValues.email }));
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: false })
+      );
 
-      window.location.href = '/app/verify';
+      window.location.href = "/app/verify";
     } catch (error) {
       console.error("Register error:", error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
       dispatch(slice.actions.setRegisterStatus(false));
       throw error;
     }
@@ -116,20 +124,24 @@ export function VerifyEmail(formValues) {
   return async (dispatch) => {
     dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     try {
-      const response = await axios.post('/verify', formValues, {
-        headers: { 'Content-Type': 'application/json' },
+      const response = await axios.post("/verify", formValues, {
+        headers: { "Content-Type": "application/json" },
       });
 
       console.log("Verify response:", response.data);
 
       dispatch(slice.actions.setRegisterStatus(true));
       dispatch(slice.actions.setVerifyStatus(true));
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: false })
+      );
 
-      window.location.href = '/app/sign-in';
+      window.location.href = "/app/sign-in";
     } catch (error) {
       console.error("Verify error:", error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
       throw error;
     }
   };
@@ -137,19 +149,26 @@ export function VerifyEmail(formValues) {
 
 export function ForgotPassword(formValues) {
   return async (dispatch, getState) => {
-    await axios.post('/forgotPassword', {
-      ...formValues
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => {
-      console.log(response);
-    }).catch((error) => {
-      console.log(error);
-    })
+    await axios
+      .post(
+        "/forgotPassword",
+        {
+          ...formValues,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-};
+}
 
 export function NewPassword({ token, password, passwordConfirm }) {
   return async (dispatch) => {
@@ -157,7 +176,7 @@ export function NewPassword({ token, password, passwordConfirm }) {
     try {
       const response = await axios.post(
         "/resetPassword",
-        { token, password, passwordConfirm }, 
+        { token, password, passwordConfirm },
         {
           headers: {
             "Content-Type": "application/json",
@@ -165,16 +184,18 @@ export function NewPassword({ token, password, passwordConfirm }) {
         }
       );
       console.log("Reset Password response:", response.data);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: false })
+      );
     } catch (error) {
       console.error("Reset Password error:", error.response?.data || error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
       throw new Error(error.response?.data?.message || "Có lỗi xảy ra");
     }
   };
-};
-
-
+}
 
 export function UpdateProfile(userId, formData) {
   return async (dispatch, getState) => {
@@ -192,13 +213,17 @@ export function UpdateProfile(userId, formData) {
 
       console.log("🔥 Update Profile response:", response.data);
       dispatch(slice.actions.updateProfile(response.data.user));
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: false })
+      );
     } catch (error) {
       console.error("🔥 Update Profile error:", error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
     }
   };
-};
+}
 
 export function EditPassword(userId, formValues) {
   return async (dispatch, getState) => {
@@ -207,29 +232,35 @@ export function EditPassword(userId, formValues) {
     try {
       const { token } = getState().auth;
 
-      const response = await axios.post(`/changePassword/${userId}`, formValues, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        `/changePassword/${userId}`,
+        formValues,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log("Change Password response:", response.data);
-
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: false })
+      );
+      return response.status;
     } catch (error) {
       console.error("Change Password error:", error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
     }
   };
 }
 
-
-
 export function LogoutUser() {
   return async (dispatch) => {
     try {
-      await axios.get('/logout');
+      await axios.get("/logout");
     } catch (error) {
       console.error("Logout error:", error);
     }
