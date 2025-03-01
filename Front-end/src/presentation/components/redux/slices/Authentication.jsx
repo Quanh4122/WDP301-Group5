@@ -1,16 +1,42 @@
-import { createSlice } from "@reduxjs/toolkit";
-import axios from "../../utils/axios";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from '../../utils/axios';
+import { signInWithGoogle } from '../../utils/firbase';
 
 const initialState = {
   isLoading: false,
   isLoggedIn: false,
-  token: "",
-  email: "",
+  token: '',
+  email: '',
+  userId: '',
+  name: '',
+  photoURL: '',
+  role: '',
   error: false,
   isRegister: false,
   isVerify: false,
   user: null,
 };
+
+
+export const loginWithGoogle = createAsyncThunk(
+  'auth/loginWithGoogle',
+  async (_, { rejectWithValue }) => {
+    try {
+      const userData = await signInWithGoogle();
+      // Xác định role dựa trên email hoặc dữ liệu từ Firebase
+      let role = "User"; // Default role
+      if (userData.email.startsWith("admin")) {
+        role = "Admin";
+      } else if (userData.email.startsWith("driver")) {
+        role = "Driver";
+      }
+
+      return { ...userData, role };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const slice = createSlice({
   name: "Authentication",
@@ -25,13 +51,18 @@ const slice = createSlice({
       state.token = action.payload.token;
       state.user = action.payload.user;
       state.email = action.payload.email;
+      state.role = action.payload.user.role;
       state.isRegister = false;
     },
     signOut(state) {
       state.isLoggedIn = false;
       state.token = "";
       state.user = null;
-      state.email = "";
+      state.email = '';
+      state.name = '';
+      state.userId = '';
+      state.photoURL = '';
+      state.role = '';
       state.isRegister = false;
     },
     updateRegisterEmail(state, action) {
@@ -47,6 +78,31 @@ const slice = createSlice({
       state.user = { ...state.user, ...action.payload };
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginWithGoogle.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(loginWithGoogle.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = true;
+        state.token = action.payload.token;
+        state.email = action.payload.email;
+        state.userId = action.payload.id;
+        state.name = action.payload.name;
+        state.photoURL = action.payload.photoURL;
+        state.role = action.payload.role; // Lưu role vào Redux
+      })
+      .addCase(loginWithGoogle.rejected, (state, action) => {
+        if (action.payload === "Firebase: Error (auth/popup-closed-by-user).") {
+          state.isLoading = false;
+          return; 
+        }
+        state.isLoading = false;
+        state.error = action.payload;
+      });
+  }
 });
 
 export default slice.reducer;
@@ -211,16 +267,14 @@ export function UpdateProfile(userId, formData) {
         },
       });
 
-      console.log("🔥 Update Profile response:", response.data);
+      console.log("Update Profile response:", response.data);
       dispatch(slice.actions.updateProfile(response.data.user));
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
     } catch (error) {
-      console.error("🔥 Update Profile error:", error);
-      dispatch(
-        slice.actions.updateIsLoading({ isLoading: false, error: true })
-      );
+      console.error("Update Profile error:", error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
     }
   };
 }

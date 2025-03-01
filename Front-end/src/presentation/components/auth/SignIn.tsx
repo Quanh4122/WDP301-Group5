@@ -13,7 +13,7 @@ import { styled } from '@mui/material/styles';
 import { Divider, IconButton, InputAdornment } from '@mui/material';
 import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
-import { LoginUser } from '../redux/slices/Authentication';
+import { LoginUser, loginWithGoogle } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
 
 
@@ -54,6 +54,17 @@ export default function SignIn() {
   const dispatch = useDispatch();
 
   const { isLoading } = useSelector((state: RootState) => state.auth);
+
+  const handleGoogleLogin = async () => {
+    try {
+      const user = await dispatch(loginWithGoogle()).unwrap();  // Dùng `.unwrap()` để bắt lỗi từ async thunk
+      toast.success("Đăng nhập thành công")
+      navigate("/");
+    } catch (error) {
+      console.error("Google login failed:", error);
+      toast.error("Đăng nhập thất bại");
+    }
+  };
 
 
   const validateInputs = () => {
@@ -172,8 +183,13 @@ export default function SignIn() {
           </Typography>
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button fullWidth variant="outlined" onClick={() => alert('Sign in with Google')} startIcon={<GoogleIcon />}>
-              Sign in with Google
+            <Button onClick={handleGoogleLogin}
+              disabled={isLoading} fullWidth variant="outlined" startIcon={<GoogleIcon />}>
+              {isLoading ? "Đang đăng nhập..." : (
+                <>
+                  Sign in with Google
+                </>
+              )}
             </Button>
             <Button fullWidth variant="outlined" onClick={() => alert('Sign in with Facebook')} startIcon={<FacebookIcon />}>
               Sign in with Facebook
