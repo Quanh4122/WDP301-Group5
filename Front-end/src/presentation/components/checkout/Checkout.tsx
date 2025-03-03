@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -20,21 +20,26 @@ import Review from './components/Review';
 import SitemarkIcon from './components/SitemarkIcon';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeIconDropdown from '../shared-theme/ColorModeIconDropdown';
+import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/Store';
+import axiosInstance from '../utils/axios';
+import { User } from 'lucide-react';
+import { RequestModel, UserModel } from './models';
+import { CarModels } from '../car_list/model';
 
-const steps = ['Shipping address', 'Payment details', 'Review your order'];
-function getStepContent(step: number) {
+const steps = ['Shipping address', 'Review your order'];
+function getStepContent(step: number, timeValue: any[], dateValue: any[], userData?: UserModel, carData?: CarModels) {
   switch (step) {
     case 0:
-      return <AddressForm />;
+      return <AddressForm timeValue={timeValue} dateValue={dateValue} userData={userData} />;
     case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
+      return <Review timeValue={timeValue} dateValue={dateValue} userData={userData} carModal={carData} />;
     default:
       throw new Error('Unknown step');
   }
 }
-export default function Checkout(props: { disableCustomTheme?: boolean }) {
+const Checkout = (props: { disableCustomTheme?: boolean }) => {
   const [activeStep, setActiveStep] = React.useState(0);
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -42,6 +47,43 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+
+  const location = useLocation()
+  const { carDetail, dateValue, timeValue } = location.state
+  const userId = useSelector((state: RootState) => (state.auth?.user as { userId: string } | null)?.userId);
+  const [userBooking, setUserBooking] = useState<UserModel>()
+
+  useEffect(() => {
+    console.log(carDetail, dateValue, timeValue, userId)
+    getUserById()
+  }, [])
+
+  const getUserById = async () => {
+    await axiosInstance.get("/getUserById", {
+      params: { key: userId }
+    })
+      .then((res) => setUserBooking(res.data))
+      .catch(err => console.log(err))
+  }
+
+  const handleBooking = async () => {
+    console.log(timeValue)
+    const formBooking: RequestModel = {
+      userId: userId,
+      driverId: "",
+      carId: carDetail._id,
+      startDate: dateValue[0] + " " + timeValue[0],
+      endDate: dateValue[1] + " " + timeValue[1],
+      isRequesDriver: false
+    }
+
+    await axiosInstance.post("/request/createRequest", formBooking)
+      .then(res => console.log(res))
+      .catch(err => console.log(err))
+
+    handleNext()
+  }
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -54,7 +96,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
         sx={{
           height: {
             xs: '100%',
-            sm: 'calc(100dvh - var(--template-frame-height, 0px))',
+            sm: '100%',
           },
           mt: {
             xs: 4,
@@ -86,7 +128,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
               maxWidth: 500,
             }}
           >
-            <Info totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} />
+            <Info carModel={carDetail} />
           </Box>
         </Grid>
         <Grid
@@ -154,7 +196,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
                   {activeStep >= 2 ? '$144.97' : '$134.98'}
                 </Typography>
               </div>
-              <InfoMobile totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} />
+              {/* <InfoMobile totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} /> */}
             </CardContent>
           </Card>
           <Box
@@ -203,13 +245,14 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
                 <Button
                   variant="contained"
                   sx={{ alignSelf: 'start', width: { xs: '100%', sm: 'auto' } }}
+                  onClick={handleBack}
                 >
-                  Go to my orders
+                  Let's Order
                 </Button>
               </Stack>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep)}
+                {getStepContent(activeStep, timeValue, dateValue, userBooking, carDetail)}
                 <Box
                   sx={[
                     {
@@ -251,10 +294,10 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
                   <Button
                     variant="contained"
                     endIcon={<ChevronRightRoundedIcon />}
-                    onClick={handleNext}
+                    onClick={activeStep === steps.length - 1 ? handleBooking : handleNext}
                     sx={{ width: { xs: '100%', sm: 'fit-content' } }}
                   >
-                    {activeStep === steps.length - 1 ? 'Place order' : 'Next'}
+                    {activeStep === steps.length - 1 ? 'Order' : 'Next'}
                   </Button>
                 </Box>
               </React.Fragment>
@@ -265,3 +308,5 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
     </AppTheme>
   );
 }
+
+export default Checkout

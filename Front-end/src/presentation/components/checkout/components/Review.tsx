@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
@@ -6,26 +6,57 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { UserModel } from '../models';
+import dayjs from 'dayjs';
+import { CarModels } from '../../car_list/model';
 
-const addresses = ['1 MUI Drive', 'Reactville', 'Anytown', '99999', 'USA'];
-const payments = [
-  { name: 'Card type:', detail: 'Visa' },
-  { name: 'Card holder:', detail: 'Mr. John Smith' },
-  { name: 'Card number:', detail: 'xxxx-xxxx-xxxx-1234' },
-  { name: 'Expiry date:', detail: '04/2024' },
-];
+interface props {
+  timeValue: any[],
+  dateValue: any[],
+  userData?: UserModel,
+  carModal?: CarModels,
+}
 
-export default function Review() {
+const Review = ({ timeValue, dateValue, userData, carModal }: props) => {
+
+  const [totalTime, setTotalTime] = useState<any>()
+  const [VATFee, setVATFee] = useState<any>()
+  useEffect(() => {
+    calculateTotalTimeBooking()
+
+  }, [])
+
+  const calculateTotalTimeBooking = () => {
+    const startDate = dayjs(dateValue[0] + " " + timeValue[0], 'DD/MM/YYYY HH:mm')
+    const endDate = dayjs(dateValue[1] + " " + timeValue[1], 'DD/MM/YYYY HH:mm')
+    const total = endDate.diff(startDate, 'hour', true)
+    setTotalTime(total)
+    const calVATFee = carModal?.price && carModal?.price * total * 0.1
+    setVATFee(calVATFee)
+  }
+
   return (
     <Stack spacing={2}>
       <List disablePadding>
         <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Products" secondary="4 selected" />
-          <Typography variant="body2">$134.98</Typography>
+          <ListItemText primary="Thời gian thuê" />
+          <Typography variant="body2">{totalTime} h</Typography>
         </ListItem>
         <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Shipping" secondary="Plus taxes" />
-          <Typography variant="body2">$9.99</Typography>
+          <ListItemText primary="Thuế VAT" />
+          <Typography variant="body2">{VATFee} kđ</Typography>
+        </ListItem>
+        <ListItem sx={{ py: 1, px: 0 }}>
+          <ListItemText primary="Total" />
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            $144.97
+          </Typography>
+        </ListItem>
+        <ListItem sx={{ py: 1, px: 0 }}>
+          <ListItemText primary="Total" />
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            $144.97
+          </Typography>
         </ListItem>
         <ListItem sx={{ py: 1, px: 0 }}>
           <ListItemText primary="Total" />
@@ -43,14 +74,13 @@ export default function Review() {
       >
         <div>
           <Typography variant="subtitle2" gutterBottom>
-            Shipment details
+            Thông tin của bạn
           </Typography>
-          <Typography gutterBottom>John Smith</Typography>
-          <Typography gutterBottom sx={{ color: 'text.secondary' }}>
-            {addresses.join(', ')}
-          </Typography>
+          <Typography gutterBottom>Họ và tên: <span className='text-gray-500'>{userData?.userName}</span></Typography>
+          <Typography gutterBottom>Email: <span className='text-gray-500'>{userData?.email}</span></Typography>
+          <Typography gutterBottom>Số điện thoại: <span className='text-gray-500'>{userData?.phoneNumber}</span></Typography>
         </div>
-        <div>
+        {/* <div>
           <Typography variant="subtitle2" gutterBottom>
             Payment details
           </Typography>
@@ -71,8 +101,10 @@ export default function Review() {
               </React.Fragment>
             ))}
           </Grid>
-        </div>
+        </div> */}
       </Stack>
     </Stack>
   );
 }
+
+export default Review

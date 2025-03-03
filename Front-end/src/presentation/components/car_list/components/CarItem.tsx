@@ -46,7 +46,7 @@ const CarItem = ({ carModel }: props) => {
                         <h3 className="text-lg font-semibold mb-2">{carModel?.carName + " " + carModel?.carVersion}</h3>
                         {/* <p className="text-gray-600 mb-4">Huyện Hòa Vang</p> */}
                         <div className="flex items-center justify-end">
-                            <p className="text-md font-bold text-sky-500"><span className="text-base line-through text-gray-500 mr-1">440K</span>{carModel?.price[3]}K /1 Ngày
+                            <p className="text-md font-bold text-sky-500"><span className="text-base line-through text-gray-500 mr-1">440K</span>{carModel?.price}K /1 Ngày
                                 {/* <ArrowCircleRightIcon className="mx-2" /> */}
                             </p>
                         </div>
@@ -74,7 +74,7 @@ const CarItem = ({ carModel }: props) => {
                             <div className="flex items-center text-sky-500">
                                 <LocalGasStationIcon />
                                 <Typography variant="body2" color="textSecondary">
-                                {displayFlue(carModel?.carType.flue)}
+                                    {displayFlue(carModel?.carType.flue)}
                                 </Typography>
                             </div>
                         </div>

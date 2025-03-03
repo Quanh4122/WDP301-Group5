@@ -1,15 +1,12 @@
-require('dotenv').config();
-const UserModel = require('../models/user.model');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+require("dotenv").config();
+const UserModel = require("../models/user.model");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const otpGenerator = require("otp-generator");
-const mailService = require('../services/sendMail');
+const mailService = require("../services/sendMail");
 const otp = require("../Templates/Mail/otp");
 const ResetPassword = require("../Templates/Mail/resetPassword");
 const crypto = require("crypto");
-
-
-
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -24,15 +21,13 @@ const generateAndSendOTP = async (user) => {
   user.otp_expiry_time = Date.now() + 10 * 60 * 1000; // 10 mins expiry
   await user.save({ new: true, validateModifiedOnly: true });
 
-
   await mailService.sendEmail({
     to: user.email,
     subject: "Verification OTP",
-    text: 'Hello',
+    text: "Hello",
     html: otp(`${user.userName}`, new_otp),
   });
 };
-
 
 // [POST] /register
 const register = async (req, res) => {
@@ -47,7 +42,9 @@ const register = async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = existing_user || new UserModel({ userName, phoneNumber, email, password: hashedPassword });
+  const user =
+    existing_user ||
+    new UserModel({ userName, phoneNumber, email, password: hashedPassword });
 
   if (!existing_user) {
     await user.save();
@@ -58,7 +55,7 @@ const register = async (req, res) => {
   return res.json({
     status: "success",
     message: "User registered successfully! OTP sent to email.",
-    user_id: user._id
+    user_id: user._id,
   });
 };
 
@@ -73,11 +70,14 @@ const register = async (req, res) => {
 //   res.status(200).json({ status: "success", message: "OTP Sent Successfully!" });
 // };
 
-
 // [POST] /verify
 const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
-  const user = await UserModel.findOne({ email, otp, otp_expiry_time: { $gt: Date.now() } });
+  const user = await UserModel.findOne({
+    email,
+    otp,
+    otp_expiry_time: { $gt: Date.now() },
+  });
 
   if (!user) {
     return res.status(400).json({
@@ -94,14 +94,16 @@ const verifyOTP = async (req, res) => {
   }
 
   if (user.otp !== otp) {
-    return res.status(400).json({ status: "error", message: "OTP is incorrect" });
+    return res
+      .status(400)
+      .json({ status: "error", message: "OTP is incorrect" });
   }
 
   user.verified = true;
   user.otp = undefined;
   await user.save({ new: true, validateModifiedOnly: true });
 
-  const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "1h" });
 
   res.status(200).json({
     status: "success",
@@ -110,7 +112,6 @@ const verifyOTP = async (req, res) => {
     user_id: user._id,
   });
 };
-
 
 // [POST] /login
 const login = async (req, res) => {
@@ -121,30 +122,34 @@ const login = async (req, res) => {
       status: "error",
       message: "Email is not verify, Please verify.",
     });
-  };
+  }
   if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
-  };
+    return res.status(400).json({ message: "Email and password are required" });
+  }
 
   await UserModel.findOne({ email: email })
-    .populate('role')
-    .then(user => {
+    .populate("role")
+    .then((user) => {
       if (user) {
         bcrypt.compare(password, user.password, (err, response) => {
           if (response) {
-            const token = jwt.sign({
-              _id: user._id,
-              email: user.email,
-              username: user.userName,
-              role: user.role,
-              phoneNumber: user.phoneNumber,
-            }, JWT_SECRET, { expiresIn: '1h' })
-            res.cookie('token', token, {
+            const token = jwt.sign(
+              {
+                _id: user._id,
+                email: user.email,
+                username: user.userName,
+                role: user.role,
+                phoneNumber: user.phoneNumber,
+              },
+              JWT_SECRET,
+              { expiresIn: "1h" }
+            );
+            res.cookie("token", token, {
               httpOnly: true,
-              sameSite: 'strict'
+              sameSite: "strict",
             });
             res.json({
-              Status: 'Success',
+              Status: "Success",
               userId: user._id,
               userName: user.userName,
               fullName: user.fullName,
@@ -152,37 +157,40 @@ const login = async (req, res) => {
               avatar: user.avatar,
               address: user.address,
               role: user.role.roleName,
-              token: token
+              token: token,
             });
           } else {
-            return res.status(401).json({ message: 'Password is incorrect' });
-            ;
+            return res.status(401).json({ message: "Password is incorrect" });
           }
         });
       } else {
-        return res.status(401).json({ message: 'User not exist' });
-      };
+        return res.status(401).json({ message: "User not exist" });
+      }
     });
 };
 
 // [GET] /logout
 const logout = async (req, res) => {
-  res.clearCookie('token');
-  return res.json('Success');
+  res.clearCookie("token");
+  return res.json("Success");
 };
-
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   const user = await UserModel.findOne({ email });
 
   if (!user) {
-    return res.status(404).json({ status: "error", message: "User not found." });
+    return res
+      .status(404)
+      .json({ status: "error", message: "User not found." });
   }
 
   // Tạo token đặt lại mật khẩu
   const resetToken = crypto.randomBytes(32).toString("hex");
-  const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
   user.passwordResetToken = hashedToken;
   user.passwordResetExpires = Date.now() + 15 * 60 * 1000;
@@ -196,10 +204,13 @@ const forgotPassword = async (req, res) => {
     await mailService.sendEmail({
       to: user.email,
       subject: "Password Reset Request",
-      html: emailContent
+      html: emailContent,
     });
 
-    res.status(200).json({ status: "success", message: "Password reset link sent to email." });
+    res.status(200).json({
+      status: "success",
+      message: "Password reset link sent to email.",
+    });
   } catch (err) {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
@@ -216,7 +227,9 @@ const resetPassword = async (req, res) => {
   const { token, password, passwordConfirm } = req.body;
 
   if (!token) {
-    return res.status(400).json({ status: "error", message: "Token is missing" });
+    return res
+      .status(400)
+      .json({ status: "error", message: "Token is missing" });
   }
 
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
@@ -226,11 +239,15 @@ const resetPassword = async (req, res) => {
   });
 
   if (!user) {
-    return res.status(400).json({ status: "error", message: "Token is invalid or expired" });
+    return res
+      .status(400)
+      .json({ status: "error", message: "Token is invalid or expired" });
   }
 
   if (password !== passwordConfirm) {
-    return res.status(400).json({ status: "error", message: "Passwords do not match" });
+    return res
+      .status(400)
+      .json({ status: "error", message: "Passwords do not match" });
   }
 
   // Mã hóa mật khẩu mới
@@ -248,7 +265,6 @@ const resetPassword = async (req, res) => {
     message: "Password reset successfully",
   });
 };
-
 
 // [PUT] /editProfile/:userId
 const editProfile = async (req, res) => {
@@ -275,7 +291,9 @@ const editProfile = async (req, res) => {
       updateData.avatar = `/images/${req.file.filename}`;
     }
 
-    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, { new: true });
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
 
     if (!updatedUser) {
       return res.status(404).json({ message: "Không tìm thấy user!" });
@@ -295,13 +313,17 @@ const editProfile = async (req, res) => {
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword, confirmPassword } = req.body;
-    const { userId } = req.params; 
+    const { userId } = req.params;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin!" });
+      return res
+        .status(400)
+        .json({ message: "Vui lòng nhập đầy đủ thông tin!" });
     }
     if (newPassword !== confirmPassword) {
-      return res.status(400).json({ message: "Mật khẩu mới và xác nhận không khớp!" });
+      return res
+        .status(400)
+        .json({ message: "Mật khẩu mới và xác nhận không khớp!" });
     }
 
     const user = await UserModel.findById(userId);
@@ -311,7 +333,9 @@ const changePassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Mật khẩu hiện tại không chính xác!" });
+      return res
+        .status(401)
+        .json({ message: "Mật khẩu hiện tại không chính xác!" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -328,6 +352,17 @@ const changePassword = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  try {
+    const userId = req.query.key;
+    const user = await UserModel.findById(userId);
+    return res.status(200).json(user);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lỗi máy chủ, vui lòng thử lại sau !!" });
+  }
+};
 
 module.exports = {
   register,
@@ -337,5 +372,6 @@ module.exports = {
   login,
   logout,
   editProfile,
-  changePassword
+  changePassword,
+  getUserById,
 };

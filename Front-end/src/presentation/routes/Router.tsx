@@ -9,7 +9,6 @@ import HomePage from "../components/home";
 import SignUp from "../components/auth/SignUp";
 import NotAuthenticated from "../components/services/NotAuthenticated";
 import Authorization from "../components/services/Authorization";
-import Booking from "../components/customer/Booking";
 import CreateBlog from "../components/blog/createBlog";
 import Verify from "../components/auth/Verify";
 import ResetPassword from "../components/auth/ResetPassword";
@@ -102,7 +101,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING,
-            element: <Booking />
+            element: <Checkout />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/createBlog",

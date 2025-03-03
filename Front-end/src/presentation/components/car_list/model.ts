@@ -6,7 +6,19 @@ export type CarType = {
 }
 
 export type CarModels = {
-    _id?: String,
+    _id: String,
+    carName : String,
+    carStatus : Boolean,
+    carType : CarType,
+    carVersion : number,
+    color : String,
+    licensePlateNumber: String,
+    numberOfSeat: String,
+    price: number,
+    images: String[]
+}
+
+export type CarModelsNoId = {
     carName : String,
     carStatus : Boolean,
     carType : CarType,

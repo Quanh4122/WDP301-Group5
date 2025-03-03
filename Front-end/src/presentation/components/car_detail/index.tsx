@@ -62,18 +62,24 @@ const CarDetail = () => {
         ])
     }
 
-    const [timeValue, setTimeValue] = React.useState<any[]>([dayjs().hour() + ":" + dayjs().minute(), dayjs().hour() + ":" + dayjs().minute()]);
+    const [timeValue, setTimeValue] = React.useState<any[]>([dayjs().hour() + ":" + "00", dayjs().hour() + ":" + "00"]);
 
     const getTimeValue = (value: any[]) => {
         setTimeValue([
-            value && value[0] ? value[0] : dayjs().hour() + ":" + dayjs().minute(),
-            value && value[1] ? value[1] : dayjs().hour() + ":" + dayjs().minute()
+            value && value[0] ? value[0] : dayjs().hour() + ":" + "00",
+            value && value[1] ? value[1] : dayjs().hour() + ":" + "00"
         ])
     }
 
     const onBooking = () => {
-        console.log(dateValue, timeValue)
-        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB)
+        const data = {
+            carDetail: carDetail,
+            dateValue: dateValue,
+            timeValue: timeValue
+        }
+        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING, {
+            state: data
+        })
     }
 
     return (

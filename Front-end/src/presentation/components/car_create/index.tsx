@@ -4,7 +4,7 @@ import React from "react";
 import BannerCreateCar from '../../assets/banner-created-car.jpg'
 import GradeIcon from '@mui/icons-material/Grade';
 import { useForm } from "antd/es/form/Form";
-import { CarModels } from "../car_list/model";
+import { CarModels, CarModelsNoId } from "../car_list/model";
 import axiosInstance from "../utils/axios";
 
 const CarCreate = () => {
@@ -29,7 +29,7 @@ const CarCreate = () => {
         const listImage = value.images.fileList.map((item: any) => {
             return (item.name + "")
         })
-        const data: CarModels = {
+        const data: CarModelsNoId = {
             carName: form.getFieldValue("carName"),
             color: form.getFieldValue("color"),
             carStatus: false,
@@ -47,7 +47,7 @@ const CarCreate = () => {
         createCar(data)
     }
 
-    const createCar = async (value: CarModels) => {
+    const createCar = async (value: CarModelsNoId) => {
         await axiosInstance.post("/car/createCar", value)
             .then(res => res.data)
             .catch(err => console.log(err))

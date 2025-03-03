@@ -83,7 +83,7 @@ const FormGrid = styled('div')(() => ({
 }));
 
 export default function PaymentForm() {
-  const [paymentType, setPaymentType] = React.useState('creditCard');
+  const [paymentType, setPaymentType] = React.useState('bankTranfer');
   const [cardNumber, setCardNumber] = React.useState('');
   const [cvv, setCvv] = React.useState('');
   const [expirationDate, setExpirationDate] = React.useState('');
