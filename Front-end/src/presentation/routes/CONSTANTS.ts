@@ -24,5 +24,6 @@ export const PRIVATE_ROUTES = {
             CAR_DETAIL : 'car-detail',
             CAR_CREATE : 'car-create',
             DRIVER_LIST : 'driver-list',
+            BOOKING_LIST : 'booking-list',
         }
 }

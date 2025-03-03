@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
 
 const RequestSchema = new mongoose.Schema({
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     require: true,
   },
-  driverId: {
+  driver: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Driver",
   },
-  carId: {
+  car: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Car",
     require: true,

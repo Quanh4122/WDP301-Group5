@@ -456,3 +456,9 @@ export const topProducts = [
     rating: 4.5,
   },
 ];
+
+export const statusRequest = [
+  { lable: "Pending", value: "1" },
+  { lable: "Accepted", value: "2" },
+  { lable: "Denined", value: "3" },
+]
