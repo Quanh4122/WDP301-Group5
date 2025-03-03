@@ -5,18 +5,25 @@ import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid2';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/material/styles';
+import { UserModel } from '../models';
+
+interface props {
+  timeValue: any[],
+  dateValue: any[],
+  userData?: UserModel,
+}
 
 const FormGrid = styled(Grid)(() => ({
   display: 'flex',
   flexDirection: 'column',
 }));
 
-export default function AddressForm() {
+const AddressForm = ({ timeValue, dateValue, userData }: props) => {
   return (
     <Grid container spacing={3}>
       <FormGrid size={{ xs: 12, md: 6 }}>
         <FormLabel htmlFor="first-name" required>
-          First name
+          Họ và tên
         </FormLabel>
         <OutlinedInput
           id="first-name"
@@ -25,12 +32,14 @@ export default function AddressForm() {
           placeholder="John"
           autoComplete="first name"
           required
+          readOnly
+          value={userData?.fullName}
           size="small"
         />
       </FormGrid>
       <FormGrid size={{ xs: 12, md: 6 }}>
         <FormLabel htmlFor="last-name" required>
-          Last name
+          Email
         </FormLabel>
         <OutlinedInput
           id="last-name"
@@ -38,6 +47,60 @@ export default function AddressForm() {
           type="last-name"
           placeholder="Snow"
           autoComplete="last name"
+          required
+          readOnly
+          value={userData?.email}
+          size="small"
+        />
+      </FormGrid>
+      <FormGrid size={{ xs: 6 }}>
+        <FormLabel htmlFor="city" required>
+          Số điện thoại
+        </FormLabel>
+        <OutlinedInput
+          id="city"
+          name="city"
+          type="city"
+          placeholder="New York"
+          autoComplete="City"
+          required
+          readOnly
+          value={userData?.phoneNumber}
+          size="small"
+        />
+      </FormGrid>
+      <FormGrid size={{ xs: 6 }}>
+        <FormLabel htmlFor="state" required>
+          Địa chỉ
+        </FormLabel>
+        <OutlinedInput
+          id="state"
+          name="state"
+          type="state"
+          placeholder="NY"
+          autoComplete="State"
+          required
+          readOnly
+          value={userData?.address}
+          size="small"
+        />
+      </FormGrid>
+      <FormGrid size={{ xs: 6 }}>
+        <FormLabel htmlFor="zip" required>
+          Thời gian thuê
+        </FormLabel>
+        <div className="text-sm flex items-center h-full">{timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}</div>
+      </FormGrid>
+      {/* <FormGrid size={{ xs: 6 }}>
+        <FormLabel htmlFor="country" required>
+          Country
+        </FormLabel>
+        <OutlinedInput
+          id="country"
+          name="country"
+          type="country"
+          placeholder="United States"
+          autoComplete="shipping country"
           required
           size="small"
         />
@@ -67,69 +130,16 @@ export default function AddressForm() {
           required
           size="small"
         />
-      </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="city" required>
-          City
-        </FormLabel>
-        <OutlinedInput
-          id="city"
-          name="city"
-          type="city"
-          placeholder="New York"
-          autoComplete="City"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="state" required>
-          State
-        </FormLabel>
-        <OutlinedInput
-          id="state"
-          name="state"
-          type="state"
-          placeholder="NY"
-          autoComplete="State"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="zip" required>
-          Zip / Postal code
-        </FormLabel>
-        <OutlinedInput
-          id="zip"
-          name="zip"
-          type="zip"
-          placeholder="12345"
-          autoComplete="shipping postal-code"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="country" required>
-          Country
-        </FormLabel>
-        <OutlinedInput
-          id="country"
-          name="country"
-          type="country"
-          placeholder="United States"
-          autoComplete="shipping country"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 12 }}>
+      </FormGrid> */}
+
+      {/* <FormGrid size={{ xs: 12 }}>
         <FormControlLabel
           control={<Checkbox name="saveAddress" value="yes" />}
           label="Use this address for payment details"
         />
-      </FormGrid>
+      </FormGrid> */}
     </Grid>
   );
 }
+
+export default AddressForm

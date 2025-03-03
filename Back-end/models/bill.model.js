@@ -1,18 +1,14 @@
 const mongoose = require("mongoose");
 
 const BillSchema = new mongoose.Schema({
-  requestId: { 
+  requestId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Request", 
-    require: true 
+    ref: "Request",
+    require: true,
   },
-  billStatus: { 
-    type: Boolean, 
-    require: true 
-  },
-  money: { 
-    type: Number, 
-    require: true 
+  billStatus: {
+    type: Boolean,
+    require: true,
   },
 });
 
