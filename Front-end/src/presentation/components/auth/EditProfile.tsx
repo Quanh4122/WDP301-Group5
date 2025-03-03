@@ -68,13 +68,13 @@ const EditProfile: React.FC = () => {
       formDataToSend.append("avatar", avatarFile);
     }
 
-    console.log("🔥 Dữ liệu gửi đi:", Object.fromEntries(formDataToSend.entries()));
+    console.log("Dữ liệu gửi đi:", Object.fromEntries(formDataToSend.entries()));
 
     try {
       await dispatch(UpdateProfile(user.userId, formDataToSend));
       navigate(`/app/profile/${user?.userId}`);
     } catch (error) {
-      console.error("🔥 Lỗi cập nhật hồ sơ:", error);
+      console.error("Lỗi cập nhật hồ sơ:", error);
     }
   };
 

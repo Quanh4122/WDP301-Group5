@@ -1,5 +1,5 @@
 import { Button, Image } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Carimage from "../../assets/car-image1.png"
 import MapBanner from "../../assets/map-banner.png"
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
@@ -12,7 +12,9 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { Icon, Typography } from "@mui/material";
 import UsbIcon from '@mui/icons-material/Usb';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import CableIcon from '@mui/icons-material/Cable';
+import CropLandscapeIcon from '@mui/icons-material/CropLandscape';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import AddHomeIcon from '@mui/icons-material/AddHome';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
@@ -23,19 +25,55 @@ import CarModal from "./component/CarModal";
 import CarCalendar from "./component/CarCalendar";
 import { DateRange } from "@mui/x-date-pickers-pro/models";
 import dayjs, { Dayjs } from "dayjs";
+import axiosInstance from "../utils/axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import { CarModels } from "../car_list/model";
+import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
 
 const CarDetail = () => {
 
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [isOpenModalN, setIsOpenModalN] = useState(false)
+    const location = useLocation()
+    const [carDetail, setCarDetail] = useState<CarModels>()
+    const navigate = useNavigate()
 
-    const [value, setValue] = React.useState<DateRange<Dayjs>>([
-        dayjs('2022-04-17'),
-        dayjs('2022-04-21'),
-    ]);
+    useEffect(() => {
+        console.log(location.state._id)
+        getCarById()
+    }, [])
+
+    const getCarById = async () => {
+        await axiosInstance.get("/car/getCarById", {
+            params: {
+                key: location.state._id
+            }
+        })
+            .then(res => setCarDetail(res.data))
+            .catch(err => console.log(err))
+    }
+
+    const [dateValue, setDateValue] = React.useState<any[]>([dayjs().format('DD/MM/YYYY'), dayjs().add(1, 'day').format('DD/MM/YYYY')]);
 
     const getDateValue = (value: DateRange<Dayjs>) => {
-        console.log("ok")
+        setDateValue([
+            value && value[0] ? dayjs(value[0].toLocaleString()).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY'),
+            value && value[1] ? dayjs(value[1].toLocaleString()).format('DD/MM/YYYY') : dayjs().add(1, 'day').format('DD/MM/YYYY')
+        ])
+    }
+
+    const [timeValue, setTimeValue] = React.useState<any[]>([dayjs().hour() + ":" + dayjs().minute(), dayjs().hour() + ":" + dayjs().minute()]);
+
+    const getTimeValue = (value: any[]) => {
+        setTimeValue([
+            value && value[0] ? value[0] : dayjs().hour() + ":" + dayjs().minute(),
+            value && value[1] ? value[1] : dayjs().hour() + ":" + dayjs().minute()
+        ])
+    }
+
+    const onBooking = () => {
+        console.log(dateValue, timeValue)
+        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB)
     }
 
     return (
@@ -56,36 +94,64 @@ const CarDetail = () => {
             </div>
             <div className="w-ful h-auto px-36 py-10 flex">
                 <div className="w-2/3 h-fit">
-                    <div className="block border-b-2 border-gray-300 h-24 py-3">
-                        Ford Territory 2023
-                        <div className="text-lime-500 w-16 flex items-center h-8">
+                    <div className="block border-b-2 border-gray-300 h-24 py-3 text-2xl font-bold">
+                        {carDetail?.carName + " " + carDetail?.carVersion}
+                        <div className="text-lime-500 w-16 flex items-center h-8 text-base">
                             <WatchLaterIcon />
                             24/7
                         </div>
                     </div>
-                    <div className="h-24 py-3 mt-5">
+                    <div className="h-auto py-3 mt-5">
                         <div className="font-bold text-lg">
                             Đặc điểm
                             <div className="w-7 border-b-4 border-sky-500"></div>
                         </div>
-                        <div className="flex items-center justify-between mt-2 w-2/3">
-                            <div className="flex items-center text-sky-500">
+                        <div className="flex flex-wrap items-center mt-2 w-2/3">
+                            <div className="flex text-sky-500 w-40 h-20 items-center">
+                                <DirectionsCarIcon />
+                                <div className="">
+                                    <Typography variant="body2" color="textSecondary">
+                                        Màu xe
+                                    </Typography>
+                                    {carDetail?.color}
+                                </div>
+                            </div>
+                            <div className="flex text-sky-500 w-40 h-20 items-center">
                                 <PersonIcon />
-                                <Typography variant="body2" color="textSecondary">
-                                    số ghế
-                                </Typography>
+                                <div className="">
+                                    <Typography variant="body2" color="textSecondary">
+                                        số ghế
+                                    </Typography>
+                                    {carDetail?.numberOfSeat}
+                                </div>
                             </div>
-                            <div className="flex items-center text-sky-500">
+                            <div className="flex text-sky-500 w-40 h-20 items-center">
                                 <UsbIcon />
-                                <Typography variant="body2" color="textSecondary">
-                                    chuyển động
-                                </Typography>
+                                <div>
+                                    <Typography variant="body2" color="textSecondary">
+                                        chuyển động
+                                    </Typography>
+                                    {carDetail?.carType.transmissionType ? "Số tự động" : "Số sàn"}
+                                </div>
+
                             </div>
-                            <div className="flex items-center text-sky-500">
+                            <div className="flex text-sky-500 w-40 h-20 items-center">
                                 <LocalGasStationIcon />
-                                <Typography variant="body2" color="textSecondary">
-                                    nhiên liệu
-                                </Typography>
+                                <div>
+                                    <Typography variant="body2" color="textSecondary">
+                                        nhiên liệu
+                                    </Typography>
+                                    {carDetail?.carType.flue == 1 ? "Máy xăng" : carDetail?.carType.flue == 2 ? "Máy dầu" : "Máy điện"}
+                                </div>
+                            </div>
+                            <div className="flex text-sky-500 w-40 h-20 items-center">
+                                <CropLandscapeIcon />
+                                <div>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Biển số xe
+                                    </Typography>
+                                    {carDetail?.licensePlateNumber}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -209,14 +275,14 @@ const CarDetail = () => {
                             <div className="h-full w-auto flex items-center">
                                 <div>
                                     <div className="text-xs text-gray-500">Thời gian thuê</div>
-                                    <div className="text-sm font-semibold">15h00, 27/02/2025 đến 19h00, 28/02/2025</div>
+                                    <div className="text-sm font-semibold">{timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}</div>
                                 </div>
                             </div>
                             <CarModal
                                 isOpen={isOpenModalN}
                                 onCancel={() => setIsOpenModalN(false)}
                                 title={"Thời gian thuê xe"}
-                                element={<CarCalendar setValue={getDateValue} />}
+                                element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
                             />
                         </div>
                         <div className="mt-5 flex justify-between border-b-2 h-10">
@@ -267,7 +333,9 @@ const CarDetail = () => {
                             Lưu ý: Bằng lái mới được cấp dưới 1 năm, mức cọc là 8 triệu VND
                         </p>
 
-                        <Button className="w-full h-10 mt-10" type="primary">Thuê xe</Button>
+                        <Button className="w-full h-10 mt-10" type="primary" onClick={onBooking}>
+                            Thuê xe
+                        </Button>
                     </div>
                     <div className="mt-10 w-full h-auto shadow-lg rounded-lg border">
                         <div className="bg-sky-100 p-3 text-sky-700 font-semibold">

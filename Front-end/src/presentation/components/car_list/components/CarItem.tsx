@@ -17,7 +17,18 @@ const CarItem = ({ carModel }: props) => {
     const img: any = carModel?.images[0] || Carimage
     const navigate = useNavigate()
     const goToDetail = () => {
-        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_DETAIL)
+        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_DETAIL, { state: carModel })
+    }
+
+    const displayFlue = (val: Number | undefined) => {
+        if (val == 1) {
+            return "Xăng"
+        } else if (val == 2) {
+            return "Dầu"
+        } else {
+            return "Điện"
+        }
+
     }
 
     return (
@@ -27,7 +38,7 @@ const CarItem = ({ carModel }: props) => {
                     component="img"
                     height="194"
                     width="200"
-                    image={img}
+                    image={`http://localhost:3030/${carModel?.images[0]}`}
                     sx={{ width: 340 }}
                 />
                 <CardContent>
@@ -63,7 +74,7 @@ const CarItem = ({ carModel }: props) => {
                             <div className="flex items-center text-sky-500">
                                 <LocalGasStationIcon />
                                 <Typography variant="body2" color="textSecondary">
-                                    {carModel?.carType.flue == 1 ? "Xăng" : carModel?.carType.flue == 2 ? "Dầu" : "Điện"}
+                                {displayFlue(carModel?.carType.flue)}
                                 </Typography>
                             </div>
                         </div>

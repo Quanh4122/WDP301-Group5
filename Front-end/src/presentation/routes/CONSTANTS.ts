@@ -7,6 +7,9 @@ export const PRIVATE_ROUTES = {
             PRODUCT_DETAIL : 'product-detail',
             SIGN_IN : 'sign-in',
             VERIFY: 'verify',
+            NOT_FOUND: 'not-found',
+            NOT_AUTHENTICATION: 'not-authetication',
+            NOT_AUTHORIZATION: 'unauthorized',
             FORGOT_PASSWORD: 'forgot-password',
             RESET_PASSWORD: 'reset-password',
             PROFILE: 'profile',
@@ -15,10 +18,11 @@ export const PRIVATE_ROUTES = {
             DASH_BOARD: 'dashboard',
             CHECK_OUT: 'checkout',
             REGISTER: 'register',
-            NOT_AUTHENTICATION: 'not-authentication',
             AUTHORIZATION: 'authorization',
             CAR_LIST : 'car-lists',
             BOOKING : 'booking',
             CAR_DETAIL : 'car-detail',
+            CAR_CREATE : 'car-create',
+            DRIVER_LIST : 'driver-list',
         }
 }

@@ -3,16 +3,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { EditPassword } from "../redux/slices/Authentication";
 import { RootState } from "../redux/Store";
 import { ToastContainer, toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
+import { TextField, IconButton, InputAdornment } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
 
 const ChangePassword: React.FC = () => {
   const dispatch = useDispatch<any>();
   const userId = useSelector((state: RootState) => (state.auth.user as { userId: string } | null)?.userId);
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
-  
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // State để kiểm soát hiển thị mật khẩu
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,56 +41,78 @@ const ChangePassword: React.FC = () => {
 
     try {
       console.log("Gửi request đổi mật khẩu với userId:", userId);
-      const response = await dispatch(EditPassword(userId, { currentPassword, newPassword, confirmPassword })).unwrap();
-      
-      if (response?.success) {
+      const response = await dispatch(EditPassword(userId, { currentPassword, newPassword, confirmPassword }));
+      console.log(response)
+      if (response == 200) {
         toast.success("Thay đổi mật khẩu thành công!");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-      } 
+      }
     } catch (err: any) {
       console.error("Lỗi đổi mật khẩu:", err);
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");}
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
+    }
   };
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg mb-20">
       <h2 className="text-2xl font-bold text-center mb-4">Thay đổi mật khẩu</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-semibold">Mật khẩu hiện tại</label>
-          <input
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            required
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
+        {/* Mật khẩu hiện tại */}
+        <TextField
+          fullWidth
+          label="Mật khẩu hiện tại"
+          type={showCurrentPassword ? "text" : "password"}
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowCurrentPassword(!showCurrentPassword)} edge="end">
+                  {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-        <div>
-          <label className="block font-semibold">Mật khẩu mới</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
+        {/* Mật khẩu mới */}
+        <TextField
+          fullWidth
+          label="Mật khẩu mới"
+          type={showNewPassword ? "text" : "password"}
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end">
+                  {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-        <div>
-          <label className="block font-semibold">Xác nhận mật khẩu</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
+        {/* Xác nhận mật khẩu */}
+        <TextField
+          fullWidth
+          label="Xác nhận mật khẩu"
+          type={showConfirmPassword ? "text" : "password"}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
         <button
           type="submit"

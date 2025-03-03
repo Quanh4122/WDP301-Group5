@@ -12,7 +12,7 @@ router.post('/login', userController.login);
 router.get('/logout', verifyToken, userController.logout);
 router.post('/forgotPassword', userController.forgotPassword);
 router.post('/resetPassword', userController.resetPassword);
-router.post('/changePassword/:userId', userController.changePassword);
+router.post('/changePassword/:userId', verifyToken, userController.changePassword);
 router.put('/editProfile/:userId', verifyToken, upload.single("avatar"), userController.editProfile);
 
 

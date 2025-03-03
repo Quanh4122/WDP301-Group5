@@ -127,6 +127,7 @@ const login = async (req, res) => {
   };
 
   await UserModel.findOne({ email: email })
+    .populate('role')
     .then(user => {
       if (user) {
         bcrypt.compare(password, user.password, (err, response) => {
@@ -150,7 +151,7 @@ const login = async (req, res) => {
               phoneNumber: user.phoneNumber,
               avatar: user.avatar,
               address: user.address,
-              role: user.role,
+              role: user.role.roleName,
               token: token
             });
           } else {
@@ -219,8 +220,6 @@ const resetPassword = async (req, res) => {
   }
 
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-
   const user = await UserModel.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
