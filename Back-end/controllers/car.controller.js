@@ -117,22 +117,29 @@ const createCar = async (req, res) => {
     transmissionType: carType.transmissionType,
   });
 
-  const arrImages = images.map((item) => {
-    return `/images/${item}`;
-  });
+  if (images.length == 0) {
+    const error = new Error("Please choose files");
+    error.httpStatusCode = 400;
+    return next(error);
+  } else {
+    const arrImages = images.map((item) => {
+      return `/images/${item}`;
+    });
 
-  const carModel = new CarModel({carName,
-    carStatus,
-    carType: carTypeModel._id,
-    carVersion,
-    color,
-    images: arrImages,
-    licensePlateNumber,
-    numberOfSeat,
-    price,
-  });
-  await carModel.save();
-  return res.status(200).json({ message: "Create Successfull !!!" });
+    const carModel = new CarModel({
+      carName,
+      carStatus,
+      carType: carTypeModel._id,
+      carVersion,
+      color,
+      images: arrImages,
+      licensePlateNumber,
+      numberOfSeat,
+      price,
+    });
+    await carModel.save();
+    return res.status(200).json({ message: "Create Successfull !!!" });
+  }
 };
 
 module.exports = {
