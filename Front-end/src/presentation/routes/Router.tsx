@@ -26,6 +26,7 @@ import NotFound from "../components/auth/NotFound";
 import NotAuthentication from "../components/auth/NotAuthentication";
 import NotAuthorization from "../components/auth/NotAuthorization";
 import ProtectedRoute from "./PrivateRoute";
+import RequestList from "../components/request_list";
 
 
 const Router = () => {
@@ -134,7 +135,11 @@ const Router = () => {
         {
             path: "*",
             element: <NotFound />
-        }
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING_LIST,
+            element: <RequestList />
+        },
 
     ]
 

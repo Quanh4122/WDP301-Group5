@@ -27,6 +27,8 @@ import axiosInstance from '../utils/axios';
 import { User } from 'lucide-react';
 import { RequestModel, UserModel } from './models';
 import { CarModels } from '../car_list/model';
+import dayjs from 'dayjs';
+
 
 const steps = ['Shipping address', 'Review your order'];
 function getStepContent(step: number, timeValue: any[], dateValue: any[], userData?: UserModel, carData?: CarModels) {
@@ -66,14 +68,18 @@ const Checkout = (props: { disableCustomTheme?: boolean }) => {
       .catch(err => console.log(err))
   }
 
+  const fomatDate = (date: string) => {
+    const arr = date.split('/')
+    return arr[1] + "/" + arr[0] + "/" + arr[2]
+  }
+
   const handleBooking = async () => {
-    console.log(timeValue)
     const formBooking: RequestModel = {
       userId: userId,
       driverId: "",
       carId: carDetail._id,
-      startDate: dateValue[0] + " " + timeValue[0],
-      endDate: dateValue[1] + " " + timeValue[1],
+      startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
+      endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
       isRequesDriver: false
     }
 
