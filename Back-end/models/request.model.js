@@ -11,7 +11,7 @@ const RequestSchema = new mongoose.Schema({
     ref: "Driver",
   },
   car: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: [mongoose.Schema.Types.ObjectId],
     ref: "Car",
     require: true,
   },

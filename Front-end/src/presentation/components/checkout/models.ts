@@ -18,26 +18,27 @@ export type RequestModel = {
 }
 export type RequestModelFull = {
     user: UserModel,
-    car: CarModel,
+    car: [CarModel],
     driver?: DriverModel,
     startDate: Date,
     endDate: Date,
-    requestStatus: String,
+    requestStatus: string,
     isRequestDriver?: Boolean
 }
 
 export type CarModel = {
-    _id: String,
-    carName : String,
+    _id: string,
+    carName : string,
     carVersion : number,
-    color : String,
-    licensePlateNumber: String,
-    numberOfSeat?: String,
+    color : string,
+    licensePlateNumber: string,
+    numberOfSeat?: string,
     price: number,
+    images: string[]
 }
 
 export type DriverModel = {
-    name: String, 
-    age: String,
-    image: String,
+    name: string, 
+    age: string,
+    image: string,
 }

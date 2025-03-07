@@ -1,31 +1,31 @@
 export type CarType = {
-    _id ? : String,
+    _id ? : string,
     bunkBed : Boolean,
     flue : Number,
     transmissionType : Boolean,
 }
 
 export type CarModels = {
-    _id: String,
-    carName : String,
+    _id: string,
+    carName : string,
     carStatus : Boolean,
     carType : CarType,
     carVersion : number,
-    color : String,
-    licensePlateNumber: String,
-    numberOfSeat: String,
+    color : string,
+    licensePlateNumber: string,
+    numberOfSeat: string,
     price: number,
-    images: String[]
+    images: string[]
 }
 
 export type CarModelsNoId = {
-    carName : String,
+    carName : string,
     carStatus : Boolean,
     carType : CarType,
     carVersion : number,
-    color : String,
-    licensePlateNumber: String,
-    numberOfSeat: String,
+    color : string,
+    licensePlateNumber: string,
+    numberOfSeat: string,
     price: number[],
-    images: String[]
+    images: string[]
 }
