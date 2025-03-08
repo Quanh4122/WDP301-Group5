@@ -29,7 +29,7 @@ import axiosInstance from "../utils/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CarModels } from "../car_list/model";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
-import { RequestModel } from "../checkout/models";
+import { RequestModalForCallApi, RequestModel, RequestModelFull, UserModel } from "../checkout/models";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
 import { toast } from "react-toastify";
@@ -44,7 +44,6 @@ const CarDetail = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        console.log(location.state._id)
         getCarById()
     }, [])
 
@@ -88,13 +87,13 @@ const CarDetail = () => {
             timeValue: timeValue
         }
         if (carDetail) {
-            const formBooking: RequestModel = {
-                userId: userId,
-                driverId: "",
-                carId: carDetail._id,
-                startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
-                endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
-                isRequesDriver: false
+            const formBooking: RequestModalForCallApi = {
+                user: userId,
+                car: [carDetail._id],
+                startDate: "",
+                endDate: "",
+                isRequestDriver: false,
+                requestStatus: '1'
             }
 
             await axiosInstance.post("/request/createRequest", formBooking)

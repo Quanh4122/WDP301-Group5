@@ -30,10 +30,6 @@ import { CarModels } from '../car_list/model';
 import dayjs from 'dayjs';
 
 const Checkout = (props: { disableCustomTheme?: boolean }) => {
-  const [activeStep, setActiveStep] = React.useState(0);
-  const handleNext = () => {
-    setActiveStep(activeStep + 1);
-  };
 
   const location = useLocation()
   const requestData = location.state
@@ -72,7 +68,10 @@ const Checkout = (props: { disableCustomTheme?: boolean }) => {
     //   .then(res => console.log(res))
     //   .catch(err => console.log(err))
 
-    handleNext()
+  }
+
+  const onBooking = (value: any) => {
+    console.log(value)
   }
 
   return (
@@ -148,7 +147,7 @@ const Checkout = (props: { disableCustomTheme?: boolean }) => {
             }}
           >
             <React.Fragment>
-              <AddressForm userData={requestData.user} />
+              <AddressForm requestData={requestData} />
             </React.Fragment>
           </Box>
         </Grid>

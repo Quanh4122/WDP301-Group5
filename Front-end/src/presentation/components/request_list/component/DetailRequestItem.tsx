@@ -169,9 +169,9 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                             <Typography variant="subtitle2" gutterBottom>
                                 Thông tin của bạn
                             </Typography>
-                            <Typography gutterBottom>Họ và tên: <span className='text-gray-500'>{detailRequest.user.userName}</span></Typography>
-                            <Typography gutterBottom>Email: <span className='text-gray-500'>{detailRequest.user.email}</span></Typography>
-                            <Typography gutterBottom>Số điện thoại: <span className='text-gray-500'>{detailRequest.user.phoneNumber}</span></Typography>
+                            <Typography gutterBottom>Họ và tên: <span className='text-gray-500'>{detailRequest.user?.userName}</span></Typography>
+                            <Typography gutterBottom>Email: <span className='text-gray-500'>{detailRequest.user?.email}</span></Typography>
+                            <Typography gutterBottom>Số điện thoại: <span className='text-gray-500'>{detailRequest.user?.phoneNumber}</span></Typography>
                         </div>
 
                     </Stack>

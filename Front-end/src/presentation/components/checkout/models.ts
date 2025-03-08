@@ -1,27 +1,45 @@
 export type UserModel = {
-    _id: string,
+    _id?: string,
     userName: string,
-    fullName: string,
+    fullName?: string,
     phoneNumber: string,
-    address: string,
+    address?: string,
     avatar?: string,
     email?: string,
 }
 
 export type RequestModel = {
-    userId? : string,
-    driverId? : string,
-    carId?: string,
+    user? : string,
+    driver? : string,
+    car?: string[],
     startDate? : any,
     endDate? : any,
     isRequesDriver? : boolean,
 }
 export type RequestModelFull = {
-    user: UserModel,
+    user?: UserModel,
     car: [CarModel],
-    driver?: DriverModel,
-    startDate: Date,
-    endDate: Date,
+    driver?: [DriverModel],
+    startDate: any,
+    endDate: any,
+    requestStatus: string,
+    isRequestDriver?: Boolean
+}
+
+export type RequestModalForCallApi = {
+    user?: string,
+    car?: string[],
+    driver?: string[],
+    startDate: any,
+    endDate: any,
+    requestStatus: string,
+    isRequestDriver?: Boolean
+}
+
+export type RequestAcceptForApi = {
+    user?: UserModel,
+    startDate: any,
+    endDate: any,
     requestStatus: string,
     isRequestDriver?: Boolean
 }

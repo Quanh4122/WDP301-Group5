@@ -15,7 +15,7 @@ interface props {
 const RequestItem = ({ requestModel }: props) => {
 
     const [requestData, setRequestData] = useState<RequestModelFull>(requestModel)
-    const [avatarPreview, setAvatarPreview] = useState(`http://localhost:3030${requestData.user.avatar}`);
+    const [avatarPreview, setAvatarPreview] = useState(`http://localhost:3030${requestData.user?.avatar}`);
     const startDate = dayjs(requestData.startDate).format("HH:mm, DD/MM/YYYY ")
     const endDate = dayjs(requestData.endDate).format("HH:mm, DD/MM/YYYY")
     const [isOpen, setIsOpen] = useState<boolean>(false)
