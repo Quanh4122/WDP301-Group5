@@ -458,7 +458,8 @@ export const topProducts = [
 ];
 
 export const statusRequest = [
-  { lable: "Pending", value: "1" },
-  { lable: "Accepted", value: "2" },
-  { lable: "Denined", value: "3" },
+  { lable: "On Selecting Car", value: "1" },
+  { lable: "Pending", value: "2" },
+  { lable: "Accepted", value: "3" },
+  { lable: "Denined", value: "4" },
 ]

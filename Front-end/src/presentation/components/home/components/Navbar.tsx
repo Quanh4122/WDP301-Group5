@@ -5,19 +5,19 @@ import { navItems } from "../../../../constants";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoutUser } from "../../redux/slices/Authentication";
-import { AppDispatch, RootState } from "../../redux/Store"; 
+import { AppDispatch, RootState } from "../../redux/Store";
 import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const naigate = useNavigate()
+  const dispatch = useDispatch<AppDispatch>();
 
-  const dispatch = useDispatch<AppDispatch>(); 
-
-  const { isLoggedIn, user, photoURL, userId } = useSelector((state: RootState) => state.auth) as { 
-    isLoggedIn: boolean; 
+  const { isLoggedIn, user, photoURL, userId } = useSelector((state: RootState) => state.auth) as {
+    isLoggedIn: boolean;
     user: { userName: string, userId: string, avatar: string } | null;
     photoURL: string;
     userId: string;
@@ -37,8 +37,14 @@ const Navbar = () => {
   }, [user, photoURL, userId]);
 
   const handleLogout = async () => {
-    await dispatch(LogoutUser()); 
+    await dispatch(LogoutUser());
   };
+
+  const onViewListRequest = () => {
+    naigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING_LIST, {
+      state: user?.userId
+    })
+  }
 
   return (
     <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-b border-neutral-700/80 px-4 md:px-32">
@@ -69,6 +75,10 @@ const Navbar = () => {
           <div className="hidden lg:flex justify-center space-x-6 items-center">
             {isLoggedIn ? (
               <>
+                <div onClick={onViewListRequest}>
+                  <NotificationsNoneIcon />
+                </div>
+
                 <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">
                   {avatarPreview ? (
                     <img

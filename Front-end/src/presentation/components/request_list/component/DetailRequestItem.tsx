@@ -27,9 +27,9 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
         const endDate = dayjs(detailRequest.endDate)
         const total = endDate.diff(startDate, 'hour', true)
         setTotalTime(total)
-        const calVATFee = detailRequest.car.price * total * 0.1
-        setVATFee(calVATFee)
-        setTotalFee(calVATFee + detailRequest.car.price * total)
+        // const calVATFee = detailRequest.car.price * total * 0.1
+        // setVATFee(calVATFee)
+        // setTotalFee(calVATFee + detailRequest.car.price * total)
     }
 
     return (
@@ -60,7 +60,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
         Tên xe
       </Typography> */}
                         <Typography variant="h4" gutterBottom>
-                            {detailRequest.car.carName + " " + detailRequest.car.carVersion}
+                            {/* {detailRequest.car.carName + " " + detailRequest.car.carVersion} */}
                         </Typography>
                         <List disablePadding>
                             <ListItem sx={{ py: 1, px: 0 }}>
@@ -69,7 +69,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                                     primary={"Giá thuê: "}
                                 />
                                 <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {detailRequest.car.price}k / 1h
+                                    {/* {detailRequest.car.price}k / 1h */}
                                 </Typography>
                             </ListItem>
                             <ListItem sx={{ py: 1, px: 0 }}>
@@ -78,7 +78,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                                     primary={"Màu xe: "}
                                 />
                                 <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {detailRequest.car.color}
+                                    {/* {detailRequest.car.color} */}
                                 </Typography>
                             </ListItem>
                             <ListItem sx={{ py: 1, px: 0 }}>
@@ -87,7 +87,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                                     primary={"Biển số xe: "}
                                 />
                                 <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {detailRequest.car.licensePlateNumber}
+                                    {/* {detailRequest.car.licensePlateNumber} */}
                                 </Typography>
                             </ListItem>
                             <ListItem sx={{ py: 1, px: 0 }}>
@@ -96,7 +96,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                                     primary={"Số chỗ: "}
                                 />
                                 <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {detailRequest.car.numberOfSeat}
+                                    {/* {detailRequest.car.numberOfSeat} */}
                                 </Typography>
                             </ListItem>
                             {/* <ListItem sx={{ py: 1, px: 0 }}>
@@ -169,9 +169,9 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                             <Typography variant="subtitle2" gutterBottom>
                                 Thông tin của bạn
                             </Typography>
-                            <Typography gutterBottom>Họ và tên: <span className='text-gray-500'>{detailRequest.user.userName}</span></Typography>
-                            <Typography gutterBottom>Email: <span className='text-gray-500'>{detailRequest.user.email}</span></Typography>
-                            <Typography gutterBottom>Số điện thoại: <span className='text-gray-500'>{detailRequest.user.phoneNumber}</span></Typography>
+                            <Typography gutterBottom>Họ và tên: <span className='text-gray-500'>{detailRequest.user?.userName}</span></Typography>
+                            <Typography gutterBottom>Email: <span className='text-gray-500'>{detailRequest.user?.email}</span></Typography>
+                            <Typography gutterBottom>Số điện thoại: <span className='text-gray-500'>{detailRequest.user?.phoneNumber}</span></Typography>
                         </div>
 
                     </Stack>
