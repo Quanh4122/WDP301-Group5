@@ -15,6 +15,7 @@ import { FormControl } from '@mui/material';
 import { Button, Form, Input, Radio } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import axiosInstance from '../../utils/axios';
+import { statusRequest } from '../../../../constants';
 
 interface props {
   requestData: RequestModelFull,
@@ -80,132 +81,121 @@ const AddressForm = ({ requestData }: props) => {
       .catch(err => console.log(err))
   }
 
+  const arrprice = requestData.car.map((item) => item.price).reduce((total, current) => {
+    return total + current
+  })
+  const [totalTime, setTotalTime] = React.useState(dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]), 'hour'))
+  const [totalPrice, setTotalPrice] = React.useState(arrprice * totalTime)
+  React.useEffect(() => {
+    const val = dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]), 'hour')
+    setTotalTime(val)
+    setTotalPrice(arrprice * totalTime)
+    console.log()
+  }, [timeValue, dateValue])
+
   return (
-    <Grid container spacing={3}>
-      <Form
-        className='w-full'
-        initialValues={initialValue}
-        form={form}
-        onFinish={onBooking}
-      >
-        <div className='flex w-full justify-between mb-2'>
-          <Form.Item
-            label="Họ và tên"
-            layout='vertical'
-            name='userName'
-            required
+    <Grid container spacing={1}>
+      {
+        requestData.requestStatus == "1" ?
+          <Form
+            className='w-full'
+            initialValues={initialValue}
+            form={form}
+            onFinish={onBooking}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Email"
-            layout='vertical'
-            name='email'
-            required
-          >
-            <Input />
-          </Form.Item>
-        </div>
-        <div className='flex w-full justify-between mb-2'>
-          <Form.Item
-            label="Số điện thoại"
-            layout='vertical'
-            name='phoneNumber'
-            required
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Địa chỉ"
-            layout='vertical'
-            name='address'
-            required
-          >
-            <Input />
-          </Form.Item>
-        </div>
-        <div className='flex w-full justify-between mb-8'>
-          <Form.Item
-            label="Bạn muốn thuê tài xế : "
-            layout='vertical'
-            name='isRequestDriver'
-            required
-          >
-            <Radio.Group
-              options={requestDriver}
-            />
-          </Form.Item>
-        </div>
-        <div
-          className="w-80 border-2 h-16  rounded-md flex items-center">
-          <div
-            className="h-full w-12 flex items-center justify-center text-sky-500"
-            onClick={() => setIsOpenModalN(true)}
-          >
-            <CalendarMonthIcon />
-          </div>
-          <div className="h-full w-auto flex items-center">
-            <div>
-              <div className="text-xs text-gray-500">Thời gian thuê</div>
-              <div className="text-sm font-semibold">{timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}</div>
+            <div className='flex w-full justify-between mb-2'>
+              <Form.Item
+                label="Họ và tên"
+                layout='vertical'
+                name='userName'
+                required
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Email"
+                layout='vertical'
+                name='email'
+                required
+              >
+                <Input />
+              </Form.Item>
+            </div>
+            <div className='flex w-full justify-between mb-2'>
+              <Form.Item
+                label="Số điện thoại"
+                layout='vertical'
+                name='phoneNumber'
+                required
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Địa chỉ"
+                layout='vertical'
+                name='address'
+                required
+              >
+                <Input />
+              </Form.Item>
+            </div>
+            <div className='flex w-full justify-between mb-8'>
+              <Form.Item
+                label="Bạn muốn thuê tài xế : "
+                layout='vertical'
+                name='isRequestDriver'
+                required
+              >
+                <Radio.Group
+                  options={requestDriver}
+                />
+              </Form.Item>
+            </div>
+            <div
+              className="w-80 border-2 h-16  rounded-md flex items-center mb-8">
+              <div
+                className="h-full w-12 flex items-center justify-center text-sky-500"
+                onClick={() => setIsOpenModalN(true)}
+              >
+                <CalendarMonthIcon />
+              </div>
+              <div className="h-full w-auto flex items-center">
+                <div>
+                  <div className="text-xs text-gray-500">Thời gian thuê</div>
+                  <div className="text-sm font-semibold">{timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}</div>
+                </div>
+              </div>
+              <CarModal
+                isOpen={isOpenModalN}
+                onCancel={() => setIsOpenModalN(false)}
+                title={"Thời gian thuê xe"}
+                element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
+              />
+            </div>
+            <div className='text-gray-500 font-medium'>
+              <div className='w-1/2 flex justify-between'>Tổng thời gian thuê : <span className='text-gray-950'>{totalTime}h</span></div>
+              <div className='w-1/2 flex justify-between'>Thuế VAT : <span className='text-gray-950'>{totalPrice * 0.1} kđ</span></div>
+              <div className='w-1/2 flex justify-between'>Tổng số tiền thuê xe : <span className='text-gray-950'>{totalPrice} kđ</span></div>
+            </div>
+            <div className='w-full flex items-center justify-end'>
+              <Button htmlType='submit' type='primary'>Đặt xe</Button>
+            </div>
+          </Form>
+          :
+          <div className='w-full h-screen flex justify-center'>
+            <div className='text-gray-500 font-medium w-2/3'>
+              <div className='w-full flex justify-between'>Họ và tên : <span className='text-gray-950'>{requestData.user?.userName}</span></div>
+              <div className='w-full flex justify-between'>Email : <span className='text-gray-950'>{requestData.user?.email}</span></div>
+              <div className='w-full flex justify-between'>Số điện thoại : <span className='text-gray-950'>{requestData.user?.phoneNumber}</span></div>
+              <div className='w-full flex justify-between'>Địa chỉ : <span className='text-gray-950'>{requestData.user?.address}</span></div>
+              <div className='w-full flex justify-between'>Trạng thái : <span className='text-gray-950'>{statusRequest.filter((item) => item.value == requestData.requestStatus)[0].lable}</span></div>
+              <div className='w-full flex justify-between'>Thời gian : <span className='text-gray-950'>Từ: {dayjs(requestData.startDate).format("HH:mm, DD/MM/YYYY")} đến {dayjs(requestData.endDate).format("HH:mm, DD/MM/YYYY")}</span></div>
+              <div className='w-full flex justify-between'>Tổng thời gian thuê : <span className='text-gray-950'>{totalTime}h</span></div>
+              <div className='w-full flex justify-between'>Thuế VAT : <span className='text-gray-950'>{totalPrice * 0.1} kđ</span></div>
+              <div className='w-full flex justify-between'>Tổng số tiền thuê xe : <span className='text-gray-950'>{totalPrice} kđ</span></div>
             </div>
           </div>
-          <CarModal
-            isOpen={isOpenModalN}
-            onCancel={() => setIsOpenModalN(false)}
-            title={"Thời gian thuê xe"}
-            element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
-          />
-        </div>
-        {/* <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="country" required>
-          Country
-        </FormLabel>
-        <OutlinedInput
-          id="country"
-          name="country"
-          type="country"
-          placeholder="United States"
-          autoComplete="shipping country"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 12 }}>
-        <FormLabel htmlFor="address1" required>
-          Address line 1
-        </FormLabel>
-        <OutlinedInput
-          id="address1"
-          name="address1"
-          type="address1"
-          placeholder="Street name and number"
-          autoComplete="shipping address-line1"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 12 }}>
-        <FormLabel htmlFor="address2">Address line 2</FormLabel>
-        <OutlinedInput
-          id="address2"
-          name="address2"
-          type="address2"
-          placeholder="Apartment, suite, unit, etc. (optional)"
-          autoComplete="shipping address-line2"
-          required
-          size="small"
-        />
-      </FormGrid> */}
-
-        {/* <FormGrid size={{ xs: 12 }}>
-        <FormControlLabel
-          control={<Checkbox name="saveAddress" value="yes" />}
-          label="Use this address for payment details"
-        />
-      </FormGrid> */}
-        <Button htmlType='submit'>Đặt xe</Button>
-      </Form>
+      }
     </Grid>
   );
 }

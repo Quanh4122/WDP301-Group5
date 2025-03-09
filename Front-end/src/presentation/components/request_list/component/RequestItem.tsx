@@ -30,7 +30,7 @@ const RequestItem = ({ requestModel }: props) => {
 
     return (
         <div className=" w-full h-auto border rounded-sm shadow-md"
-            onClick={() => setIsOpen(!isOpen)}
+        // onClick={() => setIsOpen(true)}
         >
             <div className="border-b-2 w-full h-10 px-5 flex items-center justify-between">
                 <div className="font-bold">{statusRequest.filter(item => item.value == requestData.requestStatus)[0]?.lable}</div>
@@ -66,11 +66,15 @@ const RequestItem = ({ requestModel }: props) => {
                         <div>
                             <div className="text-sm font-semibold">{item.price}k Đ/h</div>
                         </div>
-                        <Button className="border rounded-sm"
-                            onClick={() => setIsOpen(true)}
-                        >
-                            Delete
-                        </Button>
+                        {
+                            requestData.requestStatus == "1" ? <Button className="border rounded-sm"
+                            // onClick={() => setIsOpen(true)}
+                            >
+                                Delete
+                            </Button>
+                                : <></>
+                        }
+
                     </div>
                 ))
             }
