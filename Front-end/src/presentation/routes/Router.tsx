@@ -37,10 +37,6 @@ const Router = () => {
             element: <HomePage />
         },
         {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PRODUCT_DETAIL,
-            element: <ProductDetai />
-        },
-        {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN,
             element: <SignIn />
         },
@@ -94,11 +90,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DASH_BOARD,
-            element: <Dashboard />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHECK_OUT,
-            element: <Checkout />
+            element: <ProtectedRoute requiredRole="admin"><Dashboard /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING,
@@ -106,7 +98,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/createBlog",
-            element: <CreateBlog />
+            element: <ProtectedRoute requiredRole="admin"><CreateBlog /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/blog/:postId",
@@ -126,7 +118,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_CREATE,
-            element: <CarCreate />
+            element: <ProtectedRoute requiredRole="admin"><CarCreate /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_LIST,
@@ -138,7 +130,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING_LIST,
-            element: <RequestList />
+            element: <ProtectedRoute><RequestList /></ProtectedRoute>
         },
 
     ]
