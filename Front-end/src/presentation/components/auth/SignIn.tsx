@@ -15,11 +15,8 @@ import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser, loginWithGoogle } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
-
-
 import { ToastContainer, toast } from "react-toastify";
 import { Eye, EyeOff } from 'lucide-react';
-
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -57,15 +54,28 @@ export default function SignIn() {
 
   const handleGoogleLogin = async () => {
     try {
-      const user = await dispatch(loginWithGoogle()).unwrap();  // Dùng `.unwrap()` để bắt lỗi từ async thunk
-      toast.success("Đăng nhập thành công")
+      const user = await dispatch(loginWithGoogle()).unwrap();
+      // Ensure user exists before proceeding
+      if (!user || !user.userId) {
+        throw new Error("No user data returned from Google Sign-In");
+      }
+      toast.success("Đăng nhập thành công");
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google login failed:", error);
-      toast.error("Đăng nhập thất bại");
+      // Safely access error properties
+      const errorCode = error?.code || "unknown";
+      const errorMessage = error?.message || "An unknown error occurred";
+      console.error("Error code:", errorCode);
+      console.error("Error message:", errorMessage);
+
+      if (errorCode === "auth/network-request-failed") {
+        toast.error("Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn và thử lại.");
+      } else {
+        toast.error(`Đăng nhập thất bại: ${errorMessage}`);
+      }
     }
   };
-
 
   const validateInputs = () => {
     const email = (document.getElementById('email') as HTMLInputElement).value;
@@ -103,14 +113,11 @@ export default function SignIn() {
       await dispatch(LoginUser({ email, password }));
       toast.success('Login successful!');
       navigate('/');
-
     } catch (error: any) {
-      toast.error('errol!')
-      console.log(error)
+      toast.error('Đăng nhập thất bại!');
+      console.log(error);
     }
   };
-
-
 
   return (
     <>
@@ -150,7 +157,7 @@ export default function SignIn() {
                 helperText={passwordError}
                 name="password"
                 placeholder="Enter your password"
-                type={showPassword ? "text" : "password"} // Cập nhật kiểu input dựa vào showPassword
+                type={showPassword ? "text" : "password"}
                 id="password"
                 autoComplete="current-password"
                 required
@@ -185,17 +192,13 @@ export default function SignIn() {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button onClick={handleGoogleLogin}
               disabled={isLoading} fullWidth variant="outlined" startIcon={<GoogleIcon />}>
-              {isLoading ? "Đang đăng nhập..." : (
-                <>
-                  Sign in with Google
-                </>
-              )}
+              {isLoading ? "Đang đăng nhập..." : "Sign in with Google"}
             </Button>
             <Button fullWidth variant="outlined" onClick={() => alert('Sign in with Facebook')} startIcon={<FacebookIcon />}>
               Sign in with Facebook
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
+              Don't have an account?{' '}
               <RouterLink to="/app/register">
                 Sign up
               </RouterLink>

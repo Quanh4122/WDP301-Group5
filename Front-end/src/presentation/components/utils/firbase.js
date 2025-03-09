@@ -24,7 +24,7 @@ export const signInWithGoogle = async () => {
 
     return {
       token: await user.getIdToken(),
-      id: user.uid,
+      // id: user.uid,
       email: user.email,
       name: user.displayName,
       photoURL: user.photoURL,

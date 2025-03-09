@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from '../../utils/axios';
-import { signInWithGoogle } from '../../utils/firbase';
+import { auth, signInWithGoogle } from '../../utils/firbase';
+import { GoogleAuthProvider } from 'firebase/auth';
 
 const initialState = {
   isLoading: false,
@@ -19,21 +20,30 @@ const initialState = {
 
 
 export const loginWithGoogle = createAsyncThunk(
-  'auth/loginWithGoogle',
+  "auth/loginWithGoogle",
   async (_, { rejectWithValue }) => {
     try {
-      const userData = await signInWithGoogle();
-      // Xác định role dựa trên email hoặc dữ liệu từ Firebase
-      let role = "User"; // Default role
-      if (userData.email.startsWith("admin")) {
-        role = "Admin";
-      } else if (userData.email.startsWith("driver")) {
-        role = "Driver";
-      }
-
-      return { ...userData, role };
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithGoogle(auth, provider);
+      const user = result.user;
+      return {
+        userId: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      };
     } catch (error) {
-      return rejectWithValue(error.message);
+      // Ensure the error object contains Firebase-specific details
+      if (error instanceof Error) {
+        return rejectWithValue({
+          code: error.code || "unknown",
+          message: error.message || "An unknown error occurred",
+        });
+      }
+      return rejectWithValue({
+        code: "unknown",
+        message: "An unknown error occurred",
+      });
     }
   }
 );
