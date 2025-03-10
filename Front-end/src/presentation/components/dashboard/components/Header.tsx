@@ -5,6 +5,8 @@ import NavbarBreadcrumbs from './NavbarBreadcrumbs';
 import ColorModeIconDropdown from '../../shared-theme/ColorModeIconDropdown';
 
 import Search from './Search';
+import { Link } from 'react-router-dom';
+import { PRIVATE_ROUTES } from '../../../routes/CONSTANTS';
 
 export default function Header() {
   return (
@@ -39,7 +41,7 @@ export default function Header() {
         <a className='btn btn-primary' href='/app/car-lists'>Car list</a>
         <a className='btn btn-primary' href='/app/driver-list'>Driver list</a>
         <a className='btn btn-primary' href='/app/booking-list'>Booking list</a>
-        <a className='btn btn-primary' href='/app'>Add new driver</a>
+        <Link className='btn btn-primary' to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_CREATE}`}>Add new driver</Link>
         <a className='btn btn-primary' href='/app/car-create'>Add new car</a>
       </Stack>
     </Stack>
