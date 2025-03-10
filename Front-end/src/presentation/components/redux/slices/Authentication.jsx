@@ -117,10 +117,13 @@ const slice = createSlice({
         }, 60000);
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
+        if (action.payload === "Firebase: Error (auth/popup-closed-by-user).") {
+          state.isLoading = false;
+          return; 
+        }
         state.isLoading = false;
-        state.error = action.payload || null;
+        state.error = action.payload;
       });
-      
   }
 });
 
@@ -143,18 +146,17 @@ export function LoginUser(formValues) {
           isLoggedIn: true,
           token: response.data.token,
           user: {
-            userId: response.data.userId || "",
-            userName: response.data.userName || "",
-            fullName: response.data.fullName || "",
-            phoneNumber: response.data.phoneNumber || "",
-            avatar: response.data.avatar || "",
-            address: response.data.address || "",
-            role: response.data.role || "User",
+            userId: response.data.userId,
+            userName: response.data.userName,
+            fullName: response.data.fullName,
+            phoneNumber: response.data.phoneNumber,
+            avatar: response.data.avatar,
+            address: response.data.address,
+            role: response.data.role,
           },
           email: response.data.email || formValues.email,
         })
       );
-      
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
