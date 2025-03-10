@@ -292,7 +292,7 @@ const CarDetail = () => {
                         <p className="text-xs text-gray-500 mt-5">
                             Đơn giá gói chỉ áp dụng cho ngày thường. Giá ngày Lễ/Tết có thể điều chỉnh theo nhu cầu.
                         </p>
-                        <div
+                        {/* <div
                             className="w-full border-2 h-16  rounded-md flex items-center"
 
                         >
@@ -314,7 +314,7 @@ const CarDetail = () => {
                                 title={"Thời gian thuê xe"}
                                 element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
                             />
-                        </div>
+                        </div> */}
                         <div className="mt-5 flex justify-between border-b-2 h-10">
                             <p className="font-semibold text-sm text-gray-600">
                                 Phí thuê xe
