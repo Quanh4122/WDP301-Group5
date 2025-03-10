@@ -102,30 +102,33 @@ const createCar = async (req, res) => {
   const {
     carName,
     carStatus,
-    carType,
     carVersion,
     color,
     images,
     licensePlateNumber,
     numberOfSeat,
     price,
+    bunkBed,
+    flue,
+    transmissionType,
   } = req.body;
+  console.log(req.body);
+  console.log(req.files);
 
   const carTypeModel = await CarTypeModel.findOne({
-    bunkBed: carType.bunkBed,
-    flue: carType.flue,
-    transmissionType: carType.transmissionType,
+    bunkBed: bunkBed,
+    flue: flue,
+    transmissionType: transmissionType,
   });
 
-  if (images.length == 0) {
+  if (req.files.length == 0) {
     const error = new Error("Please choose files");
     error.httpStatusCode = 400;
     return next(error);
   } else {
-    const arrImages = images.map((item) => {
-      return `/images/${item}`;
+    const arrImages = req.files.map((item) => {
+      return `/images/${item.filename}`;
     });
-
     const carModel = new CarModel({
       carName,
       carStatus,
