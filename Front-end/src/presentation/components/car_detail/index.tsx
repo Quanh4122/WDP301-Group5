@@ -31,7 +31,7 @@ import { CarModels } from "../car_list/model";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
 import { RequestModalForCallApi, RequestModel, RequestModelFull, UserModel } from "../checkout/models";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/Store";
+import store, { RootState } from "../redux/Store";
 import { toast } from "react-toastify";
 
 const CarDetail = () => {
@@ -86,20 +86,25 @@ const CarDetail = () => {
             dateValue: dateValue,
             timeValue: timeValue
         }
-        if (carDetail) {
-            const formBooking: RequestModalForCallApi = {
-                user: userId,
-                car: [carDetail._id],
-                startDate: "",
-                endDate: "",
-                isRequestDriver: false,
-                requestStatus: '1'
-            }
+        if (store.getState().auth.isLoggedIn == true) {
+            if (carDetail) {
+                const formBooking: RequestModalForCallApi = {
+                    user: userId,
+                    car: [carDetail._id],
+                    startDate: "",
+                    endDate: "",
+                    isRequestDriver: false,
+                    requestStatus: '1'
+                }
 
-            await axiosInstance.post("/request/createRequest", formBooking)
-                .then(res => toast.success("Add to request Successfull !!"))
-                .catch(err => toast.error("This car may be added in your request !!"))
+                await axiosInstance.post("/request/createRequest", formBooking)
+                    .then(res => toast.success("Add to request Successfull !!"))
+                    .catch(err => toast.error("This car may be added in your request !!"))
+            }
+        } else {
+            navigate(PRIVATE_ROUTES.PATH + '/' + PRIVATE_ROUTES.SUB.SIGN_IN)
         }
+
 
     }
 
@@ -109,14 +114,12 @@ const CarDetail = () => {
                 <img src={MapBanner} className="w-40 h-20" alt="Banner" />
             </div>
             <div className="flex items-center px-36">
-                <div className="flex items-center px-2">
-                    <Image src={Carimage} width={600} height={315} className="rounded-lg" />
-                </div>
-                <div className="flex flex-wrap justify-between">
-                    <div className="mb-2"><Image src={Carimage} width={300} height={150} className="rounded-lg" /></div>
-                    <div className="mb-2"><Image src={Carimage} width={300} height={150} className="rounded-lg" /></div>
-                    <Image src={Carimage} width={300} height={150} className="rounded-lg" />
-                    <Image src={Carimage} width={300} height={150} className="rounded-lg" />
+                <div className="flex justify-between">
+                    {
+                        carDetail?.images.map(item => (
+                            <Image src={`http://localhost:3030${item}`} width={300} height={150} />
+                        ))
+                    }
                 </div>
             </div>
             <div className="w-ful h-auto px-36 py-10 flex">

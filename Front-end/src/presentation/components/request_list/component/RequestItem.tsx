@@ -29,7 +29,7 @@ const RequestItem = ({ requestModel }: props) => {
 
 
     return (
-        <div className=" w-full h-auto border rounded-sm shadow-md"
+        <div className=" w-full h-auto border rounded-sm shadow-md mb-4"
         // onClick={() => setIsOpen(true)}
         >
             <div className="border-b-2 w-full h-10 px-5 flex items-center justify-between">

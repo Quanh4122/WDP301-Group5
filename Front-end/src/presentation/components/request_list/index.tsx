@@ -26,7 +26,7 @@ const RequestList = () => {
 
     return (
         <section className="w-full min-h-64 flex items-center justify-center p-10">
-            <div className="w-full h-auto flex">
+            <div className="w-full h-auto ">
                 {
                     requestList && requestList.map((item) => (
                         <RequestItem requestModel={item} />

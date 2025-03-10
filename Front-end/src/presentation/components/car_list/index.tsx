@@ -85,27 +85,29 @@ const CarList = () => {
                     onClick={() => setIsOpenModal(true)}
                 >
                     <PersonIcon className="500" /><span>Số chỗ</span>
-                    <CarFilterModals
-                        isOpen={isOpenModal}
-                        onCancel={() => setIsOpenModal(false)}
-                        option={filterNumberOfSeat}
-                        title="Số chỗ"
-                        onSetListData={onSetListDataNumberOfSeat}
-                    />
                 </div>
+                <CarFilterModals
+                    isOpen={isOpenModal}
+                    onCancel={() => setIsOpenModal(false)}
+                    option={filterNumberOfSeat}
+                    title="Số chỗ"
+                    onSetListData={onSetListDataNumberOfSeat}
+                />
+
                 <div
                     className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
                     onClick={() => setIsOpenModalT(true)}
                 >
                     <UsbIcon /><span>Loại xe</span>
-                    <CarFilterModals
-                        isOpen={isOpenModalT}
-                        onCancel={() => setIsOpenModalT(false)}
-                        option={filterTransmissionType}
-                        title="Loại xe"
-                        onSetListData={onSetListDataTransmissionType}
-                    />
                 </div>
+                <CarFilterModals
+                    isOpen={isOpenModalT}
+                    onCancel={() => setIsOpenModalT(false)}
+                    option={filterTransmissionType}
+                    title="Loại xe"
+                    onSetListData={onSetListDataTransmissionType}
+                />
+
                 <div
                     className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
                     onClick={() => setIsOpenModalF(true)}
