@@ -6,18 +6,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { UserModel } from '../models';
+import { CarModel, UserModel } from '../models';
 import dayjs from 'dayjs';
 import { CarModels } from '../../car_list/model';
 
 interface props {
-  timeValue: any[],
-  dateValue: any[],
   userData?: UserModel,
-  carModal?: CarModels,
+  carModal?: [CarModel],
 }
 
-const Review = ({ timeValue, dateValue, userData, carModal }: props) => {
+const Review = ({ userData, carModal }: props) => {
 
   const [totalTime, setTotalTime] = useState<any>()
   const [VATFee, setVATFee] = useState<any>()
@@ -27,12 +25,12 @@ const Review = ({ timeValue, dateValue, userData, carModal }: props) => {
   }, [])
 
   const calculateTotalTimeBooking = () => {
-    const startDate = dayjs(dateValue[0] + " " + timeValue[0], 'DD/MM/YYYY HH:mm')
-    const endDate = dayjs(dateValue[1] + " " + timeValue[1], 'DD/MM/YYYY HH:mm')
-    const total = endDate.diff(startDate, 'hour', true)
-    setTotalTime(total)
-    const calVATFee = carModal?.price && carModal?.price * total * 0.1
-    setVATFee(calVATFee)
+    // const startDate = dayjs(dateValue[0] + " " + timeValue[0], 'DD/MM/YYYY HH:mm')
+    // const endDate = dayjs(dateValue[1] + " " + timeValue[1], 'DD/MM/YYYY HH:mm')
+    // const total = endDate.diff(startDate, 'hour', true)
+    // setTotalTime(total)
+    // const calVATFee = carModal?.price && carModal?.price * total * 0.1
+    // setVATFee(calVATFee)
   }
 
   return (

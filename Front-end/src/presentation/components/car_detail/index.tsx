@@ -29,17 +29,21 @@ import axiosInstance from "../utils/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CarModels } from "../car_list/model";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
+import { RequestModalForCallApi, RequestModel, RequestModelFull, UserModel } from "../checkout/models";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/Store";
+import { toast } from "react-toastify";
 
 const CarDetail = () => {
 
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [isOpenModalN, setIsOpenModalN] = useState(false)
+    const userId = useSelector((state: RootState) => (state.auth?.user as { userId: string } | null)?.userId);
     const location = useLocation()
     const [carDetail, setCarDetail] = useState<CarModels>()
     const navigate = useNavigate()
 
     useEffect(() => {
-        console.log(location.state._id)
         getCarById()
     }, [])
 
@@ -71,15 +75,32 @@ const CarDetail = () => {
         ])
     }
 
-    const onBooking = () => {
+    const fomatDate = (date: string) => {
+        const arr = date.split('/')
+        return arr[1] + "/" + arr[0] + "/" + arr[2]
+    }
+
+    const onBooking = async () => {
         const data = {
             carDetail: carDetail,
             dateValue: dateValue,
             timeValue: timeValue
         }
-        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING, {
-            state: data
-        })
+        if (carDetail) {
+            const formBooking: RequestModalForCallApi = {
+                user: userId,
+                car: [carDetail._id],
+                startDate: "",
+                endDate: "",
+                isRequestDriver: false,
+                requestStatus: '1'
+            }
+
+            await axiosInstance.post("/request/createRequest", formBooking)
+                .then(res => toast.success("Add to request Successfull !!"))
+                .catch(err => toast.error("This car may be added in your request !!"))
+        }
+
     }
 
     return (
@@ -340,7 +361,7 @@ const CarDetail = () => {
                         </p>
 
                         <Button className="w-full h-10 mt-10" type="primary" onClick={onBooking}>
-                            Thuê xe
+                            Thêm xe
                         </Button>
                     </div>
                     <div className="mt-10 w-full h-auto shadow-lg rounded-lg border">

@@ -5,98 +5,54 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { CarModels } from '../../car_list/model';
 
-const products = [
-  {
-    name: 'Professional plan',
-    desc: 'Monthly subscription',
-    price: '$15.00',
-  },
-  {
-    name: 'Dedicated support',
-    desc: 'Included in the Professional plan',
-    price: 'Free',
-  },
-  {
-    name: 'Hardware',
-    desc: 'Devices needed for development',
-    price: '$69.99',
-  },
-  {
-    name: 'Landing page template',
-    desc: 'License',
-    price: '$49.99',
-  },
-];
-
 interface InfoProps {
-  carModel: CarModels
+  carModel: [CarModels]
 }
 
 const Info = ({ carModel }: InfoProps) => {
   return (
     <React.Fragment>
-      {/* <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
+      {
+        carModel.map((item) => (
+          <div className=' flex items-center border-b-2'>
+            {/* <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
         Tên xe
       </Typography> */}
-      <Typography variant="h4" gutterBottom>
-        {carModel.carName + " " + carModel.carVersion}
-      </Typography>
-      <List disablePadding>
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Giá thuê: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.price}k / 1h
-          </Typography>
-        </ListItem>
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Màu xe: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.color}
-          </Typography>
-        </ListItem>
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Biển số xe: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.licensePlateNumber}
-          </Typography>
-        </ListItem>
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Số chỗ: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.numberOfSeat}
-          </Typography>
-        </ListItem>
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Nguyễn liệu tiêu thụ: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.carType.flue == 1 ? "Máy xăng" : carModel.carType.flue == 2 ? "Máy dầu" : "Máy điện"}
-          </Typography>
-        </ListItem>
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Loại chuyển động: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.carType.transmissionType ? "Số tự động" : "Số sàn"}
-          </Typography>
-        </ListItem>
-      </List>
+            <img src={`http://localhost:3030${item.images[0]}`} className='w-32 h32' />
+            <List disablePadding>
+              <Typography variant="h6" gutterBottom sx={{ fontSize: 13 }}>
+                {item.carName + " " + item.carVersion}
+              </Typography>
+              <ListItem sx={{ px: 0 }} >
+                <ListItemText
+                  sx={{ mr: 2 }}
+                  primary={"Giá thuê: "}
+                />
+                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                  {item.price}k / 1h
+                </Typography>
+              </ListItem>
+              <ListItem sx={{ px: 0 }}>
+                <ListItemText
+                  primary={"Biển số : "}
+                />
+                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                  {item.licensePlateNumber}
+                </Typography>
+              </ListItem>
+              <ListItem sx={{ px: 0 }}>
+                <ListItemText
+                  primary={"Số chỗ: "}
+                />
+                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                  {item.numberOfSeat}
+                </Typography>
+              </ListItem>
+            </List>
+          </div>
+        ))
+      }
+
     </React.Fragment>
   );
 }

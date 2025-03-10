@@ -7,11 +7,11 @@ const RequestSchema = new mongoose.Schema({
     require: true,
   },
   driver: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: [mongoose.Schema.Types.ObjectId],
     ref: "Driver",
   },
   car: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: [mongoose.Schema.Types.ObjectId],
     ref: "Car",
     require: true,
   },
