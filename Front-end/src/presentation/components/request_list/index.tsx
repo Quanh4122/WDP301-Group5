@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 
 const RequestList = () => {
 
-    const [requestList, setRequestList] = useState<RequestModelFull[]>()
+    const [requestList, setRequestList] = useState<RequestModelFull[]>([])
     const location = useLocation()
 
     useEffect(() => {
