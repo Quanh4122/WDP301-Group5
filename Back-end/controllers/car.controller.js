@@ -116,6 +116,7 @@ const createCar = async (req, res) => {
     flue: carType.flue,
     transmissionType: carType.transmissionType,
   });
+  console.log(carType)
 
   if (images.length == 0) {
     const error = new Error("Please choose files");
