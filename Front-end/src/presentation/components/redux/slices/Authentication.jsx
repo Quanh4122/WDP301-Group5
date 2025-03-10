@@ -1,33 +1,32 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from '../../utils/axios';
-import { signInWithGoogle } from '../../utils/firbase';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "../../utils/axios";
+import { signInWithGoogle } from "../../utils/firbase";
 
 const initialState = {
   isLoading: false,
   isLoggedIn: false,
-  token: '',
-  email: '',
-  userId: '',
-  name: '',
-  photoURL: '',
-  role: '',
+  token: "",
+  email: "",
+  userId: "",
+  name: "",
+  photoURL: "",
+  role: "",
   error: false,
   isRegister: false,
   isVerify: false,
   user: null,
 };
 
-
 export const loginWithGoogle = createAsyncThunk(
-  'auth/loginWithGoogle',
+  "auth/loginWithGoogle",
   async (_, { rejectWithValue }) => {
     try {
       const userData = await signInWithGoogle();
-      
       let role = "User"; // Default role
-      if (userData.email.startsWith("admin")) {
+      console.log(userData);
+      if (userData.user.email.startsWith("admin")) {
         role = "Admin";
-      } else if (userData.email.startsWith("driver")) {
+      } else if (userData.user.email.startsWith("driver")) {
         role = "Driver";
       }
 
@@ -58,22 +57,22 @@ const slice = createSlice({
         state.isLoggedIn = false;
         state.token = "";
         state.user = null;
-        state.email = '';
-        state.name = '';
-        state.userId = '';
-        state.photoURL = '';
-        state.role = '';
+        state.email = "";
+        state.name = "";
+        state.userId = "";
+        state.photoURL = "";
+        state.role = "";
       }, 60000);
     },
     signOut(state) {
       state.isLoggedIn = false;
       state.token = "";
       state.user = null;
-      state.email = '';
-      state.name = '';
-      state.userId = '';
-      state.photoURL = '';
-      state.role = '';
+      state.email = "";
+      state.name = "";
+      state.userId = "";
+      state.photoURL = "";
+      state.role = "";
       state.isRegister = false;
     },
     updateRegisterEmail(state, action) {
@@ -103,25 +102,24 @@ const slice = createSlice({
         state.userId = action.payload.id;
         state.name = action.payload.name;
         state.photoURL = action.payload.photoURL;
-        state.role = action.payload.role; 
+        state.role = action.payload.role;
 
         setTimeout(() => {
           state.isLoggedIn = false;
           state.token = "";
           state.user = null;
-          state.email = '';
-          state.name = '';
-          state.userId = '';
-          state.photoURL = '';
-          state.role = '';
+          state.email = "";
+          state.name = "";
+          state.userId = "";
+          state.photoURL = "";
+          state.role = "";
         }, 60000);
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || null;
       });
-      
-  }
+  },
 });
 
 export default slice.reducer;
@@ -154,7 +152,7 @@ export function LoginUser(formValues) {
           email: response.data.email || formValues.email,
         })
       );
-      
+
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
@@ -165,7 +163,7 @@ export function LoginUser(formValues) {
       throw error;
     }
   };
-};
+}
 
 export function RegisterUser(formValues) {
   return async (dispatch) => {
@@ -292,7 +290,9 @@ export function UpdateProfile(userId, formData) {
       );
     } catch (error) {
       console.error("Update Profile error:", error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
     }
   };
 }
