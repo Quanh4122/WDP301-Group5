@@ -1,6 +1,6 @@
 import { Button, Form, Input, InputNumber, Radio, Upload } from "antd";
 import { InboxOutlined } from '@ant-design/icons';
-import React from "react";
+import React, { useState } from "react";
 import BannerCreateCar from '../../assets/banner-created-car.jpg'
 import GradeIcon from '@mui/icons-material/Grade';
 import { useForm } from "antd/es/form/Form";
@@ -10,6 +10,7 @@ import axiosInstance from "../utils/axios";
 const CarCreate = () => {
 
     const [form] = useForm()
+    const [arrFile, setArrFile] = useState<File[]>()
 
     const radioBunkBed = [
         { label: "Giường nằm", value: true },
@@ -26,6 +27,7 @@ const CarCreate = () => {
         { label: 'Máy Điện', value: 3 }
     ]
     const onFinish = (value: any) => {
+        console.log(value.images)
         const listImage = value.images.fileList.map((item: any) => {
             return (item.name + "")
         })
@@ -42,16 +44,38 @@ const CarCreate = () => {
                 flue: form.getFieldValue("flue"),
                 transmissionType: form.getFieldValue("transmissionType")
             },
-            images: listImage
+            images: arrFile
         }
+        console.log(data)
         createCar(data)
     }
 
     const createCar = async (value: CarModelsNoId) => {
-        await axiosInstance.post("/car/createCar", value)
+        const formData = new FormData()
+        formData.append("carName", value.carName)
+        formData.append("color", value.color)
+        formData.append("carStatus", String(value.carStatus))
+        formData.append("licensePlateNumber", value.licensePlateNumber)
+        formData.append("price", String(value.price))
+        formData.append("carVersion", String(value.carVersion))
+        formData.append("numberOfSeat", value.numberOfSeat)
+        formData.append("bunkBed", String(value.carType.bunkBed))
+        formData.append("flue", String(value.carType.flue))
+        formData.append("transmissionType", String(value.carType.transmissionType))
+        value.images?.forEach(element => {
+            formData.append("images", element)
+        });
+        await axiosInstance.post("/car/createCar", formData)
             .then(res => res.data)
             .catch(err => console.log(err))
 
+    }
+
+    const onChangeGetFile = (files: any) => {
+        const arr: File[] = files.fileList.map((item: any) => (
+            item.originFileObj
+        ))
+        setArrFile(arr)
     }
     return (
         <div className="w-full h-auto flex p-10">
@@ -142,6 +166,7 @@ const CarCreate = () => {
                         >
                             <Upload.Dragger
                                 multiple
+                                onChange={(files) => onChangeGetFile(files)}
                             >
                                 <p className="ant-upload-drag-icon">
                                     <InboxOutlined />
