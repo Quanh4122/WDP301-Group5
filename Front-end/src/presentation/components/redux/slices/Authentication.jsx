@@ -23,7 +23,7 @@ export const loginWithGoogle = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const userData = await signInWithGoogle();
-      // Xác định role dựa trên email hoặc dữ liệu từ Firebase
+      
       let role = "User"; // Default role
       if (userData.email.startsWith("admin")) {
         role = "Admin";
@@ -53,6 +53,17 @@ const slice = createSlice({
       state.email = action.payload.email;
       state.role = action.payload.user.role;
       state.isRegister = false;
+
+      setTimeout(() => {
+        state.isLoggedIn = false;
+        state.token = "";
+        state.user = null;
+        state.email = '';
+        state.name = '';
+        state.userId = '';
+        state.photoURL = '';
+        state.role = '';
+      }, 60000);
     },
     signOut(state) {
       state.isLoggedIn = false;
@@ -92,16 +103,24 @@ const slice = createSlice({
         state.userId = action.payload.id;
         state.name = action.payload.name;
         state.photoURL = action.payload.photoURL;
-        state.role = action.payload.role; // Lưu role vào Redux
+        state.role = action.payload.role; 
+
+        setTimeout(() => {
+          state.isLoggedIn = false;
+          state.token = "";
+          state.user = null;
+          state.email = '';
+          state.name = '';
+          state.userId = '';
+          state.photoURL = '';
+          state.role = '';
+        }, 60000);
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
-        if (action.payload === "Firebase: Error (auth/popup-closed-by-user).") {
-          state.isLoading = false;
-          return; 
-        }
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload || null;
       });
+      
   }
 });
 
@@ -119,35 +138,34 @@ export function LoginUser(formValues) {
           withCredentials: true,
         }
       );
-      console.log("Login response:", response.data);
       dispatch(
         slice.actions.login({
           isLoggedIn: true,
           token: response.data.token,
           user: {
-            userId: response.data.userId,
-            userName: response.data.userName,
-            fullName: response.data.fullName,
-            phoneNumber: response.data.phoneNumber,
-            avatar: response.data.avatar,
-            address: response.data.address,
-            role: response.data.role,
+            userId: response.data.userId || "",
+            userName: response.data.userName || "",
+            fullName: response.data.fullName || "",
+            phoneNumber: response.data.phoneNumber || "",
+            avatar: response.data.avatar || "",
+            address: response.data.address || "",
+            role: response.data.role || "User",
           },
           email: response.data.email || formValues.email,
         })
       );
+      
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
     } catch (error) {
-      console.error("Login error:", error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
       throw error;
     }
   };
-}
+};
 
 export function RegisterUser(formValues) {
   return async (dispatch) => {
