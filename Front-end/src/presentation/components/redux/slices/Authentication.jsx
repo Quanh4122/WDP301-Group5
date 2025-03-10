@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from '../../utils/axios';
 import { signInWithGoogle } from '../../utils/firbase';
+import { jwtDecode } from "jwt-decode"; // ✅ Cách đúng
 
 const initialState = {
   isLoading: false,
   isLoggedIn: false,
   token: '',
+  tokenExpiration: null,
   email: '',
   userId: '',
   name: '',
@@ -18,12 +20,12 @@ const initialState = {
 };
 
 
+
 export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
   async (_, { rejectWithValue }) => {
     try {
       const userData = await signInWithGoogle();
-      // Xác định role dựa trên email hoặc dữ liệu từ Firebase
       let role = "User"; // Default role
       if (userData.email.startsWith("admin")) {
         role = "Admin";
@@ -47,6 +49,9 @@ const slice = createSlice({
       state.error = action.payload.error;
     },
     login(state, action) {
+      const decodedToken = jwtDecode(action.payload.token);
+      state.tokenExpiration = decodedToken.exp * 1000;
+
       state.isLoggedIn = true;
       state.token = action.payload.token;
       state.user = action.payload.user;
@@ -54,6 +59,7 @@ const slice = createSlice({
       state.role = action.payload.user.role;
       state.isRegister = false;
     },
+
     signOut(state) {
       state.isLoggedIn = false;
       state.token = "";
@@ -97,7 +103,7 @@ const slice = createSlice({
       .addCase(loginWithGoogle.rejected, (state, action) => {
         if (action.payload === "Firebase: Error (auth/popup-closed-by-user).") {
           state.isLoading = false;
-          return; 
+          return;
         }
         state.isLoading = false;
         state.error = action.payload;
@@ -106,6 +112,14 @@ const slice = createSlice({
 });
 
 export default slice.reducer;
+
+export function CheckTokenExpiration(dispatch, getState) {
+  const { tokenExpiration } = getState().auth;
+  if (tokenExpiration && new Date().getTime() > tokenExpiration) {
+    dispatch(LogoutUser());
+  }
+}
+
 
 export function LoginUser(formValues) {
   return async (dispatch) => {
@@ -119,11 +133,18 @@ export function LoginUser(formValues) {
           withCredentials: true,
         }
       );
+
       console.log("Login response:", response.data);
+
+      // Decode token để lấy thời gian hết hạn
+      const decodedToken = jwtDecode(response.data.token);
+      const expirationTime = decodedToken.exp * 1000; // Chuyển từ giây sang mili-giây
+
       dispatch(
         slice.actions.login({
           isLoggedIn: true,
           token: response.data.token,
+          tokenExpiration: expirationTime, // Lưu vào Redux
           user: {
             userId: response.data.userId,
             userName: response.data.userName,
@@ -136,9 +157,19 @@ export function LoginUser(formValues) {
           email: response.data.email || formValues.email,
         })
       );
+
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
+
+      // Thiết lập auto logout khi token hết hạn
+      const timeToLogout = expirationTime - new Date().getTime();
+      if (timeToLogout > 0) {
+        setTimeout(() => {
+          dispatch(LogoutUser());
+        }, timeToLogout);
+      }
+
     } catch (error) {
       console.error("Login error:", error);
       dispatch(
@@ -148,6 +179,7 @@ export function LoginUser(formValues) {
     }
   };
 }
+
 
 export function RegisterUser(formValues) {
   return async (dispatch) => {
