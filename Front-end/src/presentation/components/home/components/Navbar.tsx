@@ -25,7 +25,6 @@ const Navbar = () => {
 
   const [avatarPreview, setAvatarPreview] = useState("");
   const [userIdPreview, setUserIdPreview] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.avatar && user?.userId) {
@@ -35,19 +34,10 @@ const Navbar = () => {
       setAvatarPreview(photoURL);
       setUserIdPreview(userId);
     }
-
-    if (isLoggedIn) {
-      const timeout = setTimeout(() => {
-        dispatch(LogoutUser());
-      }, 60000); // 1 phút
-
-      return () => clearTimeout(timeout);
-    }
-  }, [user, photoURL, userId, isLoggedIn, dispatch]);
+  }, [user, photoURL, userId]);
 
   const handleLogout = async () => {
     await dispatch(LogoutUser());
-    navigate('/');
   };
 
   const onViewListRequest = () => {
@@ -67,6 +57,7 @@ const Navbar = () => {
             </Link>
           </div>
 
+          {/* Mobile Menu Button */}
           <button className="lg:hidden" onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}>
             {mobileDrawerOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -87,7 +78,8 @@ const Navbar = () => {
                 <div onClick={onViewListRequest}>
                   <NotificationsNoneIcon />
                 </div>
-                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${userIdPreview}`} className="text-black font-medium">
+
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">
                   {avatarPreview ? (
                     <img
                       src={avatarPreview}
@@ -102,7 +94,10 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.SIGN_IN}`} className="py-2 px-3 border rounded-md">
+                <Link
+                  to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.SIGN_IN}`}
+                  className="py-2 px-3 border rounded-md"
+                >
                   <button>Đăng nhập</button>
                 </Link>
                 <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.REGISTER}`} className="bg-gradient-to-r from-sky-500 to-sky-800 text-white py-2 px-3 rounded-md">
@@ -113,11 +108,12 @@ const Navbar = () => {
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {mobileDrawerOpen && (
           <div className="lg:hidden mt-4 flex flex-col space-y-4 border-t pt-4">
             {navItems.map((item, index) => (
               <Link key={index} to={item.href} onClick={() => setMobileDrawerOpen(false)}>
-                <button className="w-full text-left px-4 py-2">{item.label}</button>
+                <button className=" w-full text-left px-4 py-2">{item.label}</button>
               </Link>
             ))}
             {isLoggedIn ? (
