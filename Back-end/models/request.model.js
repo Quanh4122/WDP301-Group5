@@ -31,7 +31,7 @@ const RequestSchema = new mongoose.Schema({
     type: Boolean,
     require: true,
   },
-  time : { type : Date, default: Date.now }
+  timeCreated: { type: Date, default: Date.now },
 });
 
 const RequestModel = mongoose.model("Request", RequestSchema);
