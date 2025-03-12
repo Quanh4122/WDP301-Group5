@@ -38,7 +38,7 @@ const CarItem = ({ carModel }: props) => {
                     component="img"
                     height="194"
                     width="200"
-                    image={`http://localhost:3030/${carModel?.images[0]}`}
+                    image={`http://localhost:3030${carModel?.images[0]}`}
                     sx={{ width: 340 }}
                 />
                 <CardContent>

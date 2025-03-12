@@ -5,11 +5,11 @@ import { navItems } from "../../../../constants";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoutUser } from "../../redux/slices/Authentication";
-import { AppDispatch, RootState } from "../../redux/Store";
+import store, { AppDispatch, RootState } from "../../redux/Store";
 import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -63,20 +63,36 @@ const Navbar = () => {
           </button>
 
           <ul className="hidden lg:flex ml-14 mt-3 space-x-12">
-            {navItems.map((item, index) => (
-              <li key={index}>
-                <Link to={item.href}>
-                  <button>{item.label}</button>
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item, index) => {
+              if (item.label == "Dashboard") {
+                if (store.getState().auth.isLoggedIn && store.getState().auth.role == "admin") {
+                  return (
+                    <li key={index}>
+                      <Link to={item.href}>
+                        <button>{item.label}</button>
+                      </Link>
+                    </li>
+                  )
+                }
+              } else {
+                return (
+                  <li key={index}>
+                    <Link to={item.href}>
+                      <button>{item.label}</button>
+                    </Link>
+                  </li>
+                )
+              }
+            }
+
+            )}
           </ul>
 
           <div className="hidden lg:flex justify-center space-x-6 items-center">
             {isLoggedIn ? (
               <>
                 <div onClick={onViewListRequest}>
-                  <NotificationsNoneIcon />
+                  <ShoppingCartIcon />
                 </div>
 
                 <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">

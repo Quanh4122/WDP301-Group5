@@ -9,6 +9,7 @@ router.post("/register", userController.register);
 router.post("/verify", userController.verifyOTP);
 // router.post('/sendOtp', verifyToken, userController.sendOTP);
 router.post("/login", userController.login);
+router.post("/google-login", userController.googleLogin);
 router.get("/logout", verifyToken, userController.logout);
 router.get("/getUserById", userController.getUserById);
 router.post("/forgotPassword", userController.forgotPassword);

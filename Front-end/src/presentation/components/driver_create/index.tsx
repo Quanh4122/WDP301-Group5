@@ -7,81 +7,20 @@ import { useForm } from "antd/es/form/Form";
 import { CarModels, CarModelsNoId } from "../car_list/model";
 import axiosInstance from "../utils/axios";
 
-const CarCreate = () => {
+
+const CreateDriver = () => {
 
     const [form] = useForm()
-    const [arrFile, setArrFile] = useState<File[]>()
 
-    const radioBunkBed = [
-        { label: "Giường nằm", value: true },
-        { label: "Ghế ngồi", value: false }
-    ]
-    const radioTransmissionType = [
-        { label: "Số tự động", value: true },
-        { label: "Số sàn", value: false }
-    ]
-
-    const radioFlue = [
-        { label: 'Máy Xăng', value: 1 },
-        { label: 'Máy Dầu', value: 2 },
-        { label: 'Máy Điện', value: 3 }
-    ]
-    const onFinish = (value: any) => {
-        console.log(value.images)
-        const listImage = value.images.fileList.map((item: any) => {
-            return (item.name + "")
-        })
-        const data: CarModelsNoId = {
-            carName: form.getFieldValue("carName"),
-            color: form.getFieldValue("color"),
-            carStatus: false,
-            licensePlateNumber: form.getFieldValue("licensePlateNumber"),
-            price: form.getFieldValue("price"),
-            carVersion: form.getFieldValue("carVersion"),
-            numberOfSeat: form.getFieldValue("numberOfSeat"),
-            carType: {
-                bunkBed: form.getFieldValue("bunkBed"),
-                flue: form.getFieldValue("flue"),
-                transmissionType: form.getFieldValue("transmissionType")
-            },
-            images: arrFile
-        }
-        console.log(data)
-        createCar(data)
-    }
-
-    const createCar = async (value: CarModelsNoId) => {
-        const formData = new FormData()
-        formData.append("carName", value.carName)
-        formData.append("color", value.color)
-        formData.append("carStatus", String(value.carStatus))
-        formData.append("licensePlateNumber", value.licensePlateNumber)
-        formData.append("price", String(value.price))
-        formData.append("carVersion", String(value.carVersion))
-        formData.append("numberOfSeat", value.numberOfSeat)
-        formData.append("bunkBed", String(value.carType.bunkBed))
-        formData.append("flue", String(value.carType.flue))
-        formData.append("transmissionType", String(value.carType.transmissionType))
-        value.images?.forEach(element => {
-            formData.append("images", element)
-        });
-        await axiosInstance.post("/car/createCar", formData)
-            .then(res => res.data)
-            .catch(err => console.log(err))
+    const onFinish = () => {
 
     }
 
-    const onChangeGetFile = (files: any) => {
-        const arr: File[] = files.fileList.map((item: any) => (
-            item.originFileObj
-        ))
-        setArrFile(arr)
-    }
     return (
-        <div className="w-full h-auto flex p-10">
-            <div className="w-2/5 px-20">
+        <div className="w-full h-auto flex px-10">
+            <div className="w-2/5 p-10">
                 <div className="w-full font-bold text-lg text-sky-500">
-                    Thêm xe
+                    Thêm tài xế
                 </div>
                 <Form
                     initialValues={{ remember: true }}
@@ -137,7 +76,7 @@ const CarCreate = () => {
                             name="flue"
                         >
                             <Radio.Group
-                                options={radioFlue}
+
                             />
                         </Form.Item>
                     </div>
@@ -147,7 +86,7 @@ const CarCreate = () => {
                             name="transmissionType"
                         >
                             <Radio.Group
-                                options={radioTransmissionType}
+
                             />
                         </Form.Item>
                         <Form.Item
@@ -155,35 +94,20 @@ const CarCreate = () => {
                             name="bunkBed"
                         >
                             <Radio.Group
-                                options={radioBunkBed}
+
                             />
                         </Form.Item>
                     </div>
-                    <div>
-                        <Form.Item
-                            rules={[{ required: true }]}
-                            name="images"
-                        >
-                            <Upload.Dragger
-                                multiple
-                                onChange={(files) => onChangeGetFile(files)}
-                            >
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                <p className="ant-upload-text">Click or drag file to this area to upload car image</p>
-                            </Upload.Dragger>
-                        </Form.Item>
-                    </div>
+
                     <Button type="primary" htmlType="submit" className="w-full h-12 text-lg font-bold">Tạo xe</Button>
                 </Form>
 
             </div>
-            <div className="w-1/2">
-                <img src={BannerCreateCar} alt="banner-create-car" />
+            <div className="w-3/5 h-full">
+                <img src={BannerCreateCar} alt="banner-create-car" className="w-full h-full" />
             </div>
         </div>
     )
 }
 
-export default CarCreate
+export default CreateDriver
