@@ -9,7 +9,7 @@ import store, { AppDispatch, RootState } from "../../redux/Store";
 import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -92,7 +92,7 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <div onClick={onViewListRequest}>
-                  <NotificationsNoneIcon />
+                  <ShoppingCartIcon />
                 </div>
 
                 <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`} className="text-black font-medium">
