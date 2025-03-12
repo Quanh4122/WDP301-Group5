@@ -42,7 +42,8 @@ const RequestList = () => {
                     ))
                 }
             </div> */}
-            <RequestInSelected requestData={requestInSelected} />
+
+            {requestInSelected && <RequestInSelected requestModal={requestInSelected} />}
         </section>
     )
 }
