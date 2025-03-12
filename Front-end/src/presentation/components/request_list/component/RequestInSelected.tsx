@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { RequestAcceptForApi, RequestModelFull } from "../../checkout/models";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -15,13 +15,16 @@ import CarModal from "../../car_detail/component/CarModal";
 import CarCalendar from "../../car_detail/component/CarCalendar";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Icon } from "@mui/material";
+import { toast } from "react-toastify";
 
 interface props {
-    requestData?: RequestModelFull
+    requestModal: RequestModelFull
 }
 
-const RequestInSelected = ({ requestData }: props) => {
+const RequestInSelected = ({ requestModal }: props) => {
+
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
+    const [requestData, setRequestData] = useState<RequestModelFull>(requestModal)
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
@@ -87,6 +90,18 @@ const RequestInSelected = ({ requestData }: props) => {
         setTotalPrice(arrprice && arrprice * totalTime)
         console.log()
     }, [timeValue, dateValue])
+
+    const onDeleteCarInRequest = async (carId: any) => {
+        await axiosInstance.put("/request/userDeleteCarInRequest", {
+            requestId: requestData?._id,
+            car: carId
+        })
+            .then((res) => {
+                setRequestData(res.data)
+                toast.success("Delete Succesfull")
+            })
+            .catch((err) => toast.error("Fail to delete !!"))
+    }
 
     return (
         <div className="m-4">
@@ -169,9 +184,15 @@ const RequestInSelected = ({ requestData }: props) => {
                                 />
                             </div>
                             <div className='text-gray-500 font-medium'>
-                                <div className='w-1/2 flex justify-between'>Tổng thời gian thuê : <span className='text-gray-950'>{totalTime}h</span></div>
-                                <div className='w-1/2 flex justify-between'>Thuế VAT : <span className='text-gray-950'>{totalPrice && totalPrice * 0.1} kđ</span></div>
-                                <div className='w-1/2 flex justify-between'>Tổng số tiền thuê xe : <span className='text-gray-950'>{totalPrice} kđ</span></div>
+                                <div className='w-2/3 flex justify-between'>Tổng thời gian thuê : <span className='text-gray-950'>{totalTime}h</span></div>
+                                <div className='w-2/3 flex justify-between'>Thuế VAT : <span className='text-gray-950'>{totalPrice && (totalPrice * 0.1 * 1000).toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                })}</span></div>
+                                <div className='w-2/3 flex justify-between'>Tổng số tiền : <span className='text-gray-950'>{totalPrice && (totalPrice * 1000).toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                })}</span></div>
                             </div>
                             <div className='w-full flex items-center justify-end'>
                                 <Button htmlType='submit' type='primary'>Đặt xe</Button>
@@ -180,12 +201,12 @@ const RequestInSelected = ({ requestData }: props) => {
                     </div>
 
                 </div>
-                <div className="w-3/5 h-auto flex justify-center">
+                <div className="w-3/5 h-auto flex flex-wrap ">
                     {
                         requestData?.car.map((item) => (
-                            <div className=' flex items-center border-b-2 w-1/3 ml-5'>
+                            <div className=' flex items-center border-b-2 w-96 ml-5'>
 
-                                <img src={`http://localhost:3030${item.images[0]}`} className='w-32 h32' />
+                                <img src={`http://localhost:3030${item?.images[0]}`} className='w-32 h32' />
                                 <List disablePadding>
                                     <Typography variant="h6" gutterBottom sx={{ fontSize: 15, fontWeight: 600 }}>
                                         {item.carName + " " + item.carVersion}
@@ -216,7 +237,7 @@ const RequestInSelected = ({ requestData }: props) => {
                                         </Typography>
                                     </ListItem>
                                 </List>
-                                <div className="h-full">
+                                <div className="h-full hover:text-sky-500 hover:text-xl" onClick={() => onDeleteCarInRequest(item._id)}>
                                     <Icon><DeleteIcon /></Icon>
                                 </div>
                             </div>

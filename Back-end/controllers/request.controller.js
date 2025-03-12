@@ -93,8 +93,30 @@ const acceptBookingRequest = async (req, res) => {
   }
 };
 
+const userDeleteCarInRequest = async (req, res) => {
+  const data = req.body;
+  try {
+    await RequestModel.updateOne(
+      { _id: data.requestId },
+      {
+        $pull: { car: data.car },
+      }
+    );
+    const requestData = await RequestModel.findOne({ _id: data.requestId })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+    return res.status(200).json(requestData);
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports = {
   createRequest,
   getListRequest,
   acceptBookingRequest,
+  userDeleteCarInRequest,
 };
