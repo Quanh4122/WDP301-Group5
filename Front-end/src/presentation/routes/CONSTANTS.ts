@@ -26,5 +26,8 @@ export const PRIVATE_ROUTES = {
             DRIVER_LIST : 'driver-list',
             BOOKING_LIST : 'booking-list',
             DRIVER_CREATE : 'driver-create',
+            ADMIN_REQUEST : 'admin-request',
+            ADMIN_DETAIL_REQUEST: 'admin-detail-request',
+            TRANSACTION : 'transaction',
         }
 }

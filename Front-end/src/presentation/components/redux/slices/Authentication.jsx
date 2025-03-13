@@ -1,40 +1,86 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from '../../utils/axios';
 import { signInWithGoogle } from '../../utils/firbase';
+import { jwtDecode } from "jwt-decode";
 
 const initialState = {
   isLoading: false,
   isLoggedIn: false,
   token: '',
-  email: '',
-  userId: '',
-  name: '',
-  photoURL: '',
-  role: '',
+  tokenExpiration: null,
   error: false,
   isRegister: false,
   isVerify: false,
   user: null,
+  loginMethod: null,
 };
-
 
 export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
-  async (_, { rejectWithValue }) => {
+  async ( _, { dispatch, rejectWithValue }) => {
     try {
-      const userData = await signInWithGoogle();
-      // Xác định role dựa trên email hoặc dữ liệu từ Firebase
-      let role = "User"; // Default role
+      const userData = await signInWithGoogle(); 
+      if (!userData || !userData.email || !userData.token) {
+        throw new Error("Google login failed: No user data, email, or token returned");
+      }
+
+      let role = "User";
       if (userData.email.startsWith("admin")) {
         role = "Admin";
       } else if (userData.email.startsWith("driver")) {
         role = "Driver";
       }
 
-      return { ...userData, role };
+      const avatar = userData.photoURL || ""; 
+
+      const standardizedUser = {
+        userId: userData.userId || userData.uid, 
+        userName: userData.userName || "Unnamed User", 
+        avatar: userData.avatar || avatar, 
+        email: userData.email || "",
+        role: role,
+        fullName: userData.fullName || "",
+        phoneNumber: userData.phoneNumber || "",
+        address: userData.address || "",
+      };
+
+      const decodedToken = jwtDecode(userData.token);
+      const expirationTime = decodedToken.exp * 1000;
+
+      const timeToLogout = expirationTime - new Date().getTime();
+      if (timeToLogout > 0) {
+        setTimeout(() => {
+          dispatch(LogoutUser());
+        }, timeToLogout);
+      }
+
+      if (avatar) {
+        const formData = new FormData();
+        formData.append("avatar", avatar); 
+        formData.append("userId", standardizedUser.userId);
+      }
+
+      return {
+        token: userData.token,
+        user: standardizedUser,
+        tokenExpiration: expirationTime,
+        loginMethod: "google",
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
+  }
+);
+
+export const CheckTokenExpiration = createAsyncThunk(
+  'auth/checkTokenExpiration',
+  async (_, { dispatch, getState }) => {
+    const { tokenExpiration } = getState().auth;
+    if (tokenExpiration && new Date().getTime() > tokenExpiration) {
+      await dispatch(LogoutUser());
+      return { expired: true };
+    }
+    return { expired: false };
   }
 );
 
@@ -47,26 +93,27 @@ const slice = createSlice({
       state.error = action.payload.error;
     },
     login(state, action) {
+      const decodedToken = jwtDecode(action.payload.token);
+      state.tokenExpiration = decodedToken.exp * 1000;
+
       state.isLoggedIn = true;
       state.token = action.payload.token;
-      state.user = action.payload.user;
-      state.email = action.payload.email;
-      state.role = action.payload.user.role;
+      state.user = action.payload.user; 
+      state.loginMethod = action.payload.loginMethod;
       state.isRegister = false;
     },
     signOut(state) {
       state.isLoggedIn = false;
       state.token = "";
       state.user = null;
-      state.email = '';
-      state.name = '';
-      state.userId = '';
-      state.photoURL = '';
-      state.role = '';
+      state.tokenExpiration = null;
+      state.loginMethod = null;
+      state.error = false;
       state.isRegister = false;
+      state.isVerify = false;
     },
     updateRegisterEmail(state, action) {
-      state.email = action.payload.email;
+      state.user = state.user ? { ...state.user, email: action.payload.email } : { email: action.payload.email };
     },
     setRegisterStatus(state, action) {
       state.isRegister = action.payload;
@@ -88,21 +135,19 @@ const slice = createSlice({
         state.isLoading = false;
         state.isLoggedIn = true;
         state.token = action.payload.token;
-        state.email = action.payload.email;
-        state.userId = action.payload.id;
-        state.name = action.payload.name;
-        state.photoURL = action.payload.photoURL;
-        state.role = action.payload.role; // Lưu role vào Redux
+        state.user = action.payload.user;
+        state.tokenExpiration = action.payload.tokenExpiration;
+        state.loginMethod = action.payload.loginMethod;
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
         if (action.payload === "Firebase: Error (auth/popup-closed-by-user).") {
           state.isLoading = false;
-          return; 
+          return;
         }
         state.isLoading = false;
         state.error = action.payload;
       });
-  }
+  },
 });
 
 export default slice.reducer;
@@ -119,26 +164,40 @@ export function LoginUser(formValues) {
           withCredentials: true,
         }
       );
+
       console.log("Login response:", response.data);
+
+      const decodedToken = jwtDecode(response.data.token);
+      const expirationTime = decodedToken.exp * 1000;
+
+      const standardizedUser = {
+        userId: response.data.userId,
+        userName: response.data.userName,
+        fullName: response.data.fullName || "",
+        phoneNumber: response.data.phoneNumber || "",
+        avatar: response.data.avatar || "",
+        address: response.data.address || "",
+        role: response.data.role || "User",
+        email: response.data.email || formValues.email,
+      };
+
       dispatch(
         slice.actions.login({
-          isLoggedIn: true,
           token: response.data.token,
-          user: {
-            userId: response.data.userId,
-            userName: response.data.userName,
-            fullName: response.data.fullName,
-            phoneNumber: response.data.phoneNumber,
-            avatar: response.data.avatar,
-            address: response.data.address,
-            role: response.data.role,
-          },
-          email: response.data.email || formValues.email,
+          user: standardizedUser,
         })
       );
+
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
+
+      const timeToLogout = expirationTime - new Date().getTime();
+      if (timeToLogout > 0) {
+        setTimeout(() => {
+          dispatch(LogoutUser());
+        }, timeToLogout);
+      }
     } catch (error) {
       console.error("Login error:", error);
       dispatch(
@@ -204,17 +263,13 @@ export function VerifyEmail(formValues) {
 }
 
 export function ForgotPassword(formValues) {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     await axios
       .post(
         "/forgotPassword",
+        { ...formValues },
         {
-          ...formValues,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       )
       .then((response) => {
@@ -234,9 +289,7 @@ export function NewPassword({ token, password, passwordConfirm }) {
         "/resetPassword",
         { token, password, passwordConfirm },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
       console.log("Reset Password response:", response.data);

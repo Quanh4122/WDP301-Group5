@@ -15,11 +15,8 @@ import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser, loginWithGoogle } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
-
-
 import { ToastContainer, toast } from "react-toastify";
 import { Eye, EyeOff } from 'lucide-react';
-
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -57,15 +54,15 @@ export default function SignIn() {
 
   const handleGoogleLogin = async () => {
     try {
-      const user = await dispatch(loginWithGoogle()).unwrap();  // Dùng `.unwrap()` để bắt lỗi từ async thunk
-      toast.success("Đăng nhập thành công")
+      const user = await dispatch(loginWithGoogle()).unwrap();
+      console.log("User object:", user);
+      toast.success("Đăng nhập thành công");
       navigate("/");
     } catch (error) {
       console.error("Google login failed:", error);
       toast.error("Đăng nhập thất bại");
     }
   };
-
 
   const validateInputs = () => {
     const email = (document.getElementById('email') as HTMLInputElement).value;
@@ -89,6 +86,7 @@ export default function SignIn() {
 
     return isValid;
   };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -100,25 +98,21 @@ export default function SignIn() {
 
     try {
       await dispatch(LoginUser({ email, password }));
-      toast.success('Login successful!');
+      toast.success('Đăng nhập thành công!');
       navigate('/');
-
     } catch (error: any) {
-      toast.error('errol!')
-      console.log(error)
+      toast.error('errol!');
+      console.log(error);
     }
   };
-
-
 
   return (
     <>
       <CssBaseline />
-      <ToastContainer position="top-right" />
       <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
-            Sign in
+            Đăng nhập
           </Typography>
           {serverError && (
             <Typography color="error" sx={{ textAlign: 'center' }}>
@@ -143,13 +137,13 @@ export default function SignIn() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
+              <FormLabel htmlFor="password">Mật khẩu</FormLabel>
               <TextField
                 error={!!passwordError}
                 helperText={passwordError}
                 name="password"
                 placeholder="Enter your password"
-                type={showPassword ? "text" : "password"} // Cập nhật kiểu input dựa vào showPassword
+                type={showPassword ? "text" : "password"}
                 id="password"
                 autoComplete="current-password"
                 required
@@ -172,8 +166,8 @@ export default function SignIn() {
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
             <Link to={'/app/forgot-password'}>
-            <Button component="button" variant="text" sx={{ alignSelf: 'center' }}>
-                Forgot your password?
+              <Button component="button" variant="text" sx={{ alignSelf: 'center' }}>
+                Quên mật khẩu?
               </Button>
             </Link>
           </Box>
@@ -182,21 +176,19 @@ export default function SignIn() {
           </Typography>
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button onClick={handleGoogleLogin}
-              disabled={isLoading} fullWidth variant="outlined" startIcon={<GoogleIcon />}>
-              {isLoading ? "Đang đăng nhập..." : (
-                <>
-                  Sign in with Google
-                </>
-              )}
-            </Button>
-            <Button fullWidth variant="outlined" onClick={() => alert('Sign in with Facebook')} startIcon={<FacebookIcon />}>
-              Sign in with Facebook
+            <Button
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+              fullWidth
+              variant="outlined"
+              startIcon={<GoogleIcon />}
+            >
+              {isLoading ? "Đang đăng nhập..." : "Đăng nhập bằng google"}
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
+              Bạn chưa có tài khoản?{' '}
               <RouterLink to="/app/register">
-                Sign up
+                <button>Đăng ký</button>
               </RouterLink>
             </Typography>
           </Box>

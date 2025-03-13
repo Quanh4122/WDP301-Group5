@@ -17,13 +17,15 @@ export type RequestModel = {
     isRequesDriver? : boolean,
 }
 export type RequestModelFull = {
+    _id: any,
     user?: UserModel,
     car: [CarModel],
     driver?: [DriverModel],
     startDate: any,
     endDate: any,
     requestStatus: string,
-    isRequestDriver?: Boolean
+    isRequestDriver?: Boolean,
+    timeCreated? : string,
 }
 
 export type RequestModalForCallApi = {

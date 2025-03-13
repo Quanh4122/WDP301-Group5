@@ -17,19 +17,27 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
     const [totalTime, setTotalTime] = useState<any>()
     const [VATFee, setVATFee] = useState<any>()
     const [totalFee, setTotalFee] = useState<any>()
+    const [startDate, setStartDate] = useState<any>()
+    const [endDate, setEndDate] = useState<any>()
 
     useEffect(() => {
         calculateTotalTimeBooking()
+        console.log(detailRequest)
     }, [])
 
     const calculateTotalTimeBooking = () => {
         const startDate = dayjs(detailRequest.startDate)
         const endDate = dayjs(detailRequest.endDate)
         const total = endDate.diff(startDate, 'hour', true)
+        setStartDate(startDate.format("HH:mm, DD/MM/YYYY"))
+        setEndDate(endDate.format("HH:mm, DD/MM/YYYY"))
         setTotalTime(total)
-        // const calVATFee = detailRequest.car.price * total * 0.1
-        // setVATFee(calVATFee)
-        // setTotalFee(calVATFee + detailRequest.car.price * total)
+        const arrprice = detailRequest?.car.map((item) => item.price).reduce((total, current) => {
+            return total + current
+        })
+        const calVATFee = arrprice * total * 0.1
+        setVATFee(calVATFee)
+        setTotalFee(calVATFee + arrprice * total)
     }
 
     return (
@@ -37,89 +45,13 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
             title={<div className="flex items-center justify-center text-xl font-bold">{title}</div>}
             open={isOpen}
             onCancel={onCancel}
-            width={1000}
             centered
             footer={<div>
-                <Button>Đồng ý</Button>
-                <Button>Từ chối</Button>
+                {/* <Button>Đồng ý</Button>
+                <Button>Từ chối</Button> */}
             </div>}
         >
             <div className="flex">
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        flexGrow: 1,
-                        width: '100%',
-                        maxWidth: 500,
-                        paddingX: 5,
-                    }}
-                >
-                    <React.Fragment>
-                        {/* <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
-        Tên xe
-      </Typography> */}
-                        <Typography variant="h4" gutterBottom>
-                            {/* {detailRequest.car.carName + " " + detailRequest.car.carVersion} */}
-                        </Typography>
-                        <List disablePadding>
-                            <ListItem sx={{ py: 1, px: 0 }}>
-                                <ListItemText
-                                    sx={{ mr: 2 }}
-                                    primary={"Giá thuê: "}
-                                />
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {/* {detailRequest.car.price}k / 1h */}
-                                </Typography>
-                            </ListItem>
-                            <ListItem sx={{ py: 1, px: 0 }}>
-                                <ListItemText
-                                    sx={{ mr: 2 }}
-                                    primary={"Màu xe: "}
-                                />
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {/* {detailRequest.car.color} */}
-                                </Typography>
-                            </ListItem>
-                            <ListItem sx={{ py: 1, px: 0 }}>
-                                <ListItemText
-                                    sx={{ mr: 2 }}
-                                    primary={"Biển số xe: "}
-                                />
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {/* {detailRequest.car.licensePlateNumber} */}
-                                </Typography>
-                            </ListItem>
-                            <ListItem sx={{ py: 1, px: 0 }}>
-                                <ListItemText
-                                    sx={{ mr: 2 }}
-                                    primary={"Số chỗ: "}
-                                />
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {/* {detailRequest.car.numberOfSeat} */}
-                                </Typography>
-                            </ListItem>
-                            {/* <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Nguyễn liệu tiêu thụ: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.carType.flue == 1 ? "Máy xăng" : carModel.carType.flue == 2 ? "Máy dầu" : "Máy điện"}
-          </Typography>
-        </ListItem>
-        <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText
-            sx={{ mr: 2 }}
-            primary={"Loại chuyển động: "}
-          />
-          <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-            {carModel.carType.transmissionType ? "Số tự động" : "Số sàn"}
-          </Typography>
-        </ListItem> */}
-                        </List>
-                    </React.Fragment>
-                </Box>
                 <Box
                     sx={{
                         display: 'flex',
@@ -132,17 +64,27 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                 >
                     <List disablePadding>
                         <ListItem sx={{ py: 1, px: 0 }}>
-                            <ListItemText primary="Thời gian thuê" />
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{totalTime} h</Typography>
+                            <ListItemText primary="Ngày nhận" />
+                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{startDate}</Typography>
+                        </ListItem>
+                        <ListItem sx={{ py: 1, px: 0 }}>
+                            <ListItemText primary="Ngày trả" />
+                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{endDate}</Typography>
                         </ListItem>
                         <ListItem sx={{ py: 1, px: 0 }}>
                             <ListItemText primary="Thuế VAT" />
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{VATFee} kđ</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{(VATFee * 1000).toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}</Typography>
                         </ListItem>
                         <ListItem sx={{ py: 1, px: 0 }}>
                             <ListItemText primary="Total" />
                             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                                {totalFee}
+                                {(totalFee * 1000).toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                })}
                             </Typography>
                         </ListItem>
                         {/*<ListItem sx={{ py: 1, px: 0 }}>
@@ -167,7 +109,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: props) =>
                     >
                         <div>
                             <Typography variant="subtitle2" gutterBottom>
-                                Thông tin của bạn
+                                <div className="font-bold">Thông tin của bạn</div>
                             </Typography>
                             <Typography gutterBottom>Họ và tên: <span className='text-gray-500'>{detailRequest.user?.userName}</span></Typography>
                             <Typography gutterBottom>Email: <span className='text-gray-500'>{detailRequest.user?.email}</span></Typography>

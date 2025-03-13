@@ -1,5 +1,6 @@
-require('dotenv').config();
-const DriverModel = require('../models/driver.model');
+require("dotenv").config();
+const DriverModel = require("../models/driver.model");
+const RequestModel = require("../models/request.model");
 
 const createDriver = async (req, res) => {
     try {
@@ -85,3 +86,35 @@ const deleteDriver = async (req, res) => {
 };
 
 module.exports = { createDriver, getDriver, getAllDrivers, updateDriver, deleteDriver };
+const getAllFreeDrivers = async (req, res) => {
+  try {
+    // Fetch all drivers from the database
+    const drivers = await DriverModel.find();
+    const request = await RequestModel.find();
+    const listDriverInRequest = request
+      .map((item) => item.driver)
+      .flat()
+      .reduce((acc, current) => {
+        if (!acc.includes(current)) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+    // Check if there are no drivers
+    if (!drivers.length) {
+      return res.status(404).json({ message: "No drivers found" });
+    } else {
+      const driverRel = drivers.map((item) => {
+        if (listDriverInRequest.filter((dt) => dt == item._id).length == 0) {
+          return item;
+        }
+      });
+      res.status(200).json(driverRel);
+    }
+  } catch (error) {
+    console.error("Error fetching drivers:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { createDriver, getDriver, getAllDrivers, getAllFreeDrivers };
