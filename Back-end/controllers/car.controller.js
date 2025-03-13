@@ -120,8 +120,6 @@ const createCar = async (req, res) => {
     flue: flue,
     transmissionType: transmissionType,
   });
-  console.log(carType)
-
   if (req.files.length == 0) {
     const error = new Error("Please choose files");
     error.httpStatusCode = 400;
