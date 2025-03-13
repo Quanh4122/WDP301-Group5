@@ -34,8 +34,8 @@ const Navbar = () => {
     if (user) {
       const avatarUrl = user.avatar
         ? user.avatar.startsWith("http")
-          ? user.avatar 
-          : `http://localhost:3030${user.avatar}` 
+          ? user.avatar
+          : `http://localhost:3030${user.avatar}`
         : "";
       setAvatarPreview(avatarUrl);
       setUserIdPreview(user.userId);
@@ -52,7 +52,7 @@ const Navbar = () => {
         navigate(`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.SIGN_IN}`);
       }
     };
-  
+
     if (isLoggedIn && tokenExpiration) {
       checkToken();
       const timeToExpiration = tokenExpiration - new Date().getTime();
@@ -67,7 +67,7 @@ const Navbar = () => {
         return () => clearTimeout(timeout);
       }
     }
-  
+
     const interval = setInterval(checkToken, 60000);
     return () => clearInterval(interval);
   }, [dispatch, isLoggedIn, tokenExpiration, navigate]);

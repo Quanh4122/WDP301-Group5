@@ -131,193 +131,111 @@ const AdminDetailRequest = () => {
         navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST)
     }
     return (
-        <div className="m-4">
+        <div className="m-4 bg-blue-50 min-h-screen"> {/* Light blue background */}
             <div className="flex items-center justify-center">
                 <div className="w-2/5 h-auto flex items-center justify-center">
-                    <div className="w-4/5 h-full">
-                        <Form
-                            className='w-full'
-                            initialValues={initialValue}
-                        >
-                            <div className='flex w-full justify-between mb-2'>
-                                <Form.Item
-                                    label="Họ và tên"
-                                    layout='vertical'
-                                    name='userName'
-                                    required
-                                >
-                                    <Input disabled />
+                    <div className="w-4/5 h-full bg-white rounded-lg shadow p-6"> {/* White background, rounded corners, shadow, padding */}
+                        <Form className='w-full' initialValues={{
+                            userName: requestData?.user?.userName,
+                            email: requestData?.user?.email,
+                            phoneNumber: requestData?.user?.phoneNumber,
+                            address: requestData?.user?.address,
+                            isRequestDriver: requestData?.isRequestDriver
+                        }}>
+                            <div className='flex w-full justify-between mb-4'> {/* Increased margin-bottom */}
+                                <Form.Item label="Họ và tên" layout='vertical' name='userName' required className="w-1/2 mr-2">
+                                    <Input disabled className="border-blue-200" /> {/* Light blue border */}
                                 </Form.Item>
-                                <Form.Item
-                                    label="Email"
-                                    layout='vertical'
-                                    name='email'
-                                    required
-                                >
-                                    <Input disabled />
+                                <Form.Item label="Email" layout='vertical' name='email' required className="w-1/2 ml-2">
+                                    <Input disabled className="border-blue-200" />
                                 </Form.Item>
                             </div>
-                            <div className='flex w-full justify-between mb-2'>
-                                <Form.Item
-                                    label="Số điện thoại"
-                                    layout='vertical'
-                                    name='phoneNumber'
-                                    required
-                                >
-                                    <Input disabled />
+                            <div className='flex w-full justify-between mb-4'>
+                                <Form.Item label="Số điện thoại" layout='vertical' name='phoneNumber' required className="w-1/2 mr-2">
+                                    <Input disabled className="border-blue-200" />
                                 </Form.Item>
-                                <Form.Item
-                                    label="Địa chỉ"
-                                    layout='vertical'
-                                    name='address'
-                                    required
-                                >
-                                    <Input disabled />
+                                <Form.Item label="Địa chỉ" layout='vertical' name='address' required className="w-1/2 ml-2">
+                                    <Input disabled className="border-blue-200" />
                                 </Form.Item>
                             </div>
                             <div className='flex w-full justify-between mb-8'>
-                                <Form.Item
-                                    label="Bạn muốn thuê tài xế : "
-                                    layout='vertical'
-                                    name='isRequestDriver'
-                                    required
-                                >
-                                    <Radio.Group
-                                        disabled
-                                        options={requestDriver}
-                                    />
+                                <Form.Item label="Bạn muốn thuê tài xế :" layout='vertical' name='isRequestDriver' required className="w-full">
+                                    <Radio.Group disabled options={requestDriver} />
                                 </Form.Item>
                             </div>
-                            <div
-                                className="w-80 border-2 h-16  rounded-md flex items-center mb-8">
-                                <div
-                                    className="h-full w-12 flex items-center justify-center text-sky-500"
-                                // onClick={() => setIsOpenModalN(true)}
-                                >
+                            <div className="w-full border border-blue-200 rounded-md p-3 mb-8 flex items-center"> {/* Light blue border, flex items-center */}
+                                <div className="w-12 flex items-center justify-center text-blue-500"> {/* Blue icon */}
                                     <CalendarMonthIcon />
                                 </div>
-                                <div className="h-full w-auto flex items-center">
-                                    <div>
-                                        <div className="text-xs text-gray-500">Thời gian thuê</div>
-                                        <div className="text-sm font-semibold">{timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}</div>
-                                    </div>
+                                <div className="flex-1">
+                                    <div className="text-xs text-gray-500">Thời gian thuê</div>
+                                    <div className="text-sm font-semibold text-blue-700">{timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}</div> {/* Blue text */}
                                 </div>
-                                {/* <CarModal
-                                    isOpen={isOpenModalN}
-                                    onCancel={() => setIsOpenModalN(false)}
-                                    title={"Thời gian thuê xe"}
-                                    element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
-                                /> */}
                             </div>
-                            {
-                                requestData.isRequestDriver &&
-                                <div
-                                    className="w-80 border-2 h-16  rounded-md flex items-center mb-8">
-                                    <div
-                                        className="h-full w-12 flex items-center justify-center text-sky-500"
-                                        onClick={() => setIsOpenModalN(true)}
-                                    >
+                            {requestData?.isRequestDriver && (
+                                <div className="w-full border border-blue-200 rounded-md p-3 mb-8 flex items-center">
+                                    <div className="w-12 flex items-center justify-center text-blue-500 cursor-pointer" onClick={() => setIsOpenModalN(true)}>
                                         <CalendarMonthIcon />
                                     </div>
-                                    <div className="h-full w-auto flex items-center">
-                                        <div>
-                                            <div className="text-xs text-gray-500">Danh sách tài xế</div>
-                                            <div className="text-sm font-semibold">
-
-                                            </div>
-                                        </div>
+                                    <div className="flex-1">
+                                        <div className="text-xs text-gray-500">Danh sách tài xế</div>
                                     </div>
-                                    <ModalDriverSelect
-                                        isOpen={isOpenModalN}
-                                        onCancel={() => setIsOpenModalN(false)}
-                                        listDriver={driverList}
-                                        onSelectedValue={onSelectedValue}
-                                    />
+                                    <ModalDriverSelect isOpen={isOpenModalN} onCancel={() => setIsOpenModalN(false)} listDriver={driverList} onSelectedValue={onSelectedValue} />
                                 </div>
-                            }
-                            <div className='text-gray-500 font-medium'>
-                                <div className='w-2/3 flex justify-between'>Tổng thời gian thuê : <span className='text-gray-950'>{totalTime}h</span></div>
-                                <div className='w-2/3 flex justify-between'>Thuế VAT : <span className='text-gray-950'>{totalPrice && (totalPrice * 0.1 * 1000).toLocaleString('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND'
-                                })}</span></div>
-                                <div className='w-2/3 flex justify-between'>Tổng số tiền : <span className='text-gray-950'>{totalPrice && (totalPrice * 1000).toLocaleString('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND'
-                                })}</span></div>
+                            )}
+                            <div className='text-gray-500 font-medium mb-8'>
+                                <div className='flex justify-between'>Tổng thời gian thuê : <span className='text-blue-700'>{totalTime}h</span></div> {/* Blue text */}
+                                <div className='flex justify-between'>Thuế VAT : <span className='text-blue-700'>{totalPrice && (totalPrice * 0.1 * 1000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></div>
+                                <div className='flex justify-between'>Tổng số tiền : <span className='text-blue-700'>{totalPrice && (totalPrice * 1000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></div>
                             </div>
                             <div className='w-full flex items-center justify-end mt-5'>
-                                <Button
-                                    type='primary'
-                                    onClick={() => onSubmitData(true)}
-                                    className="mr-5"
-                                >
+                                <Button type='primary' onClick={() => onSubmitData(true)} className="mr-5 bg-blue-500 hover:bg-blue-600 border-blue-600"> {/* Blue buttons */}
                                     Đồng ý
                                 </Button>
-                                <Button
-                                    type='primary'
-                                    onClick={() => onSubmitData(false)}
-                                >
+                                <Button type='primary' onClick={() => onSubmitData(false)} className="bg-blue-500 hover:bg-blue-600 border-blue-600">
                                     Từ chối
                                 </Button>
                             </div>
                         </Form>
                     </div>
-
                 </div>
-                <div className="w-3/5 h-auto flex flex-wrap ">
-                    {
-                        requestData?.car.map((item, index) => (
-                            <div className='flex items-center border-b-2 w-96 ml-5'>
-
-                                <img src={`http://localhost:3030${item?.images[0]}`} className='w-32 h32' />
-                                <List disablePadding>
-                                    <Typography variant="h6" gutterBottom sx={{ fontSize: 15, fontWeight: 600 }}>
-                                        {item.carName + " " + item.carVersion}
+                <div className="w-3/5 h-auto flex flex-wrap">
+                    {requestData?.car.map((item, index) => (
+                        <div className='flex items-center border-b border-blue-200 w-full p-4' key={index}> {/* Light blue border, padding */}
+                            <img src={`http://localhost:3030${item?.images[0]}`} alt={item.carName} className='w-32 h-32 rounded-md mr-4' /> {/* Rounded image, margin right */}
+                            <List disablePadding className="flex-1">
+                                <Typography variant="h6" gutterBottom sx={{ fontSize: 15, fontWeight: 600 }} className="text-blue-500">
+                                    {item.carName + " " + item.carVersion}
+                                </Typography>
+                                <ListItem sx={{ px: 0 }}>
+                                    <ListItemText primary={"Giá thuê: "} />
+                                    <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                                        {item.price}k / 1h
                                     </Typography>
-                                    <ListItem sx={{ px: 0 }} >
-                                        <ListItemText
-                                            sx={{ mr: 2 }}
-                                            primary={"Giá thuê: "}
-                                        />
-                                        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                            {item.price}k / 1h
-                                        </Typography>
-                                    </ListItem>
+                                </ListItem>
+                                <ListItem sx={{ px: 0 }}>
+                                    <ListItemText primary={"Biển số : "} />
+                                    <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                                        {item.licensePlateNumber}
+                                    </Typography>
+                                </ListItem>
+                                <ListItem sx={{ px: 0 }}>
+                                    <ListItemText primary={"Số chỗ: "} />
+                                    <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                                        {item.numberOfSeat}
+                                    </Typography>
+                                </ListItem>
+                                {driverSelected.length > 0 && (
                                     <ListItem sx={{ px: 0 }}>
-                                        <ListItemText
-                                            primary={"Biển số : "}
-                                        />
+                                        <ListItemText primary={"Tài xế: "} />
                                         <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                            {item.licensePlateNumber}
+                                            {driverList?.find(d => driverSelected[0] === d._id)?.name}
                                         </Typography>
                                     </ListItem>
-                                    <ListItem sx={{ px: 0 }}>
-                                        <ListItemText
-                                            primary={"Số chỗ: "}
-                                        />
-                                        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                            {item.numberOfSeat}
-                                        </Typography>
-                                    </ListItem>
-                                    {
-                                        driverSelected.length > 0 &&
-                                        <ListItem sx={{ px: 0 }}>
-                                            <ListItemText
-                                                primary={"Tài xế: "}
-                                            />
-                                            <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                                {driverList?.find(item => driverSelected[0] == item._id).name}
-                                            </Typography>
-                                        </ListItem>
-                                    }
-                                </List>
-                                {/* <div className="h-full hover:text-sky-500 hover:text-xl" onClick={() => onDeleteCarInRequest(item._id)}>
-                                    <Icon><DeleteIcon /></Icon>
-                                </div> */}
-                            </div>
-                        ))
-                    }
+                                )}
+                            </List>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

@@ -7,97 +7,87 @@ import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 
-interface props {
-    requestList: RequestModelFull[] | []
+interface Props {
+    requestList: RequestModelFull[] | [];
 }
 
-const ListRequestPending = ({ requestList }: props) => {
+const ListRequestPending = ({ requestList }: Props) => {
+    const [listData, setListData] = useState<RequestModelFull[] | []>([]);
+    const navigate = useNavigate();
 
-    const [listData, setListData] = useState<RequestModelFull[] | []>()
     useEffect(() => {
-        setListData(requestList)
-    }, [])
-    const navigate = useNavigate()
+        setListData(requestList);
+    }, [requestList]);
 
     return (
-        <div className="w-full h-auto mt-5">
-            <div>
-                {
-                    requestList?.map((item, index) => (
-                        <div key={index}>
+        <div className="w-full mt-5">
+            {requestList?.map((item, index) => (
+                <div key={index} className="mb-4 rounded-md shadow-md overflow-hidden bg-white border border-blue-100"> {/* White background, light blue border */}
+                    {/* User Info */}
+                    <div className="flex items-center justify-between p-4 border-b border-blue-100"> {/* Light blue border */}
+                        <div className="flex items-center space-x-4">
+                            {item.user?.avatar ? (
+                                <img
+                                    src={`http://localhost:3030${item.user?.avatar}`}
+                                    alt="Avatar Preview"
+                                    className="w-12 h-12 rounded-full object-cover border border-blue-200" // Light blue border
+                                />
+                            ) : (
+                                <PersonIcon className="w-12 h-12 text-blue-500" /> // Light blue icon
+                            )}
                             <div>
-                                <div className="w-full h-28 flex items-center justify-between px-5 border-b-2 border rounded-sm ">
-                                    <div
-                                    // className="flex items-center"
-                                    >
-                                        <div>
-                                            {item.user?.avatar ? (
-                                                <img
-                                                    src={`http://localhost:3030${item.user?.avatar}`}
-                                                    alt="Avatar Preview"
-                                                    className="w-20 h-20 mx-auto border rounded-sm object-cover"
-                                                />
-                                            ) : <PersonIcon />}
-                                        </div>
-                                        {item.user?.userName}
-                                    </div>
-                                    <div>{item.user?.email}</div>
-                                    <div>{dayjs(item.timeCreated).format("DD/MM/YYYY")}</div>
-                                    <div>{statusRequest.find(dt => dt.value == item.requestStatus)?.lable}</div>
-                                    <Button
-                                        onClick={() => navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST, { state: item })}
-                                    >
-                                        {
-                                            item.requestStatus == "2" ? "Chi tiết" : ""
-                                        }
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="w-full h-auto border rounded-sm shadow-md mb-4 flex overflow-hidden">
-                                {
-                                    item.car.map(item => (
-                                        <div className="w-96 px-5 h-28 border-b-2 flex items-center">
-                                            <div>
-                                                <div>
-                                                    {item.images ? (
-                                                        <img
-                                                            src={`http://localhost:3030${item.images[0]}`}
-                                                            alt="Preview"
-                                                            className="w-20 h-20 border rounded-sm object-cover"
-                                                        />
-                                                    ) : <PersonIcon />}
-                                                </div>
-                                                <div className="w-24 overflow-hidden whitespace-nowrap text-ellipsis">{item.carName}</div>
-                                            </div>
-                                            <div className="pl-3">
-                                                <div>
-                                                    <div className="text-sm font-semibold">
-                                                        Số chỗ: <span>{item.numberOfSeat}</span>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-sm font-semibold">
-                                                        Biển số xe: <span>{item.licensePlateNumber}</span>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-sm font-semibold">{(item.price * 1000).toLocaleString('vi-VN', {
-                                                        style: 'currency',
-                                                        currency: 'VND'
-                                                    })}/h</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                }
+                                <div className="font-semibold text-blue-700">{item.user?.userName}</div> {/* Blue text */}
+                                <div className="text-sm text-gray-500">{item.user?.email}</div>
                             </div>
                         </div>
-                    ))
-                }
-            </div>
+                        <div className="flex items-center space-x-4">
+                            <div className="text-sm text-gray-600">{dayjs(item.timeCreated).format("DD/MM/YYYY")}</div>
+                            <div className="text-sm text-blue-600">{statusRequest.find((dt) => dt.value == item.requestStatus)?.lable}</div> {/* Blue text */}
+                            {item.requestStatus === "2" && (
+                                <Button
+                                    onClick={() => navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST, { state: item })}
+                                    className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md px-3 py-1" // Light blue button
+                                >
+                                    Chi tiết
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Car Info */}
+                    <div className="flex flex-wrap">
+                        {item.car.map((carItem, carIndex) => (
+                            <div key={carIndex} className="w-full sm:w-1/2 md:w-1/3 p-4 border-b border-blue-100"> {/* Light blue border */}
+                                <div className="flex items-center space-x-4">
+                                    {carItem.images && carItem.images.length > 0 ? (
+                                        <img
+                                            src={`http://localhost:3030${carItem.images[0]}`}
+                                            alt="Car Preview"
+                                            className="w-16 h-16 rounded-md object-cover border border-blue-200" // Light blue border
+                                        />
+                                    ) : (
+                                        <PersonIcon className="w-16 h-16 text-blue-500" /> // Light blue icon
+                                    )}
+                                    <div>
+                                        <div className="font-semibold truncate w-32 text-blue-700">{carItem.carName}</div> {/* Blue text */}
+                                        <div className="text-sm text-gray-600">Số chỗ: {carItem.numberOfSeat}</div>
+                                        <div className="text-sm text-gray-600">Biển số: {carItem.licensePlateNumber}</div>
+                                        <div className="text-sm text-gray-600">
+                                            {(carItem.price * 1000).toLocaleString('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND',
+                                            })}
+                                            /h
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
+    );
+};
 
-    )
-}
-
-export default ListRequestPending
+export default ListRequestPending;

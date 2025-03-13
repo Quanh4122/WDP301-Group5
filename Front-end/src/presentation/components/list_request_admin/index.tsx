@@ -1,43 +1,75 @@
-import { Button } from 'antd'
-import React, { useEffect, useState } from 'react'
-import { RequestModelFull } from '../checkout/models'
-import axiosInstance from '../utils/axios'
-import ListRequestPending from './components/ListRequestPending'
+import { Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { RequestModelFull } from '../checkout/models';
+import axiosInstance from '../utils/axios';
+import ListRequestPending from './components/ListRequestPending';
 
 const AdminRequest = () => {
+    const [requestDataPending, setRequestDataPending] = useState<RequestModelFull[] | []>([]);
+    const [requestDataAccepted, setRequestDataAccepted] = useState<RequestModelFull[] | []>([]);
+    const [requestDataDenied, setRequestDataDenied] = useState<RequestModelFull[] | []>([]);
+    const [dataDisplay, setDataDisplay] = useState<RequestModelFull[] | []>(requestDataPending); // Initialize with pending data
 
-    const [requestDataPending, setRequestDataPending] = useState<RequestModelFull[] | []>()
-    const [requestDataAccepted, setRequestDataAccepted] = useState<RequestModelFull[] | []>()
-    const [requestDataDenined, setRequestDataDenined] = useState<RequestModelFull[] | []>()
+    const optionRequest = [
+        { label: "Pending", value: "Pending" },
+        { label: "Accepted", value: "Accepted" },
+        { label: "Denied", value: "Denied" },
+    ];
 
     useEffect(() => {
-        getListRequest()
-    }, [])
+        getListRequest();
+    }, []);
+
+    useEffect(() => {
+        setDataDisplay(requestDataPending);
+    }, [requestDataPending])
 
     const getListRequest = async () => {
-        await axiosInstance.get('request/getListAdminRequest')
-            .then(res => setListRequest(res.data))
-            .catch(err => console.log(err))
-    }
+        try {
+            const res = await axiosInstance.get('request/getListAdminRequest');
+            setListRequest(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const setListRequest = (listRequest: RequestModelFull[]) => {
-        setRequestDataPending(listRequest.filter(item => item.requestStatus == '2'))
-        setRequestDataAccepted(listRequest.filter(item => item.requestStatus == '3'))
-        setRequestDataDenined(listRequest.filter(item => item.requestStatus == '4'))
-    }
+        setRequestDataPending(listRequest.filter((item) => item.requestStatus === '2'));
+        setRequestDataAccepted(listRequest.filter((item) => item.requestStatus === '3'));
+        setRequestDataDenied(listRequest.filter((item) => item.requestStatus === '4'));
+    };
+
+    const onChangeValue = (value: string) => {
+        if (value === 'Pending') {
+            setDataDisplay(requestDataPending);
+        } else if (value === 'Accepted') {
+            setDataDisplay(requestDataAccepted);
+        } else {
+            setDataDisplay(requestDataDenied);
+        }
+    };
 
     return (
-        <div className='w-full h-screen p-5'>
-            <div>
-                <Button>Change Screen</Button>
+        <div className="w-full min-h-screen p-5 bg-gray-100">
+            <div className="mb-4 bg-white shadow-md p-4 rounded-md">
+                <Select
+                    options={optionRequest}
+                    defaultValue={'Pending'}
+                    onChange={(value) => onChangeValue(value)}
+                    className="w-48"
+                // Các style của select
+
+                />
             </div>
-            <div>
-                {
-                    <ListRequestPending requestList={requestDataPending || []} />
-                }
+            <div className="bg-white shadow-md p-4 rounded-md">
+                {dataDisplay && dataDisplay.length > 0 ? (
+                    <ListRequestPending requestList={dataDisplay || []} />
+                ) : (
+                    <div className="text-center text-gray-500">Không có dữ liệu</div>
+                )}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default AdminRequest
+export default AdminRequest;
