@@ -21,6 +21,9 @@ const Navbar = () => {
     tokenExpiration: number | null;
   };
 
+  console.log(user);
+  
+
   const [avatarPreview, setAvatarPreview] = useState("");
   const [userIdPreview, setUserIdPreview] = useState("");
 
