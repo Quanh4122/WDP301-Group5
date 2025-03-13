@@ -6,6 +6,15 @@ const VerifyToken = require("../middlewares/VerifyToken");
 
 router.post("/createRequest", VerifyToken, RequestController.createRequest);
 router.get("/getListRequest", VerifyToken, RequestController.getListRequest);
-router.post("/userAcceptRequest", VerifyToken, RequestController.acceptBookingRequest);
+router.post(
+  "/userAcceptRequest",
+  VerifyToken,
+  RequestController.acceptBookingRequest
+);
+router.put(
+  "/userDeleteCarInRequest",
+  VerifyToken,
+  RequestController.userDeleteCarInRequest
+);
 
 module.exports = router;

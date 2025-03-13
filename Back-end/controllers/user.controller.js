@@ -7,6 +7,8 @@ const mailService = require("../services/sendMail");
 const otp = require("../Templates/Mail/otp");
 const ResetPassword = require("../Templates/Mail/resetPassword");
 const crypto = require("crypto");
+const admin = require("../services/firebaseAdmin");
+const { log } = require("console");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -142,7 +144,7 @@ const login = async (req, res) => {
                 phoneNumber: user.phoneNumber,
               },
               JWT_SECRET,
-              { expiresIn: "1h" }
+              { expiresIn: "1m" }
             );
             res.cookie("token", token, {
               httpOnly: true,
@@ -168,6 +170,75 @@ const login = async (req, res) => {
       }
     });
 };
+
+// [POST] LOGIN WITH GOOGLE
+const googleLogin = async (req, res) => {
+  const { idToken } = req.body;
+  console.log("🔥 idToken:", idToken);
+
+  if (!idToken) {
+    return res.status(400).json({
+      status: "error",
+      message: "idToken is required",
+    });
+  }
+
+  try {
+    // Verify the ID token with Firebase Admin SDK
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const { uid, email, name, picture } = decodedToken;
+
+    // Check if user already exists in the database
+    let user = await UserModel.findOne({ email: email });
+
+    if (!user) {
+      // If the user does not exist, create a new one
+      user = new UserModel({
+        userName: name,
+        email: email,
+        avatar: picture,
+        verified: true, 
+        role: "user",
+      });
+
+      await user.save();
+    }
+
+    // Generate JWT token for the user
+    const token = jwt.sign(
+      {
+        _id: user._id,
+        email: user.email,
+        userName: user.userName,
+        avatar: user.avatar,
+        role: user.role,
+      },
+      JWT_SECRET,
+      { expiresIn: "1m" }
+    );
+
+    // Respond with user details and the JWT token
+    res.status(200).json({
+      status: "success",
+      message: "Google login successful",
+      token,
+      user: {
+        userId: user._id,
+        email: user.email,
+        userName: user.userName,
+        avatar: user.avatar,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Error logging in with Google",
+    });
+  }
+};
+
 
 // [GET] /logout
 const logout = async (req, res) => {
@@ -374,4 +445,5 @@ module.exports = {
   editProfile,
   changePassword,
   getUserById,
+  googleLogin,
 };

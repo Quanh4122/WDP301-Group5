@@ -29,13 +29,13 @@ const RequestItem = ({ requestModel }: props) => {
 
 
     return (
-        <div className=" w-full h-auto border rounded-sm shadow-md mb-4"
+        <div className="w-full h-auto border rounded-sm shadow-md mb-4"
         // onClick={() => setIsOpen(true)}
         >
             <div className="border-b-2 w-full h-10 px-5 flex items-center justify-between">
                 <div className="font-bold">{statusRequest.filter(item => item.value == requestData.requestStatus)[0]?.lable}</div>
                 <div>
-                    <Button className="border rounded-sm" onClick={onGoToBooking}>Đặt xe</Button>
+                    <Button className="border rounded-sm" onClick={() => setIsOpen(true)}>Xem chi tiết</Button>
                 </div>
             </div>
             {
@@ -64,16 +64,19 @@ const RequestItem = ({ requestModel }: props) => {
                             </div>
                         </div>
                         <div>
-                            <div className="text-sm font-semibold">{item.price}k Đ/h</div>
+                            <div className="text-sm font-semibold">{(item.price * 1000).toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}</div>
                         </div>
-                        {
+                        {/* {
                             requestData.requestStatus == "1" ? <Button className="border rounded-sm"
                             // onClick={() => setIsOpen(true)}
                             >
                                 Delete
                             </Button>
                                 : <></>
-                        }
+                        } */}
 
                     </div>
                 ))
