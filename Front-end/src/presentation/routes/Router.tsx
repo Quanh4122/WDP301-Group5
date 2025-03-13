@@ -31,6 +31,7 @@ import CreateDriver from "../components/driver_create";
 import AdminRequest from "../components/list_request_admin";
 import ListRequestPending from "../components/list_request_admin/components/ListRequestPending";
 import AdminDetailRequest from "../components/list_request_admin/components/AdminDetailRequest";
+import TransactionList from "../components/transaction/transactionList";
 
 
 const Router = () => {
@@ -148,6 +149,11 @@ const Router = () => {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST,
             element: <AdminDetailRequest />
         },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.TRANSACTION,
+            element: <TransactionList />
+        },
+        
     ]
 
     return (
