@@ -1,7 +1,6 @@
 import { PRIVATE_ROUTES, ROOT } from "./CONSTANTS";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../components/Layout/PrivateRoute";
-import ProductDetai from "../components/list_all/components/ProductDetail";
 import SignIn from "../components/auth/SignIn";
 import Dashboard from "../components/dashboard/Dashboard";
 import Checkout from "../components/checkout/Checkout";
