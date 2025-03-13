@@ -12,6 +12,7 @@ const initialState = {
   isRegister: false,
   isVerify: false,
   user: null,
+  loginMethod: null,
 };
 
 export const loginWithGoogle = createAsyncThunk(
@@ -38,9 +39,9 @@ export const loginWithGoogle = createAsyncThunk(
         avatar: userData.avatar || avatar, 
         email: userData.email || "",
         role: role,
-        fullName:  "",
-        phoneNumber: "",
-        address: "",
+        fullName: userData.fullName || "",
+        phoneNumber: userData.phoneNumber || "",
+        address: userData.address || "",
       };
 
       const decodedToken = jwtDecode(userData.token);
@@ -63,6 +64,7 @@ export const loginWithGoogle = createAsyncThunk(
         token: userData.token,
         user: standardizedUser,
         tokenExpiration: expirationTime,
+        loginMethod: "google",
       };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -96,7 +98,8 @@ const slice = createSlice({
 
       state.isLoggedIn = true;
       state.token = action.payload.token;
-      state.user = action.payload.user; // Lưu toàn bộ thông tin user
+      state.user = action.payload.user; 
+      state.loginMethod = action.payload.loginMethod;
       state.isRegister = false;
     },
     signOut(state) {
@@ -104,6 +107,7 @@ const slice = createSlice({
       state.token = "";
       state.user = null;
       state.tokenExpiration = null;
+      state.loginMethod = null;
       state.error = false;
       state.isRegister = false;
       state.isVerify = false;
@@ -133,6 +137,7 @@ const slice = createSlice({
         state.token = action.payload.token;
         state.user = action.payload.user;
         state.tokenExpiration = action.payload.tokenExpiration;
+        state.loginMethod = action.payload.loginMethod;
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
         if (action.payload === "Firebase: Error (auth/popup-closed-by-user).") {

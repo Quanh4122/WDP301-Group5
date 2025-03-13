@@ -5,8 +5,9 @@ import { Link } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 
 const UserProfile: React.FC = () => {
-  const { user, isLoggedIn } = useSelector((state: RootState) => state.auth) as {
+  const { user, isLoggedIn, loginMethod } = useSelector((state: RootState) => state.auth) as {
     isLoggedIn: boolean;
+    loginMethod: string | null; // Thêm loginMethod vào type
     user: {
       userId: string;
       userName: string;
@@ -14,9 +15,11 @@ const UserProfile: React.FC = () => {
       fullName?: string;
       phoneNumber?: string;
       address?: string;
-      email?: string; // Thêm email nếu backend hoặc Google trả về
+      email?: string;
     } | null;
   };
+
+  console.log("User:", user, "Login Method:", loginMethod);
 
   const [avatarPreview, setAvatarPreview] = useState("");
   const [userIdPreview, setUserIdPreview] = useState("");
@@ -24,7 +27,6 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     if (isLoggedIn && user) {
-      // Chuẩn hóa avatar
       if (user.avatar) {
         setAvatarPreview(
           user.avatar.startsWith("http") ? user.avatar : `http://localhost:3030${user.avatar}`
@@ -32,14 +34,9 @@ const UserProfile: React.FC = () => {
       } else {
         setAvatarPreview("");
       }
-
-      // Chuẩn hóa userId
       setUserIdPreview(user.userId || "");
-
-      // Chuẩn hóa userName
       setUserNamePreview(user.userName || "");
     } else {
-      // Reset khi không đăng nhập
       setAvatarPreview("");
       setUserIdPreview("");
       setUserNamePreview("");
@@ -59,7 +56,6 @@ const UserProfile: React.FC = () => {
             ) : (
               <PersonIcon style={{ width: 50, height: 50 }} />
             )}
-
             <div>
               <p className="text-xl font-semibold">{userNamePreview || "Người dùng"}</p>
               <p className="text-gray-600">{user.email || "Chưa cập nhật email"}</p>
@@ -86,14 +82,17 @@ const UserProfile: React.FC = () => {
               to={`/app/edit-profile/${userIdPreview}`}
               className="px-4 py-2 bg-green-500 text-white rounded-md"
             >
-              <button>Edit Profile</button>
+              <button>Cập nhật thông tin</button>
             </Link>
-            <Link
-              to={`/app/change-password/${userIdPreview}`}
-              className="px-4 py-2 bg-violet-400 text-white rounded-md hover:bg-violet-500 transition"
-            >
-              <button>Change Password</button>
-            </Link>
+            {/* Chỉ hiển thị nút Change Password nếu không đăng nhập bằng Google */}
+            {loginMethod !== "google" && (
+              <Link
+                to={`/app/change-password/${userIdPreview}`}
+                className="px-4 py-2 bg-violet-400 text-white rounded-md hover:bg-violet-500 transition"
+              >
+                <button>Đổi mật khẩu</button>
+              </Link>
+            )}
           </div>
         </>
       ) : (

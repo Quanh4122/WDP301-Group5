@@ -145,7 +145,7 @@ const login = async (req, res) => {
                 phoneNumber: user.phoneNumber,
               },
               JWT_SECRET,
-              { expiresIn: "5m" }
+              { expiresIn: "10m" }
             );
             res.cookie("token", token, {
               httpOnly: true,
@@ -220,7 +220,7 @@ const googleLogin = async (req, res) => {
         role: user.role,
       },
       JWT_SECRET,
-      { expiresIn: "1m" }
+      { expiresIn: "10m" }
     );
 
     res.cookie("token", token, {
@@ -236,9 +236,12 @@ const googleLogin = async (req, res) => {
         userId: user._id,
         email: user.email,
         userName: user.userName,
+        fullName: user.fullName,
         avatar: user.avatar,
         role: user.role,
         token: token,
+        phoneNumber: user.phoneNumber,
+        address: user.address,
       },
     });
   } catch (error) {

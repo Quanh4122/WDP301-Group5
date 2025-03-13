@@ -50,6 +50,9 @@ export const signInWithGoogle = async () => {
       userName: data.user.userName || user.displayName || "Unnamed User",
       avatar: data.user.avatar || user.photoURL || "",
       role: data.user.role || "User", // Lấy role từ backend nếu có
+      fullName: data.user.fullName || user.displayName || "Unnamed User",
+      phoneNumber: data.user.phoneNumber || user.phoneNumber || "",
+      address: data.user.address || user.address || "",
     };
   } catch (error) {
     console.error("❌ Google login error:", error);
