@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "../redux/Store";
 import { RootState } from "../redux/Store";
 import { UpdateProfile } from "../redux/slices/Authentication";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const EditProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,11 +27,11 @@ const EditProfile: React.FC = () => {
   });
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || "");
 
   useEffect(() => {
     if (user?.avatar) {
-      setAvatarPreview(`http://localhost:3030${user.avatar}`);
+      setAvatarPreview(user.avatar.startsWith("http") ? user.avatar : `http://localhost:3030${user.avatar}`);
     }
   }, [user]);
 
@@ -44,7 +45,7 @@ const EditProfile: React.FC = () => {
       setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarPreview(reader.result as string); // 🟢 Cập nhật preview ngay lập tức
+        setAvatarPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -54,7 +55,7 @@ const EditProfile: React.FC = () => {
     e.preventDefault();
 
     if (!user?.userId) {
-      console.error("Lỗi: userId không tồn tại!");
+      toast.error("Lỗi: userId không tồn tại!");
       return;
     }
 
@@ -68,18 +69,19 @@ const EditProfile: React.FC = () => {
       formDataToSend.append("avatar", avatarFile);
     }
 
-    console.log("Dữ liệu gửi đi:", Object.fromEntries(formDataToSend.entries()));
-
     try {
       await dispatch(UpdateProfile(user.userId, formDataToSend));
+      toast.success("Cập nhật hồ sơ thành công!");
       navigate(`/app/profile/${user?.userId}`);
     } catch (error) {
       console.error("Lỗi cập nhật hồ sơ:", error);
+      toast.error("Lỗi khi cập nhật hồ sơ!");
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-20 mb-20">
+      <ToastContainer />
       <h2 className="text-2xl font-bold mb-4 text-center">Chỉnh sửa hồ sơ</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -139,11 +141,12 @@ const EditProfile: React.FC = () => {
           />
         </div>
         <div>
-          <button type="submit"
-            className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
-              Save
+          <button
+            type="submit"
+            className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+          >
+            Save
           </button>
-          {' '}
         </div>
       </form>
     </div>

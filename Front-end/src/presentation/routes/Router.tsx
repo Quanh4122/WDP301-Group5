@@ -31,6 +31,7 @@ import CreateDriver from "../components/driver_create";
 import AdminRequest from "../components/list_request_admin";
 import ListRequestPending from "../components/list_request_admin/components/ListRequestPending";
 import AdminDetailRequest from "../components/list_request_admin/components/AdminDetailRequest";
+import TransactionList from "../components/transaction/transactionList";
 
 
 const Router = () => {
@@ -94,7 +95,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DASH_BOARD,
-            element: <ProtectedRoute requiredRole="admin"><Dashboard /></ProtectedRoute>
+            element: <ProtectedRoute requiredRole="Admin"><Dashboard /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING,
@@ -102,7 +103,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/createBlog",
-            element: <ProtectedRoute requiredRole="admin"><CreateBlog /></ProtectedRoute>
+            element: <ProtectedRoute requiredRole="Admin"><CreateBlog /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/blog/:postId",
@@ -122,7 +123,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_CREATE,
-            element: <ProtectedRoute requiredRole="admin"><CarCreate /></ProtectedRoute>
+            element: <ProtectedRoute requiredRole="Admin"><CarCreate /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_LIST,
@@ -148,6 +149,11 @@ const Router = () => {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST,
             element: <AdminDetailRequest />
         },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.TRANSACTION,
+            element: <TransactionList />
+        },
+        
     ]
 
     return (
