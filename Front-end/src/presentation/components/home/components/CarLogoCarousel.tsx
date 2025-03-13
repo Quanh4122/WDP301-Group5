@@ -5,7 +5,7 @@ import BMWLogo from '../../../assets/BMWLogo.png';
 import MercedesLogo from '../../../assets/MercedesLogo.png';
 import PorscheLogo from '../../../assets/PorscheLogo.png';
 import KiaLogo from '../../../assets/KiaLogo.png';
-import HuyndaiLogo from '../../../assets/HuyndaiLogo.jpg';
+import HuyndaiLogo from '../../../assets/HuyndaiLogo.png';
 
 const CarLogoCarousel = () => {
   const logos = [
@@ -76,9 +76,6 @@ const CarLogoCarousel = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 20px', // Khoảng cách giữa các logo
-                backgroundColor: '#fff', // Nền trắng cho logo
-                borderRadius: '8px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Hiệu ứng bóng
                 transition: 'transform 0.3s ease-in-out',
                 '&:hover': {
                   transform: 'scale(1.1)', // Phóng to khi hover
