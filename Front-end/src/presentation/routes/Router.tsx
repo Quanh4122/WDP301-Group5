@@ -28,6 +28,9 @@ import NotAuthorization from "../components/auth/NotAuthorization";
 import ProtectedRoute from "./PrivateRoute";
 import RequestList from "../components/request_list";
 import CreateDriver from "../components/driver_create";
+import AdminRequest from "../components/list_request_admin";
+import ListRequestPending from "../components/list_request_admin/components/ListRequestPending";
+import AdminDetailRequest from "../components/list_request_admin/components/AdminDetailRequest";
 
 
 const Router = () => {
@@ -136,6 +139,14 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_CREATE,
             element: <CreateDriver />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST,
+            element: <AdminRequest />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST,
+            element: <AdminDetailRequest />
         },
     ]
 
