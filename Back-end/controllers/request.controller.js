@@ -3,7 +3,6 @@ const UserModel = require("../models/user.model");
 
 const createRequest = async (req, res) => {
   const data = req.body;
-
   const requestModel = new RequestModel({
     user: data.user,
     driver: data.driver || [],
@@ -44,8 +43,9 @@ const createRequest = async (req, res) => {
 
 const getListRequest = async (req, res) => {
   const userId = req.query.key;
+  console.log(userId.userId);
   try {
-    const requestList = await RequestModel.find({ user: userId })
+    const requestList = await RequestModel.find({ user: userId.userId })
       .populate("user", "userName fullName email phoneNumber address avatar")
       .populate(
         "car",

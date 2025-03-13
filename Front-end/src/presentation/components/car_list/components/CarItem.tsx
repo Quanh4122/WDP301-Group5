@@ -32,61 +32,59 @@ const CarItem = ({ carModel }: props) => {
     }
 
     return (
-        <div onClick={() => goToDetail()}>
-            <Card sx={{ maxWidth: 300 }} className="bg-gray-100 rounded-lg shadow-md m-2">
-                <CardMedia
-                    component="img"
-                    height="194"
-                    width="200"
-                    image={`http://localhost:3030${carModel?.images[0]}`}
-                    sx={{ width: 340 }}
+        <div onClick={() => goToDetail()} className="cursor-pointer"> {/* Added cursor-pointer for better UX */}
+            <div className="bg-white rounded-lg shadow-md m-2 w-full max-w-sm"> {/* Replaced Card with div for Tailwind styling */}
+                <img
+                    src={`http://localhost:3030${carModel?.images[0]}`}
+                    alt={`${carModel?.carName} ${carModel?.carVersion}`}
+                    className="w-full h-48 object-cover rounded-t-lg"
                 />
-                <CardContent>
+                <div className="p-4"> {/* Replaced CardContent with div for Tailwind styling */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-2">{carModel?.carName + " " + carModel?.carVersion}</h3>
-                        {/* <p className="text-gray-600 mb-4">Huyện Hòa Vang</p> */}
+                        <h3 className="text-lg font-semibold mb-2 text-sky-700"> {/* Added text-sky-700 for better visibility */}
+                            {carModel?.carName} {carModel?.carVersion}
+                        </h3>
                         <div className="flex items-center justify-end">
-                            <p className="text-md font-bold text-sky-500"><span className="text-base line-through text-gray-500 mr-1">440K</span>{carModel?.price}K /1 Ngày
-                                {/* <ArrowCircleRightIcon className="mx-2" /> */}
+                            <p className="text-md font-bold text-sky-500">
+                                <span className="text-base line-through text-gray-500 mr-1">440K</span>
+                                {carModel?.price}K / 1 Ngày
                             </p>
                         </div>
                         <div className="flex items-center justify-end mt-2">
                             <p className="text-md font-bold text-gray-800">2 ngày 4 giờ</p>
                         </div>
                         <div className="flex items-center justify-end mt-2">
-                            <p className="text-xs text-gray-800">Giá tạm tính chưa bao gồm vat</p>
+                            <p className="text-xs text-gray-800">Giá tạm tính chưa bao gồm VAT</p>
                         </div>
                     </div>
-                    <Typography>
-                        <div className="flex items-center justify-between mt-2">
+                    <div className="mt-2">
+                        <div className="flex items-center justify-between">
                             <div className="flex items-center text-sky-500">
-                                <PersonIcon />
-                                <Typography variant="body2" color="textSecondary">
+                                <PersonIcon className="mr-1" />
+                                <span className="text-sm">
                                     {carModel?.numberOfSeat} chỗ
-                                </Typography>
+                                </span>
                             </div>
                             <div className="flex items-center text-sky-500">
-                                <UsbIcon />
-                                <Typography variant="body2" color="textSecondary">
+                                <UsbIcon className="mr-1" />
+                                <span className="text-sm">
                                     {carModel?.carType.transmissionType ? "Số tự động" : "Số sàn"}
-                                </Typography>
+                                </span>
                             </div>
                             <div className="flex items-center text-sky-500">
-                                <LocalGasStationIcon />
-                                <Typography variant="body2" color="textSecondary">
+                                <LocalGasStationIcon className="mr-1" />
+                                <span className="text-sm">
                                     {displayFlue(carModel?.carType.flue)}
-                                </Typography>
+                                </span>
                             </div>
                         </div>
-                    </Typography>
-                    <Typography >
-                        <div className="w-full h-10 mt-5 flex justify-center items-center bg-orange-100 text-orange-500">
-                            <CalendarMonthIcon />
-                            Xem Lịch xe
-                        </div>
-                    </Typography>
-                </CardContent>
-            </Card>
+                    </div>
+                    <div className="w-full h-10 mt-5 flex justify-center items-center bg-sky-100 text-sky-500 rounded-md hover:bg-sky-200 transition duration-200"> {/* Adjusted styling */}
+                        <CalendarMonthIcon className="mr-1" />
+                        Xem Lịch xe
+                    </div>
+                </div>
+            </div>
         </div>
 
     )

@@ -72,19 +72,17 @@ const CarList = () => {
     }
 
     return (
-        <div className="w-full">
-            <div className="w-full h-20 bg-black">
-                <img src={MapBanner} className="w-40 h-20" />
-            </div>
-            <div className="w-2/3 px-24 h-24 flex flex-wrap items-center">
-                <div className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 text-sky-500 border-sky-500 border-solid flex items-center justify-center hover:bg-sky-500 hover:text-white">
+        <div className="w-full bg-white"> {/* White background */}
+
+            <div className="w-full px-8 md:px-24 py-6 flex flex-wrap items-center"> {/* Padding adjusted for responsiveness */}
+                <div className="h-8 px-3 mr-3 rounded-full border border-sky-500 text-sky-500 flex items-center justify-center hover:bg-sky-500 hover:text-white transition duration-200"> {/* Rounded buttons with hover effect */}
                     Tất cả
                 </div>
                 <div
-                    className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
+                    className="h-8 px-3 mr-3 rounded-full border border-sky-500 text-sky-500 flex items-center justify-center hover:bg-sky-500 hover:text-white transition duration-200 cursor-pointer"
                     onClick={() => setIsOpenModal(true)}
                 >
-                    <PersonIcon className="500" /><span>Số chỗ</span>
+                    <PersonIcon className="mr-1" /><span>Số chỗ</span>
                 </div>
                 <CarFilterModals
                     isOpen={isOpenModal}
@@ -93,12 +91,11 @@ const CarList = () => {
                     title="Số chỗ"
                     onSetListData={onSetListDataNumberOfSeat}
                 />
-
                 <div
-                    className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
+                    className="h-8 px-3 mr-3 rounded-full border border-sky-500 text-sky-500 flex items-center justify-center hover:bg-sky-500 hover:text-white transition duration-200 cursor-pointer"
                     onClick={() => setIsOpenModalT(true)}
                 >
-                    <UsbIcon /><span>Loại xe</span>
+                    <UsbIcon className="mr-1" /><span>Loại xe</span>
                 </div>
                 <CarFilterModals
                     isOpen={isOpenModalT}
@@ -107,12 +104,11 @@ const CarList = () => {
                     title="Loại xe"
                     onSetListData={onSetListDataTransmissionType}
                 />
-
                 <div
-                    className="w-auto h-8 px-3 mr-3 rounded-2xl border-1 border-sky-500 border-solid flex items-center justify-center text-sky-500 hover:bg-sky-500 hover:text-white"
+                    className="h-8 px-3 mr-3 rounded-full border border-sky-500 text-sky-500 flex items-center justify-center hover:bg-sky-500 hover:text-white transition duration-200 cursor-pointer"
                     onClick={() => setIsOpenModalF(true)}
                 >
-                    <LocalGasStationIcon /><span>Nhiên liệu</span>
+                    <LocalGasStationIcon className="mr-1" /><span>Nhiên liệu</span>
                 </div>
                 <CarFilterModals
                     isOpen={isOpenModalF}
@@ -122,12 +118,12 @@ const CarList = () => {
                     onSetListData={onSetListDataFlue}
                 />
             </div>
-            <div className=" flex flex-wrap items-center py-10 px-20">
-                {
-                    carList && carList.map((item, index) => (
-                        <CarItem carModel={item} key={index} />
-                    ))
-                }
+            <div className="flex flex-wrap justify-center p-4">
+                {carList && carList.map((item, index) => (
+                    <div key={index} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2"> {/* Added width classes and padding */}
+                        <CarItem carModel={item} />
+                    </div>
+                ))}
             </div>
         </div>
 

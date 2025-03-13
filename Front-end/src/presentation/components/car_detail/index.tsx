@@ -113,13 +113,17 @@ const CarDetail = () => {
             <div className="w-full h-20 bg-black mb-8">
                 <img src={MapBanner} className="w-40 h-20" alt="Banner" />
             </div>
-            <div className="flex items-center px-36">
-                <div className="flex justify-between">
-                    {
-                        carDetail?.images.map(item => (
-                            <Image src={`http://localhost:3030${item}`} width={300} height={150} />
-                        ))
-                    }
+            <div className="flex justify-center px-4 md:px-36"> {/* Adjusted padding and justify-center */}
+                <div className="flex flex-wrap justify-center"> {/* Added flex-wrap and justify-center */}
+                    {carDetail?.images.map((item, index) => (
+                        <div key={index} className="w-full sm:w-1/2 md:w-1/4 p-2"> {/* Added width classes and padding */}
+                            <img
+                                src={`http://localhost:3030${item}`}
+                                alt={`Car Image ${index}`}
+                                className="w-full h-auto object-cover rounded-md"
+                            />
+                        </div>
+                    ))}
                 </div>
             </div>
             <div className="w-ful h-auto px-36 py-10 flex">
