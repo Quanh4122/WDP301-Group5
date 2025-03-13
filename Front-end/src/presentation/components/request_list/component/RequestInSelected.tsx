@@ -16,6 +16,8 @@ import CarCalendar from "../../car_detail/component/CarCalendar";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Icon } from "@mui/material";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 
 interface props {
     requestModal: RequestModelFull
@@ -25,6 +27,7 @@ const RequestInSelected = ({ requestModal }: props) => {
 
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
     const [requestData, setRequestData] = useState<RequestModelFull>(requestModal)
+    const navigate = useNavigate()
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
@@ -75,7 +78,10 @@ const RequestInSelected = ({ requestModal }: props) => {
         }
 
         await axiosInstance.post("/request/userAcceptRequest", requestBookingAccept)
-            .then(res => console.log(res))
+            .then(res => {
+                toast.success("Bạn đã thành công đặt xe xe !!")
+                navigate("/")
+            })
             .catch(err => console.log(err))
     }
     const arrprice = requestData?.car.map((item) => item.price).reduce((total, current) => {

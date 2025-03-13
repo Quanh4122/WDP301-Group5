@@ -34,7 +34,7 @@ const RequestList = () => {
 
     const onCategoryTypeByRequestList = (list: RequestModelFull[]) => {
         setRequestInSelected(list.filter((item) => item.requestStatus == "1")[0])
-        setRequestPending(list.filter((item) => item.requestStatus == "2"))
+        setRequestPending(list.filter((item) => item.requestStatus != "1"))
 
     }
 
