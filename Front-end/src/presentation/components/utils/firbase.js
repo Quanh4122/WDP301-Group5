@@ -20,14 +20,15 @@ export const signInWithGoogle = async () => {
     // Step 1: Sign in with Google popup
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-    const token = await user.getIdToken(); // Get Firebase ID token
-    console.log("✅ Google ID Token:", token);
+    const idToken = await user.getIdToken(); // Get Firebase ID token
+    console.log("✅ Google ID Token:", idToken);
 
     // Step 2: Send token to backend for verification
     const response = await fetch("http://localhost:3030/google-login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken: token }),
+      body: JSON.stringify({ idToken: idToken }), // Gửi idToken từ Firebase
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -37,17 +38,21 @@ export const signInWithGoogle = async () => {
     const data = await response.json();
     console.log("🟢 Backend response:", data);
 
-    // Step 3: Use Firebase user data as fallback if backend response is incomplete
+    if (!data.user || !data.user.token) {
+      throw new Error("Backend did not return a valid token");
+    }
+
+    // Step 3: Return data with backend token only
     return {
-      token: data.token || token, // Use backend token if provided, else Firebase token
-      email: data.email || user.email || "", // Fallback to Firebase email
-      userId: data.id || user.uid, // Fallback to Firebase UID
-      userName: data.name || user.displayName || "Unnamed User",
-      avatar: data.photoURL || user.photoURL || "",
-      // Add other fields as needed (e.g., role if backend provides it)
+      token: data.user.token, // Chỉ dùng token từ backend
+      email: data.user.email || user.email || "",
+      userId: data.user.userId,
+      userName: data.user.userName || user.displayName || "Unnamed User",
+      avatar: data.user.avatar || user.photoURL || "",
+      role: data.user.role || "User", // Lấy role từ backend nếu có
     };
   } catch (error) {
     console.error("❌ Google login error:", error);
-    throw new Error(`Firebase: ${error.message}`); // Propagate error to thunk
+    throw new Error(`Firebase: ${error.message}`);
   }
 };

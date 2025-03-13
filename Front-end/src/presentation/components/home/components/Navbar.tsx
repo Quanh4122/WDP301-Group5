@@ -30,14 +30,12 @@ const Navbar = () => {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [userIdPreview, setUserIdPreview] = useState("");
 
-  // Cập nhật avatar và userId khi user thay đổi
   useEffect(() => {
     if (user) {
-      // Kiểm tra xem avatar có phải là URL đầy đủ (từ Google) hay đường dẫn cục bộ
       const avatarUrl = user.avatar
         ? user.avatar.startsWith("http")
-          ? user.avatar // Nếu là URL đầy đủ (Google), dùng trực tiếp
-          : `http://localhost:3030${user.avatar}` // Nếu là đường dẫn cục bộ, thêm prefix
+          ? user.avatar 
+          : `http://localhost:3030${user.avatar}` 
         : "";
       setAvatarPreview(avatarUrl);
       setUserIdPreview(user.userId);
@@ -47,7 +45,6 @@ const Navbar = () => {
     }
   }, [user]);
 
-  // Kiểm tra token expiration và logout nếu cần
   useEffect(() => {
     const checkToken = async () => {
       const result = await dispatch(CheckTokenExpiration());
@@ -55,7 +52,7 @@ const Navbar = () => {
         navigate(`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.SIGN_IN}`);
       }
     };
-
+  
     if (isLoggedIn && tokenExpiration) {
       checkToken();
       const timeToExpiration = tokenExpiration - new Date().getTime();
@@ -70,7 +67,7 @@ const Navbar = () => {
         return () => clearTimeout(timeout);
       }
     }
-
+  
     const interval = setInterval(checkToken, 60000);
     return () => clearInterval(interval);
   }, [dispatch, isLoggedIn, tokenExpiration, navigate]);

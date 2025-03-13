@@ -16,9 +16,9 @@ const initialState = {
 
 export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
-  async (_, { rejectWithValue }) => {
+  async ( _, { dispatch, rejectWithValue }) => {
     try {
-      const userData = await signInWithGoogle();
+      const userData = await signInWithGoogle(); // Giả sử hàm này trả về dữ liệu từ Google
       if (!userData || !userData.email || !userData.token) {
         throw new Error("Google login failed: No user data, email, or token returned");
       }
@@ -30,19 +30,34 @@ export const loginWithGoogle = createAsyncThunk(
         role = "Driver";
       }
 
+      const avatar = userData.photoURL || ""; 
+
       const standardizedUser = {
-        userId: userData.userId,
-        userName: userData.userName || "Unnamed User",
-        avatar: userData.avatar || "",
+        userId: userData.userId || userData.uid, 
+        userName: userData.userName || "Unnamed User", 
+        avatar: userData.avatar || avatar, 
         email: userData.email || "",
         role: role,
-        fullName: "",
+        fullName:  "",
         phoneNumber: "",
         address: "",
       };
 
       const decodedToken = jwtDecode(userData.token);
       const expirationTime = decodedToken.exp * 1000;
+
+      const timeToLogout = expirationTime - new Date().getTime();
+      if (timeToLogout > 0) {
+        setTimeout(() => {
+          dispatch(LogoutUser());
+        }, timeToLogout);
+      }
+
+      if (avatar) {
+        const formData = new FormData();
+        formData.append("avatar", avatar); 
+        formData.append("userId", standardizedUser.userId);
+      }
 
       return {
         token: userData.token,

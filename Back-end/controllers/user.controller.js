@@ -145,7 +145,7 @@ const login = async (req, res) => {
                 phoneNumber: user.phoneNumber,
               },
               JWT_SECRET,
-              { expiresIn: "1m" }
+              { expiresIn: "5m" }
             );
             res.cookie("token", token, {
               httpOnly: true,
@@ -223,17 +223,22 @@ const googleLogin = async (req, res) => {
       { expiresIn: "1m" }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+    });
+
     // Respond with user details and the JWT token
     res.status(200).json({
       status: "success",
       message: "Google login successful",
-      token,
       user: {
         userId: user._id,
         email: user.email,
         userName: user.userName,
         avatar: user.avatar,
         role: user.role,
+        token: token,
       },
     });
   } catch (error) {
@@ -347,11 +352,6 @@ const resetPassword = async (req, res) => {
 const editProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log("🔥 userId nhận được:", userId);
-    console.log("🔥 req.params:", req.params);
-
-    console.log("🔥 Dữ liệu nhận được từ body:", req.body);
-    console.log("🔥 File nhận được:", req.file);
 
     if (!userId) {
       return res.status(400).json({ message: "Thiếu userId!" });
