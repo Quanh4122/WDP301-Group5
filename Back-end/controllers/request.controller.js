@@ -114,9 +114,24 @@ const userDeleteCarInRequest = async (req, res) => {
   }
 };
 
+const listAdminAcceptRequest = async (req, res) => {
+  try {
+    const requestList = await RequestModel.find({ requestStatus: { $ne: "1" } })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+    return res.status(200).json(requestList);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   createRequest,
   getListRequest,
   acceptBookingRequest,
   userDeleteCarInRequest,
+  listAdminAcceptRequest,
 };
