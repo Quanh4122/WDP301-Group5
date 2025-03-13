@@ -28,6 +28,7 @@ import NotAuthorization from "../components/auth/NotAuthorization";
 import ProtectedRoute from "./PrivateRoute";
 import RequestList from "../components/request_list";
 import CreateDriver from "../components/driver_create";
+import TransactionList from "../components/transaction/transactionList";
 
 
 const Router = () => {
@@ -137,6 +138,11 @@ const Router = () => {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_CREATE,
             element: <CreateDriver />
         },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.TRANSACTION,
+            element: <TransactionList />
+        },
+        
     ]
 
     return (
