@@ -16,7 +16,7 @@ const AdminRequest = () => {
 
     const getListRequest = async () => {
         await axiosInstance.get('request/getListAdminRequest')
-            .then(res => setRequestDataPending(res.data))
+            .then(res => setListRequest(res.data))
             .catch(err => console.log(err))
     }
 

@@ -16,13 +16,15 @@ import CarCalendar from "../../car_detail/component/CarCalendar";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Icon } from "@mui/material";
 import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ModalDriverSelect from "./ModalDriverSelect";
+import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 
 const AdminDetailRequest = () => {
     const location = useLocation()
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
     const [requestData, setRequestData] = useState<RequestModelFull>(location.state)
+    const [driverList, setDriverList] = useState<any[]>()
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
@@ -35,6 +37,17 @@ const AdminDetailRequest = () => {
         address: requestData?.user?.address,
         isRequestDriver: requestData.isRequestDriver ? true : false
     }
+
+    useEffect(() => {
+        getListDriver()
+    }, [])
+
+    const getListDriver = async () => {
+        await axiosInstance.get("/driverFree")
+            .then(res => setDriverList(res.data))
+            .catch(err => console.log(err))
+    }
+
     const [dateValue, setDateValue] = React.useState<any[]>([dayjs().format('DD/MM/YYYY'), dayjs().add(1, 'day').format('DD/MM/YYYY')]);
     const getDateValue = (value: DateRange<Dayjs>) => {
         setDateValue([
@@ -90,16 +103,32 @@ const AdminDetailRequest = () => {
         console.log()
     }, [timeValue, dateValue])
 
-    const onDeleteCarInRequest = async (carId: any) => {
-        await axiosInstance.put("/request/userDeleteCarInRequest", {
-            requestId: requestData?._id,
-            car: carId
-        })
-            .then((res) => {
-                setRequestData(res.data)
-                toast.success("Delete Succesfull")
-            })
-            .catch((err) => toast.error("Fail to delete !!"))
+    const [driverSelected, setDriverSelected] = useState<any[]>([])
+    const onSelectedValue = (value: any) => {
+        if (value.isSelect == true) {
+            let dt = [...driverSelected, value.value]
+            setDriverSelected(dt)
+            dt.length >= requestData.car.length && setIsOpenModalN(false)
+        } else {
+            const data = driverSelected.filter(item => item != value.value)
+            setDriverSelected(data)
+        }
+
+    }
+
+    const navigate = useNavigate()
+
+    const onSubmitData = async (isAccept: boolean) => {
+        const dataSubmit = {
+            driver: driverSelected,
+            requestId: requestData._id,
+            isAccept: isAccept
+        }
+
+        await axiosInstance.post('/request/handleAdminAcceptRequest', dataSubmit)
+            .then(res => console.log(res.status))
+            .catch(err => console.log(err))
+        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST)
     }
     return (
         <div className="m-4">
@@ -109,8 +138,6 @@ const AdminDetailRequest = () => {
                         <Form
                             className='w-full'
                             initialValues={initialValue}
-                            form={form}
-                            onFinish={onBooking}
                         >
                             <div className='flex w-full justify-between mb-2'>
                                 <Form.Item
@@ -182,27 +209,32 @@ const AdminDetailRequest = () => {
                                     element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
                                 /> */}
                             </div>
-                            <div
-                                className="w-80 border-2 h-16  rounded-md flex items-center mb-8">
+                            {
+                                requestData.isRequestDriver &&
                                 <div
-                                    className="h-full w-12 flex items-center justify-center text-sky-500"
-                                    onClick={() => setIsOpenModalN(true)}
-                                >
-                                    <CalendarMonthIcon />
-                                </div>
-                                <div className="h-full w-auto flex items-center">
-                                    <div>
-                                        <div className="text-xs text-gray-500">Danh sách tài xế</div>
-                                        <div className="text-sm font-semibold">
+                                    className="w-80 border-2 h-16  rounded-md flex items-center mb-8">
+                                    <div
+                                        className="h-full w-12 flex items-center justify-center text-sky-500"
+                                        onClick={() => setIsOpenModalN(true)}
+                                    >
+                                        <CalendarMonthIcon />
+                                    </div>
+                                    <div className="h-full w-auto flex items-center">
+                                        <div>
+                                            <div className="text-xs text-gray-500">Danh sách tài xế</div>
+                                            <div className="text-sm font-semibold">
 
+                                            </div>
                                         </div>
                                     </div>
+                                    <ModalDriverSelect
+                                        isOpen={isOpenModalN}
+                                        onCancel={() => setIsOpenModalN(false)}
+                                        listDriver={driverList}
+                                        onSelectedValue={onSelectedValue}
+                                    />
                                 </div>
-                                <ModalDriverSelect
-                                    isOpen={isOpenModalN}
-                                    onCancel={() => setIsOpenModalN(false)}
-                                />
-                            </div>
+                            }
                             <div className='text-gray-500 font-medium'>
                                 <div className='w-2/3 flex justify-between'>Tổng thời gian thuê : <span className='text-gray-950'>{totalTime}h</span></div>
                                 <div className='w-2/3 flex justify-between'>Thuế VAT : <span className='text-gray-950'>{totalPrice && (totalPrice * 0.1 * 1000).toLocaleString('vi-VN', {
@@ -214,8 +246,20 @@ const AdminDetailRequest = () => {
                                     currency: 'VND'
                                 })}</span></div>
                             </div>
-                            <div className='w-full flex items-center justify-end'>
-                                <Button htmlType='submit' type='primary'>Đồng ý đơn</Button>
+                            <div className='w-full flex items-center justify-end mt-5'>
+                                <Button
+                                    type='primary'
+                                    onClick={() => onSubmitData(true)}
+                                    className="mr-5"
+                                >
+                                    Đồng ý
+                                </Button>
+                                <Button
+                                    type='primary'
+                                    onClick={() => onSubmitData(false)}
+                                >
+                                    Từ chối
+                                </Button>
                             </div>
                         </Form>
                     </div>
@@ -223,8 +267,8 @@ const AdminDetailRequest = () => {
                 </div>
                 <div className="w-3/5 h-auto flex flex-wrap ">
                     {
-                        requestData?.car.map((item) => (
-                            <div className=' flex items-center border-b-2 w-96 ml-5'>
+                        requestData?.car.map((item, index) => (
+                            <div className='flex items-center border-b-2 w-96 ml-5'>
 
                                 <img src={`http://localhost:3030${item?.images[0]}`} className='w-32 h32' />
                                 <List disablePadding>
@@ -256,6 +300,17 @@ const AdminDetailRequest = () => {
                                             {item.numberOfSeat}
                                         </Typography>
                                     </ListItem>
+                                    {
+                                        driverSelected.length > 0 &&
+                                        <ListItem sx={{ px: 0 }}>
+                                            <ListItemText
+                                                primary={"Tài xế: "}
+                                            />
+                                            <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                                                {driverList?.find(item => driverSelected[0] == item._id).name}
+                                            </Typography>
+                                        </ListItem>
+                                    }
                                 </List>
                                 {/* <div className="h-full hover:text-sky-500 hover:text-xl" onClick={() => onDeleteCarInRequest(item._id)}>
                                     <Icon><DeleteIcon /></Icon>

@@ -22,5 +22,10 @@ router.get(
   VerifyToken,
   RequestController.listAdminAcceptRequest
 );
+router.post(
+  "/handleAdminAcceptRequest",
+  VerifyToken,
+  RequestController.handleAdminAcceptRequest
+);
 
 module.exports = router;

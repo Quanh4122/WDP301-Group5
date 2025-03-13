@@ -23,7 +23,7 @@ const ListRequestPending = ({ requestList }: props) => {
         <div className="w-full h-auto mt-5">
             <div>
                 {
-                    listData?.map((item, index) => (
+                    requestList?.map((item, index) => (
                         <div key={index}>
                             <div>
                                 <div className="w-full h-28 flex items-center justify-between px-5 border-b-2 border rounded-sm ">
