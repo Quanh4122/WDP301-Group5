@@ -116,11 +116,11 @@ const CarDetail = () => {
             <div className="flex justify-center px-4 md:px-36"> {/* Adjusted padding and justify-center */}
                 <div className="flex flex-wrap justify-center"> {/* Added flex-wrap and justify-center */}
                     {carDetail?.images.map((item, index) => (
-                        <div key={index} className="w-full sm:w-1/2 md:w-1/4 p-2"> {/* Added width classes and padding */}
+                        <div key={index} className="w-full sm:w-1/2 md:w-1/4 p-2">
                             <img
                                 src={`http://localhost:3030${item}`}
                                 alt={`Car Image ${index}`}
-                                className="w-full h-auto object-cover rounded-md"
+                                className="w-64 h-48 object-cover rounded-md" // Added fixed height
                             />
                         </div>
                     ))}

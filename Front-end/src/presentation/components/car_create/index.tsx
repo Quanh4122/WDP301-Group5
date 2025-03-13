@@ -6,11 +6,15 @@ import GradeIcon from '@mui/icons-material/Grade';
 import { useForm } from "antd/es/form/Form";
 import { CarModels, CarModelsNoId } from "../car_list/model";
 import axiosInstance from "../utils/axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
 
 const CarCreate = () => {
 
     const [form] = useForm()
     const [arrFile, setArrFile] = useState<File[]>()
+    const navigate = useNavigate()
 
     const radioBunkBed = [
         { label: "Giường nằm", value: true },
@@ -66,7 +70,10 @@ const CarCreate = () => {
             formData.append("images", element)
         });
         await axiosInstance.post("/car/createCar", formData)
-            .then(res => res.data)
+            .then(res => {
+                toast.success("Successfull !!")
+                navigate(PRIVATE_ROUTES.PATH + "" + PRIVATE_ROUTES.SUB.CAR_LIST)
+            })
             .catch(err => console.log(err))
 
     }
@@ -78,9 +85,9 @@ const CarCreate = () => {
         setArrFile(arr)
     }
     return (
-        <div className="w-full h-auto flex p-10">
-            <div className="w-2/5 px-20">
-                <div className="w-full font-bold text-lg text-sky-500">
+        <div className="w-full min-h-screen flex p-4 md:p-8 bg-gray-100">
+            <div className="w-full md:w-2/5 px-4 md:px-8">
+                <div className="text-2xl font-semibold text-sky-600 mb-4 md:mb-6">
                     Thêm xe
                 </div>
                 <Form
@@ -89,98 +96,87 @@ const CarCreate = () => {
                     autoComplete="off"
                     form={form}
                 >
-                    <div className="w-full flex justify-between">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Form.Item
                             rules={[{ required: true }]}
                             name="carName"
                         >
-                            <Input className="w-48" placeholder="Tên xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
+                            <Input className="w-full" placeholder="Tên xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
                         </Form.Item>
                         <Form.Item
                             rules={[{ required: true }]}
                             name="color"
                         >
-                            <Input className="w-48" placeholder="Màu xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
+                            <Input className="w-full" placeholder="Màu xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
                         </Form.Item>
-                    </div>
-                    <div className="w-full flex justify-between">
                         <Form.Item
                             rules={[{ required: true }]}
                             name="licensePlateNumber"
                         >
-                            <Input className="w-48" placeholder="Biển số xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
+                            <Input className="w-full" placeholder="Biển số xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
                         </Form.Item>
                         <Form.Item
                             rules={[{ required: true }]}
                             name="carVersion"
                         >
-                            <InputNumber className="w-48" placeholder="Đời xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
+                            <InputNumber className="w-full" placeholder="Đời xe" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
                         </Form.Item>
-                    </div>
-                    <div className="w-full flex justify-between">
                         <Form.Item
                             rules={[{ required: true }]}
                             name="numberOfSeat"
                         >
-                            <InputNumber className="w-48" placeholder="Số chỗ" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
+                            <InputNumber className="w-full" placeholder="Số chỗ" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
                         </Form.Item>
                         <Form.Item
                             rules={[{ required: true }]}
                             name="price"
                         >
-                            <InputNumber className="w-48" placeholder="Giá thuê 4h" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
+                            <InputNumber className="w-full" placeholder="Giá thuê 4h" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
                         </Form.Item>
-                    </div>
-                    <div className="w-full flex justify-between">
                         <Form.Item
                             rules={[{ required: true }]}
                             name="flue"
+                            className="col-span-2"
                         >
-                            <Radio.Group
-                                options={radioFlue}
-                            />
+                            <Radio.Group options={radioFlue} className="flex flex-wrap gap-2" />
                         </Form.Item>
-                    </div>
-                    <div className="w-full flex justify-between">
                         <Form.Item
                             rules={[{ required: true }]}
                             name="transmissionType"
+                            className="col-span-2"
                         >
-                            <Radio.Group
-                                options={radioTransmissionType}
-                            />
+                            <Radio.Group options={radioTransmissionType} className="flex flex-wrap gap-2" />
                         </Form.Item>
                         <Form.Item
                             rules={[{ required: true }]}
                             name="bunkBed"
+                            className="col-span-2"
                         >
-                            <Radio.Group
-                                options={radioBunkBed}
-                            />
+                            <Radio.Group options={radioBunkBed} className="flex flex-wrap gap-2" />
                         </Form.Item>
                     </div>
-                    <div>
-                        <Form.Item
-                            rules={[{ required: true }]}
-                            name="images"
+                    <Form.Item
+                        rules={[{ required: true }]}
+                        name="images"
+                        className="mt-4"
+                    >
+                        <Upload.Dragger
+                            multiple
+                            onChange={(files) => onChangeGetFile(files)}
                         >
-                            <Upload.Dragger
-                                multiple
-                                onChange={(files) => onChangeGetFile(files)}
-                            >
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                <p className="ant-upload-text">Click or drag file to this area to upload car image</p>
-                            </Upload.Dragger>
-                        </Form.Item>
-                    </div>
-                    <Button type="primary" htmlType="submit" className="w-full h-12 text-lg font-bold">Tạo xe</Button>
+                            <p className="ant-upload-drag-icon">
+                                <InboxOutlined />
+                            </p>
+                            <p className="ant-upload-text">Click or drag file to this area to upload car image</p>
+                        </Upload.Dragger>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" className="w-full h-12 text-lg font-semibold mt-4 md:mt-6">
+                        Tạo xe
+                    </Button>
                 </Form>
-
             </div>
-            <div className="w-1/2">
-                <img src={BannerCreateCar} alt="banner-create-car" />
+            <div className="w-full md:w-1/2 mt-4 md:mt-0 flex justify-center items-center">
+                <img src={BannerCreateCar} alt="banner-create-car" className="max-w-full" />
             </div>
         </div>
     )
