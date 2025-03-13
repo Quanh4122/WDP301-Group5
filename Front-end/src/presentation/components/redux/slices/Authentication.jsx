@@ -18,7 +18,7 @@ export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
   async ( _, { dispatch, rejectWithValue }) => {
     try {
-      const userData = await signInWithGoogle(); // Giả sử hàm này trả về dữ liệu từ Google
+      const userData = await signInWithGoogle(); 
       if (!userData || !userData.email || !userData.token) {
         throw new Error("Google login failed: No user data, email, or token returned");
       }
