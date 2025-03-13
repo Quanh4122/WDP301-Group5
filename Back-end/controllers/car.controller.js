@@ -139,8 +139,15 @@ const createCar = async (req, res) => {
       numberOfSeat,
       price,
     });
-    await carModel.save();
-    return res.status(200).json({ message: "Create Successfull !!!" });
+    const carFindByLicensePlateNumber = await CarModel.findOne({
+      licensePlateNumber: licensePlateNumber,
+    });
+    if (carFindByLicensePlateNumber) {
+      return res.status(401).json({ message: "This car is existed !!!" });
+    } else {
+      await carModel.save();
+      return res.status(200).json({ message: "Create Successfull !!!" });
+    }
   }
 };
 
