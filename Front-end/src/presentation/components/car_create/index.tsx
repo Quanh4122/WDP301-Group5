@@ -72,7 +72,7 @@ const CarCreate = () => {
         await axiosInstance.post("/car/createCar", formData)
             .then(res => {
                 toast.success("Successfull !!")
-                navigate(PRIVATE_ROUTES.PATH + "" + PRIVATE_ROUTES.SUB.CAR_LIST)
+                navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST)
             })
             .catch(err => console.log(err))
 
