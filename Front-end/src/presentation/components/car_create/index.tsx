@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber, Radio, Upload } from "antd";
+import { Button, Form, Input, InputNumber, Radio, Select, Upload } from "antd";
 import { InboxOutlined } from '@ant-design/icons';
 import React, { useState } from "react";
 import BannerCreateCar from '../../assets/banner-created-car.jpg'
@@ -29,6 +29,12 @@ const CarCreate = () => {
         { label: 'Máy Xăng', value: 1 },
         { label: 'Máy Dầu', value: 2 },
         { label: 'Máy Điện', value: 3 }
+    ]
+
+    const numberOfSeat = [
+        { label: 5, value: 5 },
+        { label: 7, value: 7 },
+        { label: 9, value: 9 },
     ]
     const onFinish = (value: any) => {
         console.log(value.images)
@@ -75,7 +81,6 @@ const CarCreate = () => {
                 navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST)
             })
             .catch(err => console.log(err))
-
     }
 
     const onChangeGetFile = (files: any) => {
@@ -125,7 +130,10 @@ const CarCreate = () => {
                             rules={[{ required: true }]}
                             name="numberOfSeat"
                         >
-                            <InputNumber className="w-full" placeholder="Số chỗ" suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />} />
+                            <Select
+                                options={numberOfSeat}
+                                placeholder="Số chỗ"
+                            />
                         </Form.Item>
                         <Form.Item
                             rules={[{ required: true }]}

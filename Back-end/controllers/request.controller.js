@@ -15,6 +15,7 @@ const createRequest = async (req, res) => {
   const requestExisted = await RequestModel.findOne({
     user: data.user,
     requestStatus: "1",
+    car: {},
   });
   if (!requestExisted) {
     try {
@@ -25,7 +26,7 @@ const createRequest = async (req, res) => {
     }
   } else {
     const carExistedOnRequest = requestExisted.car.filter(
-      (item) => item._id == data.car
+      (item) => item._id == data.car[0]
     );
     if (carExistedOnRequest.length > 0) {
       return res

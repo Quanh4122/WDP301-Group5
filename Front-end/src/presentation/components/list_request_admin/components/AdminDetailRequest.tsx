@@ -31,7 +31,7 @@ const AdminDetailRequest = () => {
     ]
     const [form] = useForm()
     const initialValue = {
-        userName: requestData?.user?.userName,
+        fullName: requestData?.user?.fullName,
         email: requestData?.user?.email,
         phoneNumber: requestData?.user?.phoneNumber,
         address: requestData?.user?.address,
@@ -40,6 +40,7 @@ const AdminDetailRequest = () => {
 
     useEffect(() => {
         getListDriver()
+        console.log(initialValue)
     }, [])
 
     const getListDriver = async () => {
@@ -135,16 +136,10 @@ const AdminDetailRequest = () => {
             <div className="flex items-center justify-center">
                 <div className="w-2/5 h-auto flex items-center justify-center">
                     <div className="w-4/5 h-full bg-white rounded-lg shadow p-6"> {/* White background, rounded corners, shadow, padding */}
-                        <Form className='w-full' initialValues={{
-                            userName: requestData?.user?.userName,
-                            email: requestData?.user?.email,
-                            phoneNumber: requestData?.user?.phoneNumber,
-                            address: requestData?.user?.address,
-                            isRequestDriver: requestData?.isRequestDriver
-                        }}>
-                            <div className='flex w-full justify-between mb-4'> {/* Increased margin-bottom */}
+                        <Form className='w-full' initialValues={initialValue}>
+                            <div className='flex w-full justify-between mb-4'>
                                 <Form.Item label="Họ và tên" layout='vertical' name='userName' required className="w-1/2 mr-2">
-                                    <Input disabled className="border-blue-200" /> {/* Light blue border */}
+                                    <Input disabled className="border-blue-200" />
                                 </Form.Item>
                                 <Form.Item label="Email" layout='vertical' name='email' required className="w-1/2 ml-2">
                                     <Input disabled className="border-blue-200" />
