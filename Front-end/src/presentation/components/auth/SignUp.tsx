@@ -45,7 +45,6 @@ export default function SignUp() {
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = React.useState(false);
 
-  // Lấy trạng thái từ Redux theo kiểu an toàn
   const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
   const validateInputs = (data: FormDataType) => {
@@ -73,15 +72,14 @@ export default function SignUp() {
 
     if (validateInputs(data)) {
       try {
-        // Dispatch action đăng ký thông qua Redux
         await dispatch(RegisterUser(data));
         if (!error) {
-          toast.success('Send OTP successfully. Please check your email.');
+          toast.success('Gửi OTP thành công. Vui lý xác minh email.');
           window.location.href = '/app/verify';
         }
       } catch (err) {
         console.error(err);
-        setErrors((prev) => ({ ...prev, email: 'An error occurred. Please try again.' }));
+        setErrors((prev) => ({ ...prev, email: 'Vui lòng thử lại.' }));
       }
     }
   };
@@ -94,15 +92,15 @@ export default function SignUp() {
       <SignUpContainer alignItems="center" justifyContent="center">
         <StyledCard variant="outlined">
           <Typography component="h1" variant="h4">
-            Sign up
+            Đăng ký
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <FormControl error={Boolean(errors.userName)}>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>Họ và tên</FormLabel>
               <TextField name="userName" placeholder="Enter your full name" error={Boolean(errors.userName)} helperText={errors.userName} />
             </FormControl>
             <FormControl error={Boolean(errors.phoneNumber)}>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>Số điện thoại</FormLabel>
               <TextField name="phoneNumber" placeholder="Enter your phone number" error={Boolean(errors.phoneNumber)} helperText={errors.phoneNumber} />
             </FormControl>
             <FormControl error={Boolean(errors.email)}>
@@ -134,13 +132,10 @@ export default function SignUp() {
           </Box>
           <Divider>or</Divider>
           <Button variant="outlined" startIcon={<GoogleIcon />}>
-            Sign up with Google
-          </Button>
-          <Button variant="outlined" startIcon={<FacebookIcon />}>
-            Sign up with Facebook
+            Đăng nhập bằng Google
           </Button>
           <Typography textAlign="center">
-            Already have an account? <RouterLink to="/app/sign-in">Sign in</RouterLink>
+            Bạn đã có tài khoản? <RouterLink to="/app/sign-in"><button>Đăng nhập</button></RouterLink>
           </Typography>
         </StyledCard>
       </SignUpContainer>
