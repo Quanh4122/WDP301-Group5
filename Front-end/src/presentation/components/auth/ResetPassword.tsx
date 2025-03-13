@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NewPassword } from "../redux/slices/Authentication";
-import { Eye, EyeOff } from "lucide-react"; 
+import { Eye, EyeOff, Key } from "lucide-react"; 
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -58,7 +58,7 @@ const ResetPassword = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-gray-700 mb-4">
-          🔑 Đặt lại mật khẩu
+          <Key size={20} className="inline-block mr-2" /> Đặt lại mật khẩu
         </h2>
         <p className="text-sm text-gray-500 text-center mb-4">
           Nhập mật khẩu mới của bạn.

@@ -112,7 +112,7 @@ export default function SignIn() {
       <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
-            Sign in
+            Đăng nhập
           </Typography>
           {serverError && (
             <Typography color="error" sx={{ textAlign: 'center' }}>
@@ -137,7 +137,7 @@ export default function SignIn() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
+              <FormLabel htmlFor="password">Mật khẩu</FormLabel>
               <TextField
                 error={!!passwordError}
                 helperText={passwordError}
@@ -167,7 +167,7 @@ export default function SignIn() {
             </Button>
             <Link to={'/app/forgot-password'}>
               <Button component="button" variant="text" sx={{ alignSelf: 'center' }}>
-                Forgot your password?
+                Quên mật khẩu?
               </Button>
             </Link>
           </Box>
@@ -183,20 +183,12 @@ export default function SignIn() {
               variant="outlined"
               startIcon={<GoogleIcon />}
             >
-              {isLoading ? "Đang đăng nhập..." : "Sign in with Google"}
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign in with Facebook')}
-              startIcon={<FacebookIcon />}
-            >
-              Sign in with Facebook
+              {isLoading ? "Đang đăng nhập..." : "Đăng nhập bằng google"}
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              Don't have an account?{' '}
+              Bạn chưa có tài khoản?{' '}
               <RouterLink to="/app/register">
-                Sign up
+                <button>Đăng ký</button>
               </RouterLink>
             </Typography>
           </Box>

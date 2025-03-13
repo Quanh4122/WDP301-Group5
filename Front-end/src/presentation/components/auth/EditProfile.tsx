@@ -55,7 +55,7 @@ const EditProfile: React.FC = () => {
     e.preventDefault();
 
     if (!user?.userId) {
-      toast.error("Lỗi: userId không tồn tại!");
+      toast.error("Lỗi: Mã người dùng không tồn tại!");
       return;
     }
 
@@ -71,7 +71,7 @@ const EditProfile: React.FC = () => {
 
     try {
       await dispatch(UpdateProfile(user.userId, formDataToSend));
-      toast.success("Cập nhật hồ sơ thành công!");
+      toast.success(`Cập nhật hồ sơ ${user.fullName} thành công!`);
       navigate(`/app/profile/${user?.userId}`);
     } catch (error) {
       console.error("Lỗi cập nhật hồ sơ:", error);
@@ -92,7 +92,7 @@ const EditProfile: React.FC = () => {
               className="w-32 h-32 mx-auto rounded-full border object-cover"
             />
           )}
-          <label className="block font-semibold">Avatar</label>
+          <label className="block font-semibold">Ảnh đại diện</label>
           <input
             type="file"
             accept="image/*"
@@ -101,7 +101,7 @@ const EditProfile: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block font-semibold">Username</label>
+          <label className="block font-semibold">Tên tài khoản</label>
           <input
             type="text"
             name="userName"
@@ -111,7 +111,7 @@ const EditProfile: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block font-semibold">Tên đầy đủ</label>
+          <label className="block font-semibold">Họ và tên</label>
           <input
             type="text"
             name="fullName"
@@ -145,7 +145,7 @@ const EditProfile: React.FC = () => {
             type="submit"
             className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
           >
-            Save
+            Lưu thông tin
           </button>
         </div>
       </form>

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VerifyEmail } from "../redux/slices/Authentication";
 import { RootState } from "../redux/Store";
+import { toast } from "react-toastify";
 
 const Verify: React.FC = () => {
   const [otp, setOtp] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
   const dispatch = useDispatch();
 
   const { user, isLoading } = useSelector((state: RootState) => state.auth) as {
@@ -17,15 +17,15 @@ const Verify: React.FC = () => {
 
   const handleVerify = async () => {
     if (!user || !user.email) {
-      setMessage("Không tìm thấy email. Vui lòng đăng ký lại.");
+      toast.error("Không tìm thấy email. Vui lòng đăng ký lại.");
       return;
     }
 
     try {
       await dispatch(VerifyEmail({ email: user.email, otp }) as any);
-      setMessage("Xác minh thành công!");
+      toast.success("Xác minh email thành công!");
     } catch (err) {
-      setMessage("OTP không hợp lệ hoặc đã hết hạn.");
+      toast.success("OTP không hợp lệ hoặc đã hết hạn.");
     }
   };
 
@@ -55,16 +55,6 @@ const Verify: React.FC = () => {
         >
           {isLoading ? "Đang xác minh..." : "Xác minh"}
         </button>
-
-        {message && (
-          <p
-            className={`mt-3 text-center font-semibold ${
-              message.includes("thành công") ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {message}
-          </p>
-        )}
       </div>
     </div>
   );
