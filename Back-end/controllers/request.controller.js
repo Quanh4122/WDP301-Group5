@@ -66,6 +66,7 @@ const acceptBookingRequest = async (req, res) => {
       user: data.user,
       requestStatus: "1",
     });
+
     if (requestExisted) {
       await UserModel.updateOne(
         { _id: data.user._id },
@@ -132,6 +133,7 @@ const listAdminAcceptRequest = async (req, res) => {
 const handleAdminAcceptRequest = async (req, res) => {
   try {
     const dt = req.body;
+    const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
     if (dt.isAccept) {
       await RequestModel.updateOne(
         { _id: dt.requestId },
@@ -154,6 +156,33 @@ const handleAdminAcceptRequest = async (req, res) => {
   }
 };
 
+const handleCheckRequest = async (req, res) => {
+  try {
+    const dt = req.body;
+    const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
+    const listReqInRangeTime = await RequestModel.find(
+      {
+        $and: [
+          { startDate: { $gte: dataRequest.startDate } },
+          { endDate: { $lte: dataRequest.endDate } },
+        ],
+      },
+      "car -_id"
+    );
+
+    const arrStr = listReqInRangeTime.flatMap((item) =>
+      item.car.map((objectId) => objectId.toString())
+    );
+    const dataRequestCar = dataRequest.car.map((objectId) =>
+      objectId.toString()
+    );
+    const val = dataRequestCar.some((element) => arrStr.includes(element));
+    res.status(200).json(val);
+  } catch (error) {
+    return res.status(400).json({ message: error });
+  }
+};
+
 module.exports = {
   createRequest,
   getListRequest,
@@ -161,4 +190,5 @@ module.exports = {
   userDeleteCarInRequest,
   listAdminAcceptRequest,
   handleAdminAcceptRequest,
+  handleCheckRequest,
 };

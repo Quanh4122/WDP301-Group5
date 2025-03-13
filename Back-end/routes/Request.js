@@ -28,4 +28,10 @@ router.post(
   RequestController.handleAdminAcceptRequest
 );
 
+router.post(
+  "/handleCheckAdminAcceptRequest",
+  VerifyToken,
+  RequestController.handleCheckRequest
+);
+
 module.exports = router;

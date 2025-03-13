@@ -118,12 +118,28 @@ const AdminDetailRequest = () => {
     }
 
     const navigate = useNavigate()
+    const [dpRequest, setDpRequest] = useState<boolean>()
+    const [dpRequestC, setDpRequestC] = useState<boolean>(true)
+    const onCheckRequest = async () => {
+        const dataSubmit = {
+            driver: driverSelected,
+            requestId: requestData._id,
+            car: requestData.car
+        }
+        await axiosInstance.post('/request/handleCheckAdminAcceptRequest', dataSubmit)
+            .then(res => {
+                setDpRequest(res.data ? true : false)
+                setDpRequestC(false)
+            })
+            .catch(err => console.log(err))
+    }
 
     const onSubmitData = async (isAccept: boolean) => {
         const dataSubmit = {
             driver: driverSelected,
             requestId: requestData._id,
-            isAccept: isAccept
+            isAccept: isAccept,
+            car: requestData.car
         }
 
         await axiosInstance.post('/request/handleAdminAcceptRequest', dataSubmit)
@@ -184,12 +200,25 @@ const AdminDetailRequest = () => {
                                 <div className='flex justify-between'>Tổng số tiền : <span className='text-blue-700'>{totalPrice && (totalPrice * 1000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span></div>
                             </div>
                             <div className='w-full flex items-center justify-end mt-5'>
-                                <Button type='primary' onClick={() => onSubmitData(true)} className="mr-5 bg-blue-500 hover:bg-blue-600 border-blue-600"> {/* Blue buttons */}
-                                    Đồng ý
-                                </Button>
-                                <Button type='primary' onClick={() => onSubmitData(false)} className="bg-blue-500 hover:bg-blue-600 border-blue-600">
+                                {
+                                    dpRequestC ? <Button
+                                        type='primary'
+                                        onClick={onCheckRequest}
+                                        className="mr-5 bg-blue-500 hover:bg-blue-600 border-blue-600"
+                                    > {/* Blue buttons */}
+                                        Kiểm tra
+                                    </Button>
+                                        :
+                                        <Button type='primary' onClick={() => onSubmitData(dpRequest ? false : true)} className="mr-5 bg-blue-500 hover:bg-blue-600 border-blue-600"> {/* Blue buttons */}
+                                            {dpRequest ? "Từ chối" : "Đồng ý"}
+                                        </Button>
+                                }
+
+
+
+                                {/* <Button type='primary' onClick={() => onSubmitData(false)} className="bg-blue-500 hover:bg-blue-600 border-blue-600">
                                     Từ chối
-                                </Button>
+                                </Button> */}
                             </div>
                         </Form>
                     </div>
