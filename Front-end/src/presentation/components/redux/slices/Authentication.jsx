@@ -1,42 +1,69 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from '../../utils/axios';
 import { signInWithGoogle } from '../../utils/firbase';
-import { jwtDecode } from "jwt-decode"; // ✅ Cách đúng
+import { jwtDecode } from "jwt-decode";
 
 const initialState = {
   isLoading: false,
   isLoggedIn: false,
   token: '',
   tokenExpiration: null,
-  email: '',
-  userId: '',
-  name: '',
-  photoURL: '',
-  role: '',
   error: false,
   isRegister: false,
   isVerify: false,
   user: null,
 };
 
-
-
 export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
   async (_, { rejectWithValue }) => {
     try {
       const userData = await signInWithGoogle();
-      let role = "User"; // Default role
+      if (!userData || !userData.email || !userData.token) {
+        throw new Error("Google login failed: No user data, email, or token returned");
+      }
+
+      let role = "User";
       if (userData.email.startsWith("admin")) {
         role = "Admin";
       } else if (userData.email.startsWith("driver")) {
         role = "Driver";
       }
 
-      return { ...userData, role };
+      const standardizedUser = {
+        userId: userData.userId,
+        userName: userData.userName || "Unnamed User",
+        avatar: userData.avatar || "",
+        email: userData.email || "",
+        role: role,
+        fullName: "",
+        phoneNumber: "",
+        address: "",
+      };
+
+      const decodedToken = jwtDecode(userData.token);
+      const expirationTime = decodedToken.exp * 1000;
+
+      return {
+        token: userData.token,
+        user: standardizedUser,
+        tokenExpiration: expirationTime,
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
+  }
+);
+
+export const CheckTokenExpiration = createAsyncThunk(
+  'auth/checkTokenExpiration',
+  async (_, { dispatch, getState }) => {
+    const { tokenExpiration } = getState().auth;
+    if (tokenExpiration && new Date().getTime() > tokenExpiration) {
+      await dispatch(LogoutUser());
+      return { expired: true };
+    }
+    return { expired: false };
   }
 );
 
@@ -54,25 +81,20 @@ const slice = createSlice({
 
       state.isLoggedIn = true;
       state.token = action.payload.token;
-      state.user = action.payload.user;
-      state.email = action.payload.email;
-      state.role = action.payload.user.role;
+      state.user = action.payload.user; // Lưu toàn bộ thông tin user
       state.isRegister = false;
     },
-
     signOut(state) {
       state.isLoggedIn = false;
       state.token = "";
       state.user = null;
-      state.email = '';
-      state.name = '';
-      state.userId = '';
-      state.photoURL = '';
-      state.role = '';
+      state.tokenExpiration = null;
+      state.error = false;
       state.isRegister = false;
+      state.isVerify = false;
     },
     updateRegisterEmail(state, action) {
-      state.email = action.payload.email;
+      state.user = state.user ? { ...state.user, email: action.payload.email } : { email: action.payload.email };
     },
     setRegisterStatus(state, action) {
       state.isRegister = action.payload;
@@ -94,11 +116,8 @@ const slice = createSlice({
         state.isLoading = false;
         state.isLoggedIn = true;
         state.token = action.payload.token;
-        state.email = action.payload.email;
-        state.userId = action.payload.id;
-        state.name = action.payload.name;
-        state.photoURL = action.payload.photoURL;
-        state.role = action.payload.role; // Lưu role vào Redux
+        state.user = action.payload.user;
+        state.tokenExpiration = action.payload.tokenExpiration;
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
         if (action.payload === "Firebase: Error (auth/popup-closed-by-user).") {
@@ -108,18 +127,10 @@ const slice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       });
-  }
+  },
 });
 
 export default slice.reducer;
-
-export function CheckTokenExpiration(dispatch, getState) {
-  const { tokenExpiration } = getState().auth;
-  if (tokenExpiration && new Date().getTime() > tokenExpiration) {
-    dispatch(LogoutUser());
-  }
-}
-
 
 export function LoginUser(formValues) {
   return async (dispatch) => {
@@ -136,25 +147,24 @@ export function LoginUser(formValues) {
 
       console.log("Login response:", response.data);
 
-      // Decode token để lấy thời gian hết hạn
       const decodedToken = jwtDecode(response.data.token);
-      const expirationTime = decodedToken.exp * 1000; // Chuyển từ giây sang mili-giây
+      const expirationTime = decodedToken.exp * 1000;
+
+      const standardizedUser = {
+        userId: response.data.userId,
+        userName: response.data.userName,
+        fullName: response.data.fullName || "",
+        phoneNumber: response.data.phoneNumber || "",
+        avatar: response.data.avatar || "",
+        address: response.data.address || "",
+        role: response.data.role || "User",
+        email: response.data.email || formValues.email,
+      };
 
       dispatch(
         slice.actions.login({
-          isLoggedIn: true,
           token: response.data.token,
-          tokenExpiration: expirationTime, // Lưu vào Redux
-          user: {
-            userId: response.data.userId,
-            userName: response.data.userName,
-            fullName: response.data.fullName,
-            phoneNumber: response.data.phoneNumber,
-            avatar: response.data.avatar,
-            address: response.data.address,
-            role: response.data.role,
-          },
-          email: response.data.email || formValues.email,
+          user: standardizedUser,
         })
       );
 
@@ -162,14 +172,12 @@ export function LoginUser(formValues) {
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
 
-      // Thiết lập auto logout khi token hết hạn
       const timeToLogout = expirationTime - new Date().getTime();
       if (timeToLogout > 0) {
         setTimeout(() => {
           dispatch(LogoutUser());
         }, timeToLogout);
       }
-
     } catch (error) {
       console.error("Login error:", error);
       dispatch(
@@ -179,7 +187,6 @@ export function LoginUser(formValues) {
     }
   };
 }
-
 
 export function RegisterUser(formValues) {
   return async (dispatch) => {
@@ -236,17 +243,13 @@ export function VerifyEmail(formValues) {
 }
 
 export function ForgotPassword(formValues) {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     await axios
       .post(
         "/forgotPassword",
+        { ...formValues },
         {
-          ...formValues,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       )
       .then((response) => {
@@ -266,9 +269,7 @@ export function NewPassword({ token, password, passwordConfirm }) {
         "/resetPassword",
         { token, password, passwordConfirm },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
       console.log("Reset Password response:", response.data);

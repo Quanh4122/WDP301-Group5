@@ -56,8 +56,8 @@ export default function SignIn() {
     try {
       const user = await dispatch(loginWithGoogle()).unwrap();
       console.log("User object:", user);
-        toast.success("Đăng nhập thành công");
-        navigate("/");
+      toast.success("Đăng nhập thành công");
+      navigate("/");
     } catch (error) {
       console.error("Google login failed:", error);
       toast.error("Đăng nhập thất bại");
@@ -98,7 +98,7 @@ export default function SignIn() {
 
     try {
       await dispatch(LoginUser({ email, password }));
-      toast.success('Login successful!');
+      toast.success('Đăng nhập thành công!');
       navigate('/');
     } catch (error: any) {
       toast.error('errol!');
@@ -109,7 +109,6 @@ export default function SignIn() {
   return (
     <>
       <CssBaseline />
-      <ToastContainer position="top-right" />
       <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>

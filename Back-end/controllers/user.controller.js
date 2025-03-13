@@ -9,6 +9,7 @@ const ResetPassword = require("../Templates/Mail/resetPassword");
 const crypto = require("crypto");
 const admin = require("../services/firebaseAdmin");
 const { log } = require("console");
+const RoleModel = require("../models/role.model");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -191,6 +192,11 @@ const googleLogin = async (req, res) => {
     // Check if user already exists in the database
     let user = await UserModel.findOne({ email: email });
 
+    let userRole = await RoleModel.findOne({ roleName: 'user' });
+    if (!userRole) {
+      userRole = await new RoleModel({ roleName: 'user' }).save();
+    }
+
     if (!user) {
       // If the user does not exist, create a new one
       user = new UserModel({
@@ -198,7 +204,7 @@ const googleLogin = async (req, res) => {
         email: email,
         avatar: picture,
         verified: true, 
-        role: "user",
+        role: userRole._id,
       });
 
       await user.save();

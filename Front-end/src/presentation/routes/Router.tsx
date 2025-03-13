@@ -91,7 +91,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DASH_BOARD,
-            element: <ProtectedRoute requiredRole="admin"><Dashboard /></ProtectedRoute>
+            element: <ProtectedRoute requiredRole="Admin"><Dashboard /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING,
@@ -99,7 +99,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/createBlog",
-            element: <ProtectedRoute requiredRole="admin"><CreateBlog /></ProtectedRoute>
+            element: <ProtectedRoute requiredRole="Admin"><CreateBlog /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/blog/:postId",
@@ -119,7 +119,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_CREATE,
-            element: <ProtectedRoute requiredRole="admin"><CarCreate /></ProtectedRoute>
+            element: <ProtectedRoute requiredRole="Admin"><CarCreate /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_LIST,

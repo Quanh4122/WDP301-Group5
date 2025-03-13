@@ -5,17 +5,22 @@ import { Navigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: "admin" | "user";
+  requiredRole?: "Admin" | "User" | "Driver"; // Cập nhật để khớp với role trong Redux slice
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const { isLoggedIn, role } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth) as {
+    isLoggedIn: boolean;
+    user: {
+      role: string;
+    } | null;
+  };
 
   if (!isLoggedIn) {
     return <Navigate to="/app/not-authetication" replace />;
   }
 
-  if (requiredRole && role !== requiredRole) {
+  if (requiredRole && (!user || user.role !== requiredRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

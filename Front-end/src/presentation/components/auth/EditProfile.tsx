@@ -4,6 +4,7 @@ import { AppDispatch } from "../redux/Store";
 import { RootState } from "../redux/Store";
 import { UpdateProfile } from "../redux/slices/Authentication";
 import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const EditProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -54,6 +55,7 @@ const EditProfile: React.FC = () => {
     e.preventDefault();
 
     if (!user?.userId) {
+      toast.error("Lỗi: userId không tồn tại!");
       console.error("Lỗi: userId không tồn tại!");
       return;
     }
@@ -72,6 +74,7 @@ const EditProfile: React.FC = () => {
 
     try {
       await dispatch(UpdateProfile(user.userId, formDataToSend));
+      toast.success("Cập nhật hồ sơ thành công!");
       navigate(`/app/profile/${user?.userId}`);
     } catch (error) {
       console.error("Lỗi cập nhật hồ sơ:", error);
