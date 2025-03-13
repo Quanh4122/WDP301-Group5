@@ -1,26 +1,20 @@
 require('dotenv').config();
 const DriverModel = require('../models/driver.model');
 
-// Create a new driver
 const createDriver = async (req, res) => {
     try {
-        const { name, age, image } = req.body;
+        const { name, image, driverLicenseVerifyNumber, DoB, licenseStatus, driverStatus, licenseType } = req.body;
 
-        // Check if all required fields are provided
-        if (!name || !age || !image) {
-            return res.status(400).json({ message: "Name, age, and image are required" });
+        if (!name || !image || !driverLicenseVerifyNumber || !DoB || licenseStatus === undefined || driverStatus === undefined || !licenseType) {
+            return res.status(400).json({ message: "All fields are required" });
         }
 
-        // Check if a driver with the same name already exists
-        const existingDriver = await DriverModel.findOne({ name });
+        const existingDriver = await DriverModel.findOne({ driverLicenseVerifyNumber });
         if (existingDriver) {
-            return res.status(400).json({ message: "A driver with this name already exists" });
+            return res.status(400).json({ message: "A driver with this license number already exists" });
         }
 
-        // Create a new driver
-        const newDriver = new DriverModel({ name, age, image });
-
-        // Save to the database
+        const newDriver = new DriverModel({ name, image, driverLicenseVerifyNumber, DoB, licenseStatus, driverStatus, licenseType });
         await newDriver.save();
 
         res.status(201).json({ message: "Driver created successfully", driver: newDriver });
@@ -30,22 +24,13 @@ const createDriver = async (req, res) => {
     }
 };
 
-// Get driver by ID
 const getDriver = async (req, res) => {
     try {
         const { driverId } = req.params;
+        if (!driverId) return res.status(400).json({ message: "Driver ID is required" });
 
-        // Check if driverId is valid
-        if (!driverId) {
-            return res.status(400).json({ message: "Driver ID is required" });
-        }
-
-        // Find the driver by ID
         const driver = await DriverModel.findById(driverId);
-
-        if (!driver) {
-            return res.status(404).json({ message: "Driver not found" });
-        }
+        if (!driver) return res.status(404).json({ message: "Driver not found" });
 
         res.status(200).json(driver);
     } catch (error) {
@@ -54,16 +39,10 @@ const getDriver = async (req, res) => {
     }
 };
 
-// Get all drivers
 const getAllDrivers = async (req, res) => {
     try {
-        // Fetch all drivers from the database
         const drivers = await DriverModel.find();
-
-        // Check if there are no drivers
-        if (!drivers.length) {
-            return res.status(404).json({ message: "No drivers found" });
-        }
+        if (!drivers.length) return res.status(404).json({ message: "No drivers found" });
 
         res.status(200).json(drivers);
     } catch (error) {
@@ -72,4 +51,37 @@ const getAllDrivers = async (req, res) => {
     }
 };
 
-module.exports = { createDriver, getDriver, getAllDrivers };
+const updateDriver = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateFields = req.body;
+
+        if (Object.keys(updateFields).length === 0) {
+            return res.status(400).json({ message: "At least one field is required to update" });
+        }
+
+        const updatedDriver = await DriverModel.findByIdAndUpdate(id, updateFields, { new: true, runValidators: true });
+        if (!updatedDriver) return res.status(404).json({ message: "Driver not found" });
+
+        res.status(200).json({ message: "Driver updated successfully", driver: updatedDriver });
+    } catch (error) {
+        console.error("Error updating driver:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+const deleteDriver = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const deletedDriver = await DriverModel.findByIdAndDelete(id);
+        if (!deletedDriver) return res.status(404).json({ message: "Driver not found" });
+
+        res.status(200).json({ message: "Driver deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting driver:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+module.exports = { createDriver, getDriver, getAllDrivers, updateDriver, deleteDriver };
