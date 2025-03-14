@@ -75,7 +75,9 @@ const CarList = () => {
         <div className="w-full bg-white"> {/* White background */}
 
             <div className="w-full px-8 md:px-24 py-6 flex flex-wrap items-center"> {/* Padding adjusted for responsiveness */}
-                <div className="h-8 px-3 mr-3 rounded-full border border-sky-500 text-sky-500 flex items-center justify-center hover:bg-sky-500 hover:text-white transition duration-200"> {/* Rounded buttons with hover effect */}
+                <div className="h-8 px-3 mr-3 rounded-full border border-sky-500 text-sky-500 flex items-center justify-center hover:bg-sky-500 hover:text-white transition duration-200"
+                    onClick={() => onGetData()}
+                > {/* Rounded buttons with hover effect */}
                     Tất cả
                 </div>
                 <div

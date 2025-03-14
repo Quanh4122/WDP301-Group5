@@ -32,7 +32,7 @@ const CarItem = ({ carModel }: props) => {
     }
 
     return (
-        <div onClick={() => goToDetail()} className="cursor-pointer"> {/* Added cursor-pointer for better UX */}
+        <div className="cursor-pointer"> {/* Added cursor-pointer for better UX */}
             <div className="bg-white rounded-lg shadow-md m-2 w-full max-w-sm"> {/* Replaced Card with div for Tailwind styling */}
                 <img
                     src={`http://localhost:3030${carModel?.images[0]}`}
@@ -79,9 +79,11 @@ const CarItem = ({ carModel }: props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full h-10 mt-5 flex justify-center items-center bg-sky-100 text-sky-500 rounded-md hover:bg-sky-200 transition duration-200"> {/* Adjusted styling */}
-                        <CalendarMonthIcon className="mr-1" />
-                        Xem Lịch xe
+                    <div className="w-full h-10 mt-5 flex justify-center items-center bg-sky-100 text-sky-500 rounded-md hover:bg-sky-200 transition duration-200"
+                        onClick={() => goToDetail()}
+                    > {/* Adjusted styling */}
+                        {/* <CalendarMonthIcon className="mr-1" /> */}
+                        Xem xe
                     </div>
                 </div>
             </div>

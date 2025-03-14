@@ -42,82 +42,57 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: Props) =>
 
     return (
         <Modal
-            title={<div className="flex items-center justify-center text-xl font-bold">{title}</div>}
+            title={<div className="flex items-center justify-center text-2xl font-semibold">
+                {title}
+            </div>}
             open={isOpen}
             onCancel={onCancel}
             centered
-            footer={<div>{/* <Button>Đồng ý</Button><Button>Từ chối</Button> */}</div>}
+            footer={null} // Loại bỏ footer mặc định
         >
-            <div className="flex">
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        flexGrow: 1,
-                        width: '100%',
-                        maxWidth: 500,
-                        paddingX: 5,
-                    }}
-                >
-                    <List disablePadding>
-                        <ListItem sx={{ py: 1, px: 0 }}>
-                            <ListItemText primary="Ngày nhận" />
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                {startDate || "N/A"}
-                            </Typography>
-                        </ListItem>
-                        <ListItem sx={{ py: 1, px: 0 }}>
-                            <ListItemText primary="Ngày trả" />
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                {endDate || "N/A"}
-                            </Typography>
-                        </ListItem>
-                        <ListItem sx={{ py: 1, px: 0 }}>
-                            <ListItemText primary="Thuế VAT" />
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            <div className="flex justify-center">
+                <div className="w-full max-w-lg p-6">
+                    <ul className="space-y-2">
+                        <li className="flex justify-between items-center py-2 border-b border-gray-200">
+                            <span className="text-gray-700">Ngày nhận</span>
+                            <span className="font-semibold">{startDate || "N/A"}</span>
+                        </li>
+                        <li className="flex justify-between items-center py-2 border-b border-gray-200">
+                            <span className="text-gray-700">Ngày trả</span>
+                            <span className="font-semibold">{endDate || "N/A"}</span>
+                        </li>
+                        <li className="flex justify-between items-center py-2 border-b border-gray-200">
+                            <span className="text-gray-700">Thuế VAT</span>
+                            <span className="font-semibold">
                                 {VATFee !== null
                                     ? (VATFee * 1000).toLocaleString('vi-VN', {
                                         style: 'currency',
                                         currency: 'VND',
                                     })
                                     : "N/A"}
-                            </Typography>
-                        </ListItem>
-                        <ListItem sx={{ py: 1, px: 0 }}>
-                            <ListItemText primary="Total" />
-                            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                            </span>
+                        </li>
+                        <li className="flex justify-between items-center py-2">
+                            <span className="text-gray-700 font-semibold">Total</span>
+                            <span className="font-semibold text-lg">
                                 {totalFee !== null
                                     ? (totalFee * 1000).toLocaleString('vi-VN', {
                                         style: 'currency',
                                         currency: 'VND',
                                     })
                                     : "N/A"}
-                            </Typography>
-                        </ListItem>
-                    </List>
-                    <Divider />
-                    <Stack
-                        direction="column"
-                        divider={<Divider flexItem />}
-                        spacing={2}
-                        sx={{ my: 2 }}
-                    >
-                        <div>
-                            <Typography variant="subtitle2" gutterBottom>
-                                <div className="font-bold">Thông tin của bạn</div>
-                            </Typography>
-                            <Typography gutterBottom>
-                                Họ và tên: <span className="text-gray-500">{detailRequest.user?.userName || "N/A"}</span>
-                            </Typography>
-                            <Typography gutterBottom>
-                                Email: <span className="text-gray-500">{detailRequest.user?.email || "N/A"}</span>
-                            </Typography>
-                            <Typography gutterBottom>
-                                Số điện thoại: <span className="text-gray-500">{detailRequest.user?.phoneNumber || "N/A"}</span>
-                            </Typography>
+                            </span>
+                        </li>
+                    </ul>
+                    <div className="mt-4 border-t border-gray-200 pt-4">
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold mb-2">Thông tin của bạn</h3>
+                            <p>Họ và tên: <span className="text-gray-500">{detailRequest.user?.userName || "N/A"}</span></p>
+                            <p>Email: <span className="text-gray-500">{detailRequest.user?.email || "N/A"}</span></p>
+                            <p>Số điện thoại: <span className="text-gray-500">{detailRequest.user?.phoneNumber || "N/A"}</span></p>
                         </div>
-                    </Stack>
-                </Box>
+                    </div>
+                </div>
             </div>
         </Modal>
     );
