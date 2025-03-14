@@ -15,7 +15,6 @@ const createRequest = async (req, res) => {
   const requestExisted = await RequestModel.findOne({
     user: data.user,
     requestStatus: "1",
-    car: {},
   });
   if (!requestExisted) {
     try {

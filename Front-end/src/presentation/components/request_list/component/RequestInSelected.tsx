@@ -84,9 +84,9 @@ const RequestInSelected = ({ requestModal }: props) => {
             })
             .catch(err => console.log(err))
     }
-    const arrprice = requestData?.car.map((item) => item.price).reduce((total, current) => {
+    const arrprice = requestData?.car.length > 0 ? requestData?.car.map((item) => item.price).reduce((total, current) => {
         return total + current
-    })
+    }) : 0
     const [totalTime, setTotalTime] = React.useState(dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]), 'hour'))
     const [totalPrice, setTotalPrice] = React.useState(arrprice && arrprice * totalTime)
 
@@ -110,145 +110,122 @@ const RequestInSelected = ({ requestModal }: props) => {
     }
 
     return (
-        <div className="m-4">
-            <div className="flex items-center justify-center">
-                <div className="w-2/5 h-auto flex items-center justify-center">
-                    <div className="w-4/5 h-full">
-                        <Form
-                            className='w-full'
-                            initialValues={initialValue}
-                            form={form}
-                            onFinish={onBooking}
-                        >
-                            <div className='flex w-full justify-between mb-2'>
-                                <Form.Item
-                                    label="Họ và tên"
-                                    layout='vertical'
-                                    name='userName'
-                                    required
-                                >
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item
-                                    label="Email"
-                                    layout='vertical'
-                                    name='email'
-                                    required
-                                >
-                                    <Input />
-                                </Form.Item>
-                            </div>
-                            <div className='flex w-full justify-between mb-2'>
-                                <Form.Item
-                                    label="Số điện thoại"
-                                    layout='vertical'
-                                    name='phoneNumber'
-                                    required
-                                >
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item
-                                    label="Địa chỉ"
-                                    layout='vertical'
-                                    name='address'
-                                    required
-                                >
-                                    <Input />
-                                </Form.Item>
-                            </div>
-                            <div className='flex w-full justify-between mb-8'>
-                                <Form.Item
-                                    label="Bạn muốn thuê tài xế : "
-                                    layout='vertical'
-                                    name='isRequestDriver'
-                                    required
-                                >
-                                    <Radio.Group
-                                        options={requestDriver}
-                                    />
-                                </Form.Item>
-                            </div>
+        <div className="bg-white p-10    rounded-lg shadow-md">
+            <div className="flex">
+                {/* Phần Form */}
+                <div className="w-2/5 pr-8 border-r border-gray-200">
+                    <Form
+                        className="w-full"
+                        initialValues={initialValue}
+                        form={form}
+                        onFinish={onBooking}
+                    >
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <Form.Item
+                                label={<span className="text-blue-600 font-semibold">Họ và tên</span>}
+                                name="userName"
+                                rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
+                            >
+                                <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" />
+                            </Form.Item>
+                            <Form.Item
+                                label={<span className="text-blue-600 font-semibold">Email</span>}
+                                name="email"
+                                rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
+                            >
+                                <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" />
+                            </Form.Item>
+                            <Form.Item
+                                label={<span className="text-blue-600 font-semibold">Số điện thoại</span>}
+                                name="phoneNumber"
+                                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+                            >
+                                <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" />
+                            </Form.Item>
+                            <Form.Item
+                                label={<span className="text-blue-600 font-semibold">Địa chỉ</span>}
+                                name="address"
+                                rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+                            >
+                                <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" />
+                            </Form.Item>
+                        </div>
+                        <div className="mb-8">
+                            <Form.Item
+                                label={<span className="text-blue-600 font-semibold">Bạn muốn thuê tài xế:</span>}
+                                name="isRequestDriver"
+                                rules={[{ required: true, message: 'Vui lòng chọn tùy chọn!' }]}
+                            >
+                                <Radio.Group className="text-blue-600" options={requestDriver} />
+                            </Form.Item>
+                        </div>
+                        <div className="w-full h-14 border border-blue-300 rounded-md flex items-center mb-8">
                             <div
-                                className="w-80 border-2 h-16  rounded-md flex items-center mb-8">
-                                <div
-                                    className="h-full w-12 flex items-center justify-center text-sky-500"
-                                    onClick={() => setIsOpenModalN(true)}
-                                >
-                                    <CalendarMonthIcon />
-                                </div>
-                                <div className="h-full w-auto flex items-center">
-                                    <div>
-                                        <div className="text-xs text-gray-500">Thời gian thuê</div>
-                                        <div className="text-sm font-semibold">{timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}</div>
+                                className="h-full w-12 flex items-center justify-center text-blue-600 cursor-pointer"
+                                onClick={() => setIsOpenModalN(true)}
+                            >
+                                <CalendarMonthIcon />
+                            </div>
+                            <div className="flex-grow flex items-center">
+                                <div>
+                                    <div className="text-xs text-gray-500">Thời gian thuê</div>
+                                    <div className="text-sm font-semibold text-blue-800">
+                                        {timeValue[0]}, {dateValue[0]} đến {timeValue[1]}, {dateValue[1]}
                                     </div>
                                 </div>
-                                <CarModal
-                                    isOpen={isOpenModalN}
-                                    onCancel={() => setIsOpenModalN(false)}
-                                    title={"Thời gian thuê xe"}
-                                    element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
-                                />
                             </div>
-                            <div className='text-gray-500 font-medium'>
-                                <div className='w-2/3 flex justify-between'>Tổng thời gian thuê : <span className='text-gray-950'>{totalTime}h</span></div>
-                                <div className='w-2/3 flex justify-between'>Thuế VAT : <span className='text-gray-950'>{totalPrice && (totalPrice * 0.1 * 1000).toLocaleString('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND'
-                                })}</span></div>
-                                <div className='w-2/3 flex justify-between'>Tổng số tiền : <span className='text-gray-950'>{totalPrice && (totalPrice * 1000).toLocaleString('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND'
-                                })}</span></div>
+                            <CarModal
+                                isOpen={isOpenModalN}
+                                onCancel={() => setIsOpenModalN(false)}
+                                title="Thời gian thuê xe"
+                                element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
+                            />
+                        </div>
+                        <div className="text-gray-700 font-medium">
+                            <div className="flex justify-between">Tổng thời gian thuê: <span className="text-blue-900">{totalTime}h</span></div>
+                            <div className="flex justify-between">
+                                Thuế VAT: <span className="text-blue-900">
+                                    {totalPrice && (totalPrice * 0.1 * 1000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                </span>
                             </div>
-                            <div className='w-full flex items-center justify-end'>
-                                <Button htmlType='submit' type='primary'>Đặt xe</Button>
+                            <div className="flex justify-between">
+                                Tổng số tiền: <span className="text-blue-900">
+                                    {totalPrice && (totalPrice * 1000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                </span>
                             </div>
-                        </Form>
-                    </div>
-
+                        </div>
+                        <div className="w-full flex justify-end mt-6">
+                            <Button htmlType="submit" type="primary" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">
+                                Đặt xe
+                            </Button>
+                        </div>
+                    </Form>
                 </div>
-                <div className="w-3/5 h-auto flex flex-wrap ">
-                    {
-                        requestData?.car.map((item) => (
-                            <div className=' flex items-center border-b-2 w-96 ml-5'>
 
-                                <img src={`http://localhost:3030${item?.images[0]}`} className='w-32 h32' />
-                                <List disablePadding>
-                                    <Typography variant="h6" gutterBottom sx={{ fontSize: 15, fontWeight: 600 }}>
-                                        {item.carName + " " + item.carVersion}
-                                    </Typography>
-                                    <ListItem sx={{ px: 0 }} >
-                                        <ListItemText
-                                            sx={{ mr: 2 }}
-                                            primary={"Giá thuê: "}
-                                        />
-                                        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                            {item.price}k / 1h
-                                        </Typography>
-                                    </ListItem>
-                                    <ListItem sx={{ px: 0 }}>
-                                        <ListItemText
-                                            primary={"Biển số : "}
-                                        />
-                                        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                            {item.licensePlateNumber}
-                                        </Typography>
-                                    </ListItem>
-                                    <ListItem sx={{ px: 0 }}>
-                                        <ListItemText
-                                            primary={"Số chỗ: "}
-                                        />
-                                        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                            {item.numberOfSeat}
-                                        </Typography>
-                                    </ListItem>
-                                </List>
-                                <div className="h-full hover:text-sky-500 hover:text-xl" onClick={() => onDeleteCarInRequest(item._id)}>
-                                    <Icon><DeleteIcon /></Icon>
+                {/* Phần List Item */}
+                <div className="w-3/5 pl-8">
+                    {requestData?.car && requestData.car.length > 0 ? (
+                        <div className="flex flex-wrap">
+                            {requestData.car.map((item) => (
+                                <div key={item._id} className="flex items-center border-b border-blue-200 w-full mb-4 p-4 rounded-md shadow-sm">
+                                    <img src={`http://localhost:3030${item?.images[0]}`} alt={item.carName} className="w-32 h-32 object-cover rounded-md" />
+                                    <div className="ml-4 flex-grow">
+                                        <h6 className="text-sm font-semibold text-blue-800">{item.carName} {item.carVersion}</h6>
+                                        <ul className="space-y-1">
+                                            <li>Giá thuê: <span className="font-medium text-blue-700">{item.price}k / 1h</span></li>
+                                            <li>Biển số: <span className="font-medium text-blue-700">{item.licensePlateNumber}</span></li>
+                                            <li>Số chỗ: <span className="font-medium text-blue-700">{item.numberOfSeat}</span></li>
+                                        </ul>
+                                    </div>
+                                    <div className="hover:text-blue-600 hover:text-xl cursor-pointer" onClick={() => onDeleteCarInRequest(item._id)}>
+                                        <DeleteIcon />
+                                    </div>
                                 </div>
-                            </div>
-                        ))
-                    }
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-gray-500 italic">Không có xe nào được chọn.</div>
+                    )}
                 </div>
             </div>
         </div>
