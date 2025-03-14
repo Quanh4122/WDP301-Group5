@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
@@ -34,7 +34,7 @@ const HeroSection = () => {
         transition={{ duration: 0.6, delay: 0.4 }}
         className="flex justify-center mt-10"
       >
-        <Link to="/app/car-list">
+        <Link to="/app/car-lists">
           <button
             className="relative bg-gradient-to-r from-sky-500 to-sky-800 text-white py-3 px-6 rounded-lg shadow-md hover:from-sky-600 hover:to-sky-900 transition-all duration-300 transform hover:scale-105"
           >
