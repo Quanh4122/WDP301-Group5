@@ -1,5 +1,7 @@
 const RequestModel = require("../models/request.model");
 const UserModel = require("../models/user.model");
+const NotifyRequest = require("../Templates/Mail/notifyRequest");
+const mailService = require("../services/sendMail");
 
 const createRequest = async (req, res) => {
   const data = req.body;
@@ -132,24 +134,56 @@ const listAdminAcceptRequest = async (req, res) => {
 const handleAdminAcceptRequest = async (req, res) => {
   try {
     const dt = req.body;
-    const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
-    if (dt.isAccept) {
-      await RequestModel.updateOne(
-        { _id: dt.requestId },
-        {
-          driver: dt.driver,
-          requestStatus: "3",
-        }
-      );
+    const dataRequest = await RequestModel.findOne({
+      _id: dt.requestId,
+    }).populate("user", "userName fullName email phoneNumber address avatar");
+    const bookingAgainURL = `http://localhost:3000`;
+    const emailContent = await NotifyRequest(
+      `${dataRequest.user.userName}`,
+      bookingAgainURL,
+      dt.isAccept ? "Accepted" : "Denided"
+    );
+    if (dataRequest) {
+      if (dt.isAccept) {
+        await RequestModel.updateOne(
+          { _id: dt.requestId },
+          {
+            driver: dt.driver,
+            requestStatus: "3",
+          }
+        );
+        await mailService.sendEmail({
+          to: dataRequest.user.email,
+          subject: "Thông báo yêu cầu đặt xe",
+          html: emailContent,
+        });
+
+        return res.status(200).json({
+          status: "success",
+          message: "Password reset link sent to email.",
+        });
+      } else {
+        await RequestModel.updateOne(
+          { _id: dt.requestId },
+          {
+            requestStatus: "4",
+          }
+        );
+        await mailService.sendEmail({
+          to: dataRequest.user.email,
+          subject: "Thông báo yêu cầu đặt xe",
+          html: emailContent,
+        });
+
+        return res.status(200).json({
+          status: "success",
+          message: "Password reset link sent to email.",
+        });
+      }
+      // return res.status(200).json({ message: "Successfull !!!" });
     } else {
-      await RequestModel.updateOne(
-        { _id: dt.requestId },
-        {
-          requestStatus: "4",
-        }
-      );
+      return res.status(401).json({ message: "Cannot find this request !!!" });
     }
-    return res.status(200).json({ message: "Successfull !!!" });
   } catch (error) {
     return res.status(400).json({ message: error });
   }
@@ -161,22 +195,36 @@ const handleCheckRequest = async (req, res) => {
     const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
     const listReqInRangeTime = await RequestModel.find(
       {
-        $and: [
-          { startDate: { $gte: dataRequest.startDate } },
-          { endDate: { $lte: dataRequest.endDate } },
+        _id: { $ne: dataRequest._id },
+        $or: [
+          {
+            startDate: { $lte: dataRequest.startDate },
+            endDate: { $gte: dataRequest.startDate },
+          },
+          {
+            startDate: { $lte: dataRequest.endDate },
+            endDate: { $gte: dataRequest.endDate },
+          },
         ],
       },
       "car -_id"
     );
-
-    const arrStr = listReqInRangeTime.flatMap((item) =>
-      item.car.map((objectId) => objectId.toString())
-    );
-    const dataRequestCar = dataRequest.car.map((objectId) =>
-      objectId.toString()
-    );
-    const val = dataRequestCar.some((element) => arrStr.includes(element));
-    res.status(200).json(val);
+    console.log(listReqInRangeTime);
+    if (listReqInRangeTime.length > 0) {
+      const listReqInRangeTimeOther = listReqInRangeTime.filter(
+        (item) => item._id != dataRequest._id
+      );
+      const arrStr = listReqInRangeTimeOther.flatMap((item) =>
+        item.car.map((objectId) => objectId.toString())
+      );
+      const dataRequestCar = dataRequest.car.map((objectId) =>
+        objectId.toString()
+      );
+      const val = dataRequestCar.some((element) => arrStr.includes(element));
+      return res.status(200).json(val);
+    } else {
+      return res.status(200).json(false);
+    }
   } catch (error) {
     return res.status(400).json({ message: error });
   }

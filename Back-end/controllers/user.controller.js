@@ -192,9 +192,9 @@ const googleLogin = async (req, res) => {
     // Check if user already exists in the database
     let user = await UserModel.findOne({ email: email });
 
-    let userRole = await RoleModel.findOne({ roleName: 'user' });
+    let userRole = await RoleModel.findOne({ roleName: "user" });
     if (!userRole) {
-      userRole = await new RoleModel({ roleName: 'user' }).save();
+      userRole = await new RoleModel({ roleName: "user" }).save();
     }
 
     if (!user) {
@@ -203,7 +203,7 @@ const googleLogin = async (req, res) => {
         userName: name,
         email: email,
         avatar: picture,
-        verified: true, 
+        verified: true,
         role: userRole._id,
       });
 
@@ -252,7 +252,6 @@ const googleLogin = async (req, res) => {
     });
   }
 };
-
 
 // [GET] /logout
 const logout = async (req, res) => {

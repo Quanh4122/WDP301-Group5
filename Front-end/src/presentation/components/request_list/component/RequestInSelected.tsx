@@ -79,7 +79,7 @@ const RequestInSelected = ({ requestModal }: props) => {
 
         await axiosInstance.post("/request/userAcceptRequest", requestBookingAccept)
             .then(res => {
-                toast.success("Bạn đã thành công đặt xe xe !!")
+                toast.success("Bạn đã thành công đặt xe !!")
                 navigate("/")
             })
             .catch(err => console.log(err))
@@ -206,8 +206,8 @@ const RequestInSelected = ({ requestModal }: props) => {
                 <div className="w-3/5 pl-8">
                     {requestData?.car && requestData.car.length > 0 ? (
                         <div className="flex flex-wrap">
-                            {requestData.car.map((item) => (
-                                <div key={item._id} className="flex items-center border-b border-blue-200 w-full mb-4 p-4 rounded-md shadow-sm">
+                            {requestData.car.map((item, idx) => (
+                                <div key={idx} className="flex items-center border-b border-blue-200 w-full mb-4 p-4 rounded-md shadow-sm">
                                     <img src={`http://localhost:3030${item?.images[0]}`} alt={item.carName} className="w-32 h-32 object-cover rounded-md" />
                                     <div className="ml-4 flex-grow">
                                         <h6 className="text-sm font-semibold text-blue-800">{item.carName} {item.carVersion}</h6>

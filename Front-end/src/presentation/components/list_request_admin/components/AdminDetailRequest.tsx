@@ -25,13 +25,29 @@ const AdminDetailRequest = () => {
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
     const [requestData, setRequestData] = useState<RequestModelFull>(location.state)
     const [driverList, setDriverList] = useState<any[]>()
+    const [dateValue, setDateValue] = React.useState<any[]>([dayjs(requestData.startDate).format('DD/MM/YYYY'), dayjs(requestData.endDate).format('DD/MM/YYYY')]);
+    const getDateValue = (value: DateRange<Dayjs>) => {
+        setDateValue([
+            value && value[0] ? dayjs(value[0].toLocaleString()).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY'),
+            value && value[1] ? dayjs(value[1].toLocaleString()).format('DD/MM/YYYY') : dayjs().add(1, 'day').format('DD/MM/YYYY')
+        ])
+    }
+
+    const [timeValue, setTimeValue] = React.useState<any[]>([dayjs(requestData.startDate).hour() + ":" + "00", dayjs(requestData.endDate).hour() + ":" + "00"]);
+
+    const getTimeValue = (value: any[]) => {
+        setTimeValue([
+            value && value[0] ? value[0] : dayjs().hour() + ":" + "00",
+            value && value[1] ? value[1] : dayjs().hour() + ":" + "00"
+        ])
+    }
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
     ]
     const [form] = useForm()
     const initialValue = {
-        fullName: requestData?.user?.fullName,
+        userName: requestData?.user?.userName,
         email: requestData?.user?.email,
         phoneNumber: requestData?.user?.phoneNumber,
         address: requestData?.user?.address,
@@ -47,23 +63,6 @@ const AdminDetailRequest = () => {
         await axiosInstance.get("/driverFree")
             .then(res => setDriverList(res.data))
             .catch(err => console.log(err))
-    }
-
-    const [dateValue, setDateValue] = React.useState<any[]>([dayjs().format('DD/MM/YYYY'), dayjs().add(1, 'day').format('DD/MM/YYYY')]);
-    const getDateValue = (value: DateRange<Dayjs>) => {
-        setDateValue([
-            value && value[0] ? dayjs(value[0].toLocaleString()).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY'),
-            value && value[1] ? dayjs(value[1].toLocaleString()).format('DD/MM/YYYY') : dayjs().add(1, 'day').format('DD/MM/YYYY')
-        ])
-    }
-
-    const [timeValue, setTimeValue] = React.useState<any[]>([dayjs().hour() + ":" + "00", dayjs().hour() + ":" + "00"]);
-
-    const getTimeValue = (value: any[]) => {
-        setTimeValue([
-            value && value[0] ? value[0] : dayjs().hour() + ":" + "00",
-            value && value[1] ? value[1] : dayjs().hour() + ":" + "00"
-        ])
     }
 
     const fomatDate = (date: string) => {
@@ -128,7 +127,8 @@ const AdminDetailRequest = () => {
         }
         await axiosInstance.post('/request/handleCheckAdminAcceptRequest', dataSubmit)
             .then(res => {
-                setDpRequest(res.data ? true : false)
+                console.log(res.data)
+                setDpRequest(res.data == true ? true : false)
                 setDpRequestC(false)
             })
             .catch(err => console.log(err))
@@ -214,11 +214,6 @@ const AdminDetailRequest = () => {
                                         </Button>
                                 }
 
-
-
-                                {/* <Button type='primary' onClick={() => onSubmitData(false)} className="bg-blue-500 hover:bg-blue-600 border-blue-600">
-                                    Từ chối
-                                </Button> */}
                             </div>
                         </Form>
                     </div>

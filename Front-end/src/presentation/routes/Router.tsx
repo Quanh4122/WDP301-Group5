@@ -134,7 +134,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING_LIST,
-            element: <ProtectedRoute><RequestList /></ProtectedRoute>
+            element: <ProtectedRoute requiredRole="User"><RequestList /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_CREATE,
@@ -142,7 +142,7 @@ const Router = () => {
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST,
-            element: <AdminRequest />
+            element: <ProtectedRoute requiredRole="Admin"><AdminRequest /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST,
@@ -152,7 +152,7 @@ const Router = () => {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.TRANSACTION,
             element: <TransactionList />
         },
-        
+
     ]
 
     return (
