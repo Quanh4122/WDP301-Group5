@@ -1,12 +1,12 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from '../../utils/axios';
-import { signInWithGoogle } from '../../utils/firbase';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "../../utils/axios";
+import { signInWithGoogle } from "../../utils/firbase";
 import { jwtDecode } from "jwt-decode";
 
 const initialState = {
   isLoading: false,
   isLoggedIn: false,
-  token: '',
+  token: "",
   tokenExpiration: null,
   error: false,
   isRegister: false,
@@ -19,14 +19,16 @@ const initialState = {
 };
 
 export const loginWithGoogle = createAsyncThunk(
-  'auth/loginWithGoogle',
-  async ( _, { dispatch, rejectWithValue }) => {
+  "auth/loginWithGoogle",
+  async (_, { dispatch, rejectWithValue }) => {
     try {
-      const userData = await signInWithGoogle(); 
+      const userData = await signInWithGoogle();
       console.log("User data:", userData);
-      
+
       if (!userData || !userData.email || !userData.token) {
-        throw new Error("Google login failed: No user data, email, or token returned");
+        throw new Error(
+          "Google login failed: No user data, email, or token returned"
+        );
       }
 
       let role = "User";
@@ -36,12 +38,12 @@ export const loginWithGoogle = createAsyncThunk(
         role = "Driver";
       }
 
-      const avatar = userData.photoURL || ""; 
+      const avatar = userData.photoURL || "";
 
       const standardizedUser = {
-        userId: userData.userId || userData.uid, 
-        userName: userData.userName || "Unnamed User", 
-        avatar: userData.avatar || avatar, 
+        userId: userData.userId || userData.uid,
+        userName: userData.userName || "Unnamed User",
+        avatar: userData.avatar || avatar,
         email: userData.email || "",
         role: userData.role,
         fullName: userData.fullName || "",
@@ -61,7 +63,7 @@ export const loginWithGoogle = createAsyncThunk(
 
       if (avatar) {
         const formData = new FormData();
-        formData.append("avatar", avatar); 
+        formData.append("avatar", avatar);
         formData.append("userId", standardizedUser.userId);
       }
 
@@ -78,7 +80,7 @@ export const loginWithGoogle = createAsyncThunk(
 );
 
 export const CheckTokenExpiration = createAsyncThunk(
-  'auth/checkTokenExpiration',
+  "auth/checkTokenExpiration",
   async (_, { dispatch, getState }) => {
     const { tokenExpiration } = getState().auth;
     if (tokenExpiration && new Date().getTime() > tokenExpiration) {
@@ -90,79 +92,91 @@ export const CheckTokenExpiration = createAsyncThunk(
 );
 
 export const fetchUsersAndDrivers = createAsyncThunk(
-  'auth/fetchUsersAndDrivers',
+  "auth/fetchUsersAndDrivers",
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      const response = await axios.get('/users-drivers', {
+      const response = await axios.get("/users-drivers", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch users and drivers');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch users and drivers"
+      );
     }
   }
 );
 
 export const applyForDriver = createAsyncThunk(
-  'auth/applyForDriver',
-  async ({ userId, licenseNumber, experience, driversLicensePhoto }, { getState, rejectWithValue }) => {
+  "auth/applyForDriver",
+  async (
+    { userId, licenseNumber, experience, driversLicensePhoto },
+    { getState, rejectWithValue }
+  ) => {
     try {
       const { token } = getState().auth;
 
       // Tạo FormData để gửi dữ liệu và file
       const formData = new FormData();
-      formData.append('licenseNumber', licenseNumber);
-      formData.append('experience', experience);
+      formData.append("licenseNumber", licenseNumber);
+      formData.append("experience", experience);
       if (driversLicensePhoto) {
-        formData.append('driversLicensePhoto', driversLicensePhoto);
+        formData.append("driversLicensePhoto", driversLicensePhoto);
       }
 
-      const response = await axios.post(
-        `/apply-driver/${userId}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data', // Đảm bảo header này được thiết lập đúng
-          },
-        }
-      );
+      const response = await axios.post(`/apply-driver/${userId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data", // Đảm bảo header này được thiết lập đúng
+        },
+      });
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to apply for driver');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to apply for driver"
+      );
     }
   }
 );
 
 export const approveDriverApplication = createAsyncThunk(
-  'auth/approveDriverApplication',
+  "auth/approveDriverApplication",
   async ({ userId, status }, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
       const response = await axios.put(
         `/approve-driver/${userId}`,
         { status },
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to approve driver application');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to approve driver application"
+      );
     }
   }
 );
 
 export const fetchPendingDriverApplications = createAsyncThunk(
-  'auth/fetchPendingDriverApplications',
+  "auth/fetchPendingDriverApplications",
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
-      const response = await axios.get('/pending-drivers', {
+      const response = await axios.get("/pending-drivers", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch pending applications');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch pending applications"
+      );
     }
   }
 );
@@ -197,7 +211,9 @@ const slice = createSlice({
       state.driverApplication = null;
     },
     updateRegisterEmail(state, action) {
-      state.user = state.user ? { ...state.user, email: action.payload.email } : { email: action.payload.email };
+      state.user = state.user
+        ? { ...state.user, email: action.payload.email }
+        : { email: action.payload.email };
     },
     setRegisterStatus(state, action) {
       state.isRegister = action.payload;
@@ -264,12 +280,17 @@ const slice = createSlice({
       })
       .addCase(approveDriverApplication.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.pendingDriverApplications = state.pendingDriverApplications.filter(
-          (app) => app.user._id !== action.payload.userId
-        );
-        state.usersAndDrivers = state.usersAndDrivers.map((user) =>
+        state.pendingDriverApplications =
+          state.pendingDriverApplications.filter(
+            (app) => app.user._id !== action.payload.userId
+          );
+        state.usersAndDrivers = state.usersAndDrivers?.map((user) =>
           user._id === action.payload.userId
-            ? { ...user, driverApplication: action.payload.driverApplication, role: action.payload.role.roleName }
+            ? {
+                ...user,
+                driverApplication: action.payload.driverApplication,
+                role: action.payload.role.roleName,
+              }
             : user
         );
         if (state.user && state.user.userId === action.payload.userId) {
@@ -310,7 +331,7 @@ export function ApplyForDriver(userId, formValues) {
   };
 }
 
-export function ApproveDriverApplication(userId, status) {
+export function ApproveDriverApplication({ userId, status }) {
   return async (dispatch) => {
     await dispatch(approveDriverApplication({ userId, status }));
   };
@@ -498,7 +519,9 @@ export function UpdateProfile(userId, formData) {
       );
     } catch (error) {
       console.error("Update Profile error:", error);
-      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
     }
   };
 }

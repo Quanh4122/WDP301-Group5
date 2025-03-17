@@ -1,6 +1,9 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { FetchPendingDriverApplications, ApproveDriverApplication } from '../redux/slices/Authentication';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  FetchPendingDriverApplications,
+  ApproveDriverApplication,
+} from "../redux/slices/Authentication";
 
 const ManageAccount = () => {
   const dispatch = useDispatch();
@@ -11,7 +14,7 @@ const ManageAccount = () => {
   } = useSelector((state) => state.auth || {});
 
   useEffect(() => {
-    if (user?.role === 'Admin') {
+    if (user?.role === "Admin") {
       dispatch(FetchPendingDriverApplications());
     }
   }, [dispatch, user?.role]);
@@ -21,7 +24,9 @@ const ManageAccount = () => {
       <div className="flex justify-center items-center h-screen bg-gray-50">
         <div className="flex items-center gap-3">
           <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600"></div>
-          <span className="text-lg text-gray-700 font-medium">Loading Applications...</span>
+          <span className="text-lg text-gray-700 font-medium">
+            Loading Applications...
+          </span>
         </div>
       </div>
     );
@@ -35,7 +40,9 @@ const ManageAccount = () => {
           <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
             Account Management Dashboard
           </h1>
-          <div className="text-sm text-gray-500">Last updated: {new Date().toLocaleTimeString()}</div>
+          <div className="text-sm text-gray-500">
+            Last updated: {new Date().toLocaleTimeString()}
+          </div>
         </div>
 
         {/* Filters */}
@@ -56,7 +63,9 @@ const ManageAccount = () => {
         {/* Table */}
         {pendingDriverApplications.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-xl shadow-sm">
-            <p className="text-gray-500 text-lg">No pending applications found.</p>
+            <p className="text-gray-500 text-lg">
+              No pending applications found.
+            </p>
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -81,36 +90,36 @@ const ManageAccount = () => {
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="py-4 px-6 text-gray-900">
-                        {application.user?.userName ?? 'N/A'}
+                        {application.user?.userName ?? "N/A"}
                       </td>
                       <td className="py-4 px-6 text-gray-700">
-                        {application.user?.email ?? 'N/A'}
+                        {application.user?.email ?? "N/A"}
                       </td>
                       <td className="py-4 px-6 text-gray-700">
-                        {typeof application.user?.role === 'object'
-                          ? application.user.role?.roleName ?? 'N/A'
-                          : application.user?.role ?? 'N/A'}
+                        {typeof application.user?.role === "object"
+                          ? application.user.role?.roleName ?? "N/A"
+                          : application.user?.role ?? "N/A"}
                       </td>
                       <td className="py-4 px-6">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                            application.status === 'approved'
-                              ? 'bg-green-100 text-green-800'
-                              : application.status === 'rejected'
-                              ? 'bg-red-100 text-red-800'
-                              : application.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-gray-100 text-gray-800'
+                            application.status === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : application.status === "rejected"
+                              ? "bg-red-100 text-red-800"
+                              : application.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          {application.status ?? 'N/A'}
+                          {application.status ?? "N/A"}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-gray-700">
-                        {application.licenseNumber ?? 'N/A'}
+                        {application.licenseNumber ?? "N/A"}
                       </td>
                       <td className="py-4 px-6 text-gray-700">
-                        {application.experience ?? 'N/A'}
+                        {application.experience ?? "N/A"}
                       </td>
                       <td className="py-4 px-6">
                         {application.driversLicensePhoto && (
@@ -118,19 +127,22 @@ const ManageAccount = () => {
                             src={`http://localhost:3030${application.driversLicensePhoto}`}
                             alt="Driver License"
                             className="h-12 w-12 object-cover rounded-md border border-gray-200"
-                            onError={(e) => (e.currentTarget.src = '/fallback-image.png')}
+                            onError={(e) =>
+                              (e.currentTarget.src = "/fallback-image.png")
+                            }
                           />
                         )}
                       </td>
                       <td className="py-4 px-6 flex gap-2">
-                        {application.status === 'pending' && (
+                        {application.status === "pending" && (
                           <>
                             <button
                               onClick={() =>
                                 dispatch(
                                   ApproveDriverApplication({
-                                    userId: application.user?._id || application._id,
-                                    status: 'approved',
+                                    userId:
+                                      application.user?._id || application._id,
+                                    status: "approved",
                                   })
                                 )
                               }
@@ -143,8 +155,8 @@ const ManageAccount = () => {
                               onClick={() =>
                                 dispatch(
                                   ApproveDriverApplication({
-                                    userId: application.user?._id || application._id,
-                                    status: 'rejected',
+                                    userId: application.user?._id,
+                                    status: "rejected",
                                   })
                                 )
                               }

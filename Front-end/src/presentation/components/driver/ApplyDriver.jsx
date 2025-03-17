@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import { applyForDriver } from '../../components/redux/slices/Authentication';
-import { toast, ToastContainer } from 'react-toastify';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { applyForDriver } from "../../components/redux/slices/Authentication";
+import { toast, ToastContainer } from "react-toastify";
 
 const ApplyDriver = () => {
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [vehicleInfo, setVehicleInfo] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [experience, setExperience] = useState("");
   const [driversLicensePhoto, setDriversLicensePhoto] = useState(null); // State cho file ảnh
   const dispatch = useDispatch();
   const { userId } = useParams();
@@ -15,30 +15,30 @@ const ApplyDriver = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (userId) {
-      console.log('Dispatching applyForDriver with userId:', userId);
+      console.log("Dispatching applyForDriver with userId:", userId);
       await dispatch(
         applyForDriver({
           userId,
           licenseNumber,
-          vehicleInfo,
+          experience,
           driversLicensePhoto, // Gửi file ảnh
         })
       );
-      toast.success('Gửi hồ sơ đăng ký thành công!');
+      toast.success("Gửi hồ sơ đăng ký thành công!");
       // Reset form nếu không có lỗi
       if (!error) {
-        setLicenseNumber('');
-        setVehicleInfo('');
+        setLicenseNumber("");
+        setExperience("");
         setDriversLicensePhoto(null);
       }
     } else {
-      console.error('No userId provided');
+      console.error("No userId provided");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="max-w-lg w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
         {/* Header */}
         <div className="text-center">
@@ -51,7 +51,11 @@ const ApplyDriver = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          encType="multipart/form-data"
+        >
           <div>
             <label
               htmlFor="licenseNumber"
@@ -72,16 +76,16 @@ const ApplyDriver = () => {
 
           <div>
             <label
-              htmlFor="vehicleInfo"
+              htmlFor="experience"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Kinh nghiệm lái xe
             </label>
             <input
-              id="vehicleInfo"
+              id="experience"
               type="text"
-              value={vehicleInfo}
-              onChange={(e) => setVehicleInfo(e.target.value)}
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition duration-200 placeholder-gray-400"
               placeholder="Nhập kinh nghiệm lái xe (ví dụ: 2 năm)"
@@ -111,7 +115,9 @@ const ApplyDriver = () => {
               type="submit"
               disabled={isLoading || !driversLicensePhoto} // Vô hiệu hóa nếu chưa chọn file
               className={`w-full py-3 px-4 bg-sky-600 text-white font-semibold rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition duration-200 ${
-                isLoading || !driversLicensePhoto ? 'opacity-50 cursor-not-allowed' : ''
+                isLoading || !driversLicensePhoto
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
             >
               {isLoading ? (
@@ -139,7 +145,7 @@ const ApplyDriver = () => {
                   Đang gửi...
                 </span>
               ) : (
-                'Gửi Đơn Ứng Tuyển'
+                "Gửi Đơn Ứng Tuyển"
               )}
             </button>
           </div>

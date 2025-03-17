@@ -47,7 +47,14 @@ const register = async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new UserModel({ userName, phoneNumber, email });
+
+  const userRole = await RoleModel.findOne({ roleName: "User" });
+  const user = new UserModel({
+    userName,
+    phoneNumber,
+    email,
+    role: userRole._id,
+  });
   await user.save();
 
   const auth = new AuthModel({ user: user._id, password: hashedPassword });
@@ -140,7 +147,7 @@ const login = async (req, res) => {
       _id: user._id,
       email: user.email,
       username: user.userName,
-      role: user.role,
+      role: user.role.roleName,
       phoneNumber: user.phoneNumber,
     },
     JWT_SECRET,
@@ -263,7 +270,9 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
   const user = await UserModel.findOne({ email });
   if (!user) {
-    return res.status(404).json({ status: "error", message: "User not found." });
+    return res
+      .status(404)
+      .json({ status: "error", message: "User not found." });
   }
 
   const auth = await AuthModel.findOne({ user: user._id });
@@ -272,7 +281,10 @@ const forgotPassword = async (req, res) => {
   }
 
   const resetToken = crypto.randomBytes(32).toString("hex");
-  const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
   auth.passwordResetToken = hashedToken;
   auth.passwordResetExpires = Date.now() + 15 * 60 * 1000;
@@ -308,7 +320,9 @@ const resetPassword = async (req, res) => {
   const { token, password, passwordConfirm } = req.body;
 
   if (!token) {
-    return res.status(400).json({ status: "error", message: "Token is missing" });
+    return res
+      .status(400)
+      .json({ status: "error", message: "Token is missing" });
   }
 
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
@@ -388,10 +402,14 @@ const changePassword = async (req, res) => {
     const { userId } = req.params;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin!" });
+      return res
+        .status(400)
+        .json({ message: "Vui lòng nhập đầy đủ thông tin!" });
     }
     if (newPassword !== confirmPassword) {
-      return res.status(400).json({ message: "Mật khẩu mới và xác nhận không khớp!" });
+      return res
+        .status(400)
+        .json({ message: "Mật khẩu mới và xác nhận không khớp!" });
     }
 
     const auth = await AuthModel.findOne({ user: userId });
@@ -401,7 +419,9 @@ const changePassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(currentPassword, auth.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Mật khẩu hiện tại không chính xác!" });
+      return res
+        .status(401)
+        .json({ message: "Mật khẩu hiện tại không chính xác!" });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -426,7 +446,9 @@ const getUserById = async (req, res) => {
     }
     return res.status(200).json(user);
   } catch (error) {
-    return res.status(500).json({ message: "Lỗi máy chủ, vui lòng thử lại sau !!" });
+    return res
+      .status(500)
+      .json({ message: "Lỗi máy chủ, vui lòng thử lại sau !!" });
   }
 };
 
@@ -460,70 +482,71 @@ const getUsersAndDrivers = async (req, res) => {
 
 // [POST] Đăng ký ứng tuyển driver
 const applyForDriver = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { licenseNumber, experience } = req.body;
 
-    try {
-      const { userId } = req.params;
-      const { licenseNumber, vehicleInfo } = req.body;
-
-      // Kiểm tra các trường bắt buộc
-      if (!licenseNumber || !vehicleInfo) {
-        return res.status(400).json({
-          status: "error",
-          message: "License number và vehicle info là bắt buộc",
-        });
-      }
-
-      // Kiểm tra file upload
-      if (!req.file) {
-        return res.status(400).json({
-          status: "error",
-          message: "Vui lòng upload ảnh giấy phép lái xe",
-        });
-      }
-
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        return res.status(404).json({
-          status: "error",
-          message: "Không tìm thấy người dùng",
-        });
-      }
-
-      const existingApplication = await DriverApplicationModel.findOne({ user: userId });
-      if (existingApplication) {
-        return res.status(400).json({
-          status: "error",
-          message: "Bạn đã nộp đơn ứng tuyển tài xế trước đó",
-        });
-      }
-
-      // Tạo mới driver application với đường dẫn ảnh
-      const driverApplication = new DriverApplicationModel({
-        user: userId,
-        status: "pending",
-        appliedAt: new Date(),
-        licenseNumber,
-        experience: vehicleInfo, // Giả định vehicleInfo là experience
-        driversLicensePhoto: `/images/${req.file.filename}`, // Lưu đường dẫn ảnh
-      });
-
-      await driverApplication.save();
-
-      return res.status(200).json({
-        status: "success",
-        message: "Đơn ứng tuyển tài xế đã được gửi thành công, đang chờ duyệt",
-        data: {
-          userId: user._id,
-          driverApplication,
-        },
-      });
-    } catch (error) {
-      console.error("Error applying for driver:", error);
-      return res.status(500).json({
+    // Kiểm tra các trường bắt buộc
+    if (!licenseNumber || !experience) {
+      return res.status(400).json({
         status: "error",
-        message: "Lỗi server, vui lòng thử lại sau",
+        message: "License number và experience là bắt buộc",
       });
     }
+
+    // Kiểm tra file upload
+    if (!req.file) {
+      return res.status(400).json({
+        status: "error",
+        message: "Vui lòng upload ảnh giấy phép lái xe",
+      });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy người dùng",
+      });
+    }
+
+    const existingApplication = await DriverApplicationModel.findOne({
+      user: userId,
+    });
+    if (existingApplication) {
+      return res.status(400).json({
+        status: "error",
+        message: "Bạn đã nộp đơn ứng tuyển tài xế trước đó",
+      });
+    }
+
+    // Tạo mới driver application với đường dẫn ảnh
+    const driverApplication = new DriverApplicationModel({
+      user: userId,
+      status: "pending",
+      appliedAt: new Date(),
+      licenseNumber,
+      experience: experience, // Giả định vehicleInfo là experience
+      driversLicensePhoto: `/images/${req.file.filename}`, // Lưu đường dẫn ảnh
+    });
+
+    await driverApplication.save();
+
+    return res.status(200).json({
+      status: "success",
+      message: "Đơn ứng tuyển tài xế đã được gửi thành công, đang chờ duyệt",
+      data: {
+        userId: user._id,
+        driverApplication,
+      },
+    });
+  } catch (error) {
+    console.error("Error applying for driver:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi server, vui lòng thử lại sau",
+    });
+  }
 };
 
 // [PUT] Duyệt hoặc từ chối ứng tuyển driver (dành cho admin)
@@ -539,7 +562,9 @@ const approveDriverApplication = async (req, res) => {
       });
     }
 
-    const driverApplication = await DriverApplicationModel.findOne({ user: userId });
+    const driverApplication = await DriverApplicationModel.findOne({
+      user: userId,
+    });
     if (!driverApplication || driverApplication.status !== "pending") {
       return res.status(400).json({
         status: "error",
