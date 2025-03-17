@@ -34,4 +34,12 @@ router.put("/approve-driver/:userId", verifyToken, verifyAdmin, userController.a
 
 router.get("/pending-drivers", verifyToken, verifyAdmin, userController.getPendingDriverApplications);
 
+router.get("/approved-drivers", verifyToken, verifyAdmin, userController.getApprovedDriverApplications);
+
+router.get("/rejected-drivers", verifyToken, verifyAdmin, userController.getRejectedDriverApplications);
+
+router.put("/update-role/:userId", verifyToken, verifyAdmin, userController.updateUserRole);
+
+
+
 module.exports = router;

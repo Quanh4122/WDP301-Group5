@@ -33,7 +33,9 @@ import AdminDetailRequest from "../components/list_request_admin/components/Admi
 import TransactionList from "../components/transaction/transactionList";
 import ApplyDriver from "../components/driver/ApplyDriver";
 import ManageAccount from "../components/admin/ManageAccount";
-
+import UserList from "../components/admin/UserList";
+import ChangeRoleAccount from "../components/admin/ChangeRoleAccount";
+import ManagerCar from "../components/manager_car";
 
 const Router = () => {
 
@@ -160,13 +162,27 @@ const Router = () => {
         },
 
         {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT,
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGE_DRIVER_ACCEPT,
             element: <ProtectedRoute requiredRole="Admin"><ManageAccount /></ProtectedRoute>
+        },
+
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT,
+            element: <ProtectedRoute requiredRole="Admin"><UserList /></ProtectedRoute>
+        },
+
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_ROLE_ACCOUNT + "/:userId",
+            element: <ProtectedRoute requiredRole="Admin"><ChangeRoleAccount /></ProtectedRoute>
         },
 
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.APPLY_DRIVER + "/:userId",
             element: <ProtectedRoute requiredRole="User"><ApplyDriver /></ProtectedRoute>
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGER_CAR,
+            element: <ProtectedRoute requiredRole="Admin"><ManagerCar /></ProtectedRoute>
         },
 
     ]

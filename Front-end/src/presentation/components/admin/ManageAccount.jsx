@@ -1,118 +1,167 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FetchPendingDriverApplications,
   ApproveDriverApplication,
+  FetchApprovedDriverApplications,
+  fetchRejectedDriverApplications,
 } from "../redux/slices/Authentication";
+import { FaCheck, FaTimes } from "react-icons/fa";
+import Pagination from "../../components/home/components/Pagination";
 
 const ManageAccount = () => {
   const dispatch = useDispatch();
   const {
     pendingDriverApplications = [],
+    approvedDriverApplications = [],
+    rejectedDriverApplications = [],
     isLoading = false,
     user = null,
   } = useSelector((state) => state.auth || {});
 
+  const [filter, setFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+
   useEffect(() => {
     if (user?.role === "Admin") {
       dispatch(FetchPendingDriverApplications());
+      dispatch(FetchApprovedDriverApplications());
+      dispatch(fetchRejectedDriverApplications());
     }
   }, [dispatch, user?.role]);
 
+  const allApplications = [
+    ...pendingDriverApplications,
+    ...approvedDriverApplications,
+    ...rejectedDriverApplications,
+  ];
+
+  const filteredApplications = allApplications.filter((application) => {
+    const matchesFilter = filter === "all" || application.status === filter;
+    const matchesSearch =
+      searchTerm === "" ||
+      application.user?.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.user?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
+  const paginatedApplications = filteredApplications.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <div className="flex items-center gap-3">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600"></div>
-          <span className="text-lg text-gray-700 font-medium">
-            Loading Applications...
-          </span>
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex items-center gap-3 p-5 bg-white rounded-lg shadow-lg">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-600"></div>
+          <span className="text-lg text-gray-700 font-semibold">Đang tải...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mt-20 mb-40 bg-gray-100 py-10">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <div className=" mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
-            Account Management Dashboard
-          </h1>
-          <div className="text-sm text-gray-500">
-            Last updated: {new Date().toLocaleTimeString()}
+        <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <h1 className="text-4xl font-extrabold text-gray-900">Quản Lý Tài Khoản</h1>
+          <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
+            Cập nhật: {new Date().toLocaleString("vi-VN")}
           </div>
-        </div>
+        </header>
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="Search by username or email..."
-            className="flex-1 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-gray-700 placeholder-gray-400"
-          />
-          <select className="w-full sm:w-48 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-white text-gray-700">
-            <option value="all">All Accounts</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Tìm kiếm tên hoặc email..."
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800 placeholder-gray-400"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <svg
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+          <select
+            className="w-full sm:w-48 py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800 bg-white"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="all">Tất cả</option>
+            <option value="pending">Đang chờ</option>
+            <option value="approved">Đã duyệt</option>
+            <option value="rejected">Bị từ chối</option>
           </select>
         </div>
 
         {/* Table */}
-        {pendingDriverApplications.length === 0 ? (
-          <div className="text-center py-10 bg-white rounded-xl shadow-sm">
-            <p className="text-gray-500 text-lg">
-              No pending applications found.
-            </p>
+        {paginatedApplications.length === 0 ? (
+          <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+            <p className="text-gray-600 text-lg">Không tìm thấy dữ liệu phù hợp.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    <th className="py-4 px-6">Username</th>
+                    <th className="py-4 px-6">Tên người dùng</th>
                     <th className="py-4 px-6">Email</th>
-                    <th className="py-4 px-6">Role</th>
-                    <th className="py-4 px-6">Driver Status</th>
-                    <th className="py-4 px-6">License Number</th>
-                    <th className="py-4 px-6">Experience</th>
-                    <th className="py-4 px-6">License Photo</th>
-                    <th className="py-4 px-6">Actions</th>
+                    <th className="py-4 px-6">Vai trò</th>
+                    <th className="py-4 px-6">Trạng thái</th>
+                    <th className="py-4 px-6">Số bằng lái</th>
+                    <th className="py-4 px-6">Kinh nghiệm</th>
+                    <th className="py-4 px-6 text-center">Ảnh bằng lái</th>
+                    <th className="py-4 px-6 text-center">Hành động</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {pendingDriverApplications.map((application) => (
+                  {paginatedApplications.map((application) => (
                     <tr
                       key={application._id}
-                      className="hover:bg-gray-50 transition-colors duration-150"
+                      className="hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="py-4 px-6 text-gray-900">
+                      <td className="py-4 px-6 text-gray-900 font-medium">
                         {application.user?.userName ?? "N/A"}
                       </td>
                       <td className="py-4 px-6 text-gray-700">
                         {application.user?.email ?? "N/A"}
                       </td>
                       <td className="py-4 px-6 text-gray-700">
-                        {typeof application.user?.role === "object"
-                          ? application.user.role?.roleName ?? "N/A"
-                          : application.user?.role ?? "N/A"}
+                        {application.user?.role?.roleName ?? "N/A"}
                       </td>
                       <td className="py-4 px-6">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
                             application.status === "approved"
-                              ? "bg-green-100 text-green-800"
+                              ? "bg-green-100 text-green-700"
                               : application.status === "rejected"
-                              ? "bg-red-100 text-red-800"
-                              : application.status === "pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-gray-100 text-gray-800"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
-                          {application.status ?? "N/A"}
+                          {application.status === "approved"
+                            ? "Đã duyệt"
+                            : application.status === "rejected"
+                            ? "Bị từ chối"
+                            : "Đang chờ"}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-gray-700">
@@ -121,35 +170,37 @@ const ManageAccount = () => {
                       <td className="py-4 px-6 text-gray-700">
                         {application.experience ?? "N/A"}
                       </td>
-                      <td className="py-4 px-6">
-                        {application.driversLicensePhoto && (
+                      <td className="py-4 px-6 text-center">
+                        {application.driversLicensePhoto ? (
                           <img
                             src={`http://localhost:3030${application.driversLicensePhoto}`}
-                            alt="Driver License"
-                            className="h-12 w-12 object-cover rounded-md border border-gray-200"
+                            alt="Ảnh bằng lái"
+                            className="h-10 w-10 object-cover rounded-full border border-gray-200 shadow-sm"
                             onError={(e) =>
                               (e.currentTarget.src = "/fallback-image.png")
                             }
                           />
+                        ) : (
+                          <span className="text-gray-500 text-sm">N/A</span>
                         )}
                       </td>
-                      <td className="py-4 px-6 flex gap-2">
+                      <td className="py-4 px-6 text-center">
                         {application.status === "pending" && (
-                          <>
+                          <div className="flex justify-center gap-3">
                             <button
                               onClick={() =>
                                 dispatch(
                                   ApproveDriverApplication({
-                                    userId:
-                                      application.user?._id || application._id,
+                                    userId: application.user?._id,
                                     status: "approved",
                                   })
                                 )
                               }
-                              className="bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700 transition-all duration-200 disabled:opacity-50 text-sm font-medium"
+                              className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-all duration-200 disabled:opacity-50 shadow-md"
                               disabled={isLoading}
+                              title="Phê duyệt"
                             >
-                              Approve
+                              <FaCheck className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() =>
@@ -160,12 +211,13 @@ const ManageAccount = () => {
                                   })
                                 )
                               }
-                              className="bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 transition-all duration-200 disabled:opacity-50 text-sm font-medium"
+                              className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-all duration-200 disabled:opacity-50 shadow-md"
                               disabled={isLoading}
+                              title="Từ chối"
                             >
-                              Reject
+                              <FaTimes className="w-4 h-4" />
                             </button>
-                          </>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -177,21 +229,12 @@ const ManageAccount = () => {
         )}
 
         {/* Pagination */}
-        <div className="mt-6 flex justify-between items-center text-gray-600">
-          <button
-            disabled={true}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-300 hover:bg-blue-700 transition-all duration-200 font-medium"
-          >
-            Previous
-          </button>
-          <span className="text-sm font-medium">Page 1 of 1</span>
-          <button
-            disabled={true}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-300 hover:bg-blue-700 transition-all duration-200 font-medium"
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          className="mt-8"
+        />
       </div>
     </div>
   );

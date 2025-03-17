@@ -72,6 +72,8 @@ const register = async (req, res) => {
 // [POST] /verify
 const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
+  console.log("OTP", otp);
+  
 
   const user = await UserModel.findOne({ email });
   if (!user) {
@@ -466,6 +468,8 @@ const getUsersAndDrivers = async (req, res) => {
       .populate("role")
       .select("-__v");
 
+    console.log("Users fetched:", users); // Log để kiểm tra dữ liệu
+
     return res.status(200).json({
       status: "success",
       message: "Users and drivers retrieved successfully",
@@ -610,7 +614,11 @@ const getPendingDriverApplications = async (req, res) => {
       status: "pending",
     }).populate({
       path: "user",
-      select: "userName email phoneNumber",
+      select: "userName email phoneNumber role", // Lấy cả trường role
+      populate: {
+        path: "role", // Populate trường role từ model Role
+        select: "roleName", // Chỉ lấy roleName từ model Role
+      },
     });
 
     return res.status(200).json({
@@ -623,6 +631,132 @@ const getPendingDriverApplications = async (req, res) => {
     return res.status(500).json({
       status: "error",
       message: "Server error, please try again later",
+    });
+  }
+};
+
+
+const getApprovedDriverApplications = async (req, res) => {
+  try {
+    const approvedApplications = await DriverApplicationModel.find({
+      status: "approved",
+    }).populate({
+      path: "user",
+      select: "userName email phoneNumber role", // Lấy cả trường role
+      populate: {
+        path: "role", // Populate trường role từ model Role
+        select: "roleName", // Chỉ lấy roleName từ model Role
+      },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Approved driver applications retrieved successfully",
+      data: approvedApplications,
+    });
+  } catch (error) {
+    console.error("Error fetching approved driver applications:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Server error, please try again later",
+    });
+  }
+};
+
+const getRejectedDriverApplications = async (req, res) => {
+  try {
+    const rejectedApplications = await DriverApplicationModel.find({
+      status: "rejected",
+    }).populate({
+      path: "user",
+      select: "userName email phoneNumber role", // Lấy cả trường role
+      populate: {
+        path: "role", // Populate trường role từ model Role
+        select: "roleName", // Chỉ lấy roleName từ model Role
+      },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Rejected driver applications retrieved successfully",
+      data: rejectedApplications,
+    });
+  } catch (error) {
+    console.error("Error fetching rejected driver applications:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Server error, please try again later",
+    });
+  }
+};
+
+const updateUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params; // Lấy userId từ params
+    const { roleName } = req.body; // Lấy roleName từ body (User, Driver, Admin)
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!userId || !roleName) {
+      return res.status(400).json({
+        status: "error",
+        message: "User ID và Role Name là bắt buộc",
+      });
+    }
+
+    // Kiểm tra vai trò hợp lệ
+    const validRoles = ["User", "Driver"];
+    if (!validRoles.includes(roleName)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Vai trò không hợp lệ. Chỉ chấp nhận: User, Driver, Admin",
+      });
+    }
+
+    // Tìm user cần cập nhật
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy người dùng",
+      });
+    }
+
+    // Tìm hoặc tạo role mới
+    let newRole = await RoleModel.findOne({ roleName });
+    if (!newRole) {
+      newRole = await new RoleModel({ roleName }).save();
+    }
+
+    // Kiểm tra nếu user đã có vai trò này
+    if (user.role.toString() === newRole._id.toString()) {
+      return res.status(400).json({
+        status: "error",
+        message: `Người dùng đã có vai trò ${roleName}`,
+      });
+    }
+
+    // Cập nhật vai trò cho user
+    user.role = newRole._id;
+    await user.save();
+
+    // Lấy thông tin user sau khi cập nhật
+    const updatedUser = await UserModel.findById(userId).populate("role");
+
+    return res.status(200).json({
+      status: "success",
+      message: `Đã cập nhật vai trò thành ${roleName} thành công`,
+      data: {
+        userId: updatedUser._id,
+        userName: updatedUser.userName,
+        email: updatedUser.email,
+        role: updatedUser.role.roleName,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi server, vui lòng thử lại sau",
     });
   }
 };
@@ -641,5 +775,8 @@ module.exports = {
   applyForDriver,
   approveDriverApplication,
   getPendingDriverApplications,
+  getApprovedDriverApplications,
+  getRejectedDriverApplications,
   getUsersAndDrivers,
+  updateUserRole,
 };
