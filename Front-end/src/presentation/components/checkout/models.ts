@@ -43,7 +43,8 @@ export type RequestAcceptForApi = {
     startDate: any,
     endDate: any,
     requestStatus: string,
-    isRequestDriver?: Boolean
+    isRequestDriver?: Boolean,
+    car? :string[]
 }
 
 export type CarModel = {
@@ -54,11 +55,19 @@ export type CarModel = {
     licensePlateNumber: string,
     numberOfSeat?: string,
     price: number,
-    images: string[]
+    images: string[],
+    cartype?: CarType
 }
 
 export type DriverModel = {
     name: string, 
     age: string,
     image: string,
+}
+
+export type CarType = {
+    _id?: string,
+    bunkBed: boolean,
+    flue: number,
+    transmissionType: boolean,
 }

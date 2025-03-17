@@ -1,5 +1,6 @@
 const CarModel = require("../models/car.model");
 const CarTypeModel = require("../models/cartype.model");
+const RequestModel = require("../models/request.model");
 
 const getAllCar = async (req, res) => {
   const carList = await CarModel.find().populate(
@@ -151,6 +152,63 @@ const createCar = async (req, res) => {
   }
 };
 
+const getAllCarFree = async (req, res) => {
+  const data = req.query.key;
+  if (data[0] && data[1]) {
+    const listCarInAcceptRequest = await RequestModel.find(
+      {
+        $or: [
+          {
+            startDate: { $lte: data[0] },
+            endDate: { $gte: data[0] },
+          },
+          {
+            startDate: { $lte: data[1] },
+            endDate: { $gte: data[1] },
+          },
+          {
+            startDate: { $gte: data[0] },
+            endDate: { $lte: data[1] },
+          },
+        ],
+      },
+      "car -_id"
+    );
+    if (listCarInAcceptRequest.length > 0) {
+      const arrStr = listCarInAcceptRequest.flatMap((item) =>
+        item.car.map((objectId) => objectId.toString())
+      );
+      const newArrStr = arrStr.filter(
+        (item, index) => arrStr.indexOf(item) == index
+      );
+      const carList = await CarModel.find({
+        _id: { $nin: newArrStr },
+      }).populate("carType", "bunkBed flue transmissionType");
+      if (carList && carList.length > 0) {
+        return res.status(200).json(carList);
+      } else {
+        res.status(400).json({
+          status: "error",
+          message: "Car List do not have any element",
+        });
+      }
+    } else {
+      const carList = await CarModel.find().populate(
+        "carType",
+        "bunkBed flue transmissionType"
+      );
+      if (carList && carList.length > 0) {
+        return res.status(200).json(carList);
+      } else {
+        res.status(400).json({
+          status: "error",
+          message: "Car List do not have any element",
+        });
+      }
+    }
+  }
+};
+
 module.exports = {
   getAllCar,
   filterCarByNumberOfSeat,
@@ -158,4 +216,5 @@ module.exports = {
   filterCarByFlue,
   getCarById,
   createCar,
+  getAllCarFree,
 };

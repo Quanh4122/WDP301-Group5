@@ -13,5 +13,6 @@ router.post(
 router.post("/filterCarByFlue", CarController.filterCarByFlue);
 router.get("/getCarById", CarController.getCarById);
 router.post("/createCar", upload.array("images", 4), CarController.createCar);
+router.get("/getAllCarFree", CarController.getAllCarFree);
 
 module.exports = router;
