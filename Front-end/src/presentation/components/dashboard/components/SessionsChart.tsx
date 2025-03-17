@@ -77,7 +77,7 @@ export default function SessionsChart() {
     <Card variant="outlined" sx={{ width: '100%' }}>
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
-          Car Utilization
+          Biểu đồ số lượng xe đang sử dụng và số lượng xe tại bãi
         </Typography>
         <Stack sx={{ justifyContent: 'space-between' }}>
           <Stack
