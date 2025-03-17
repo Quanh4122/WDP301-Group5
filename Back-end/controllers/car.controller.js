@@ -113,8 +113,6 @@ const createCar = async (req, res) => {
     flue,
     transmissionType,
   } = req.body;
-  console.log(req.body);
-  console.log(req.files);
 
   const carTypeModel = await CarTypeModel.findOne({
     bunkBed: bunkBed,
@@ -209,6 +207,64 @@ const getAllCarFree = async (req, res) => {
   }
 };
 
+const updateCar = async (req, res) => {
+  const {
+    carName,
+    carStatus,
+    carVersion,
+    color,
+    images,
+    licensePlateNumber,
+    numberOfSeat,
+    price,
+    bunkBed,
+    flue,
+    transmissionType,
+  } = req.body;
+
+  const { carId } = req.params;
+
+  console.log(carId);
+
+  const carTypeModel = await CarTypeModel.findOne({
+    bunkBed: bunkBed,
+    flue: flue,
+    transmissionType: transmissionType,
+  });
+  if (req.files.length == 0) {
+    const error = new Error("Please choose files");
+    error.httpStatusCode = 400;
+    return next(error);
+  } else {
+    const arrImages = req.files.map((item) => {
+      return `/images/${item.filename}`;
+    });
+    // const carFindByLicensePlateNumber = await CarModel.findOne({
+    //   licensePlateNumber: licensePlateNumber,
+    // });
+    // if (carFindByLicensePlateNumber) {
+    //   return res.status(401).json({ message: "This car is existed !!!" });
+    // } else {
+
+    // }
+    await CarModel.updateOne(
+      { _id: carId },
+      {
+        carName,
+        carStatus,
+        carType: carTypeModel._id,
+        carVersion,
+        color,
+        images: arrImages,
+        licensePlateNumber,
+        numberOfSeat,
+        price,
+      }
+    );
+    return res.status(200).json({ message: "Create Successfull !!!" });
+  }
+};
+
 module.exports = {
   getAllCar,
   filterCarByNumberOfSeat,
@@ -217,4 +273,5 @@ module.exports = {
   getCarById,
   createCar,
   getAllCarFree,
+  updateCar,
 };

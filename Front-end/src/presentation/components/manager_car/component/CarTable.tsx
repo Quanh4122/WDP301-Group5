@@ -231,8 +231,8 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     return (
                                         <button
                                             className={`px-3 py-1 text-sm rounded-md shadow-sm hover:bg-blue-100 transition duration-200 ${page === Math.ceil(filteredCars.length / 5)
-                                                    ? "bg-blue-700 text-white"
-                                                    : "bg-gray-200"
+                                                ? "bg-blue-700 text-white"
+                                                : "bg-gray-200"
                                                 }`}
                                         >
                                             {page}

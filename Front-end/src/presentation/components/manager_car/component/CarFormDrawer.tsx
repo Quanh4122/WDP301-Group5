@@ -333,20 +333,19 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                                 <p className="text-xs text-gray-400">Support multiple files</p>
                             </Upload.Dragger>
                         </Form.Item>
+                        {/* Cố định nút "Tạo xe" hoặc "Lưu" ở dưới cùng */}
+                        <div className="sticky bottom-0 bg-white p-4 border-t border-gray-200">
+                            <Form.Item>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow-md transition duration-200"
+                                >
+                                    {carDetail ? "Lưu" : "Tạo xe"}
+                                </Button>
+                            </Form.Item>
+                        </div>
                     </Form>
-                </div>
-                {/* Cố định nút "Tạo xe" hoặc "Lưu" ở dưới cùng */}
-                <div className="sticky bottom-0 bg-white p-4 border-t border-gray-200">
-                    <Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            form={form}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow-md transition duration-200"
-                        >
-                            {carDetail ? "Lưu" : "Tạo xe"}
-                        </Button>
-                    </Form.Item>
                 </div>
             </div>
         </Drawer>
