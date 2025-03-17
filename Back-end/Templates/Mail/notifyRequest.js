@@ -123,10 +123,6 @@ module.exports = (
 
             <p>Chúng tôi xin thông báo về yêu cầu thanh toán của bạn:</p>
             <p><strong>Số tiền cần thanh toán:</strong> ${totalFee}</p>
-            <p>Để xem chi tiết, vui lòng nhấn vào nút bên dưới:</p>
-            <div style="text-align: center;">
-                <a href="${link}" class="button">Xem chi tiết</a>
-            </div>
             <p class="footer">Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>
         `
             : `
