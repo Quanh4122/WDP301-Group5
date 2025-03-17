@@ -29,5 +29,7 @@ export const PRIVATE_ROUTES = {
             ADMIN_REQUEST : 'admin-request',
             ADMIN_DETAIL_REQUEST: 'admin-detail-request',
             TRANSACTION : 'transaction',
+            MANAGE_ACCOUNT: 'manage-account',
+            APPLY_DRIVER: 'apply-driver'
         }
 }

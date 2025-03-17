@@ -13,6 +13,9 @@ const initialState = {
   isVerify: false,
   user: null,
   loginMethod: null,
+  usersAndDrivers: [],
+  pendingDriverApplications: [],
+  driverApplication: null,
 };
 
 export const loginWithGoogle = createAsyncThunk(
@@ -20,14 +23,16 @@ export const loginWithGoogle = createAsyncThunk(
   async ( _, { dispatch, rejectWithValue }) => {
     try {
       const userData = await signInWithGoogle(); 
+      console.log("User data:", userData);
+      
       if (!userData || !userData.email || !userData.token) {
         throw new Error("Google login failed: No user data, email, or token returned");
       }
 
       let role = "User";
-      if (userData.email.startsWith("admin")) {
+      if (userData.role.roleName === "Admin") {
         role = "Admin";
-      } else if (userData.email.startsWith("driver")) {
+      } else if (userData.role.roleName === "Driver") {
         role = "Driver";
       }
 
@@ -38,7 +43,7 @@ export const loginWithGoogle = createAsyncThunk(
         userName: userData.userName || "Unnamed User", 
         avatar: userData.avatar || avatar, 
         email: userData.email || "",
-        role: role,
+        role: userData.role,
         fullName: userData.fullName || "",
         phoneNumber: userData.phoneNumber || "",
         address: userData.address || "",
@@ -84,6 +89,84 @@ export const CheckTokenExpiration = createAsyncThunk(
   }
 );
 
+export const fetchUsersAndDrivers = createAsyncThunk(
+  'auth/fetchUsersAndDrivers',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get('/users-drivers', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch users and drivers');
+    }
+  }
+);
+
+export const applyForDriver = createAsyncThunk(
+  'auth/applyForDriver',
+  async ({ userId, licenseNumber, experience, driversLicensePhoto }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+
+      // Tạo FormData để gửi dữ liệu và file
+      const formData = new FormData();
+      formData.append('licenseNumber', licenseNumber);
+      formData.append('experience', experience);
+      if (driversLicensePhoto) {
+        formData.append('driversLicensePhoto', driversLicensePhoto);
+      }
+
+      const response = await axios.post(
+        `/apply-driver/${userId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data', // Đảm bảo header này được thiết lập đúng
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to apply for driver');
+    }
+  }
+);
+
+export const approveDriverApplication = createAsyncThunk(
+  'auth/approveDriverApplication',
+  async ({ userId, status }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.put(
+        `/approve-driver/${userId}`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+      );
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to approve driver application');
+    }
+  }
+);
+
+export const fetchPendingDriverApplications = createAsyncThunk(
+  'auth/fetchPendingDriverApplications',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get('/pending-drivers', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch pending applications');
+    }
+  }
+);
+
 const slice = createSlice({
   name: "Authentication",
   initialState,
@@ -98,8 +181,8 @@ const slice = createSlice({
 
       state.isLoggedIn = true;
       state.token = action.payload.token;
-      state.user = action.payload.user; 
-      state.loginMethod = action.payload.loginMethod;
+      state.user = action.payload.user;
+      state.loginMethod = action.payload.loginMethod || "email";
       state.isRegister = false;
     },
     signOut(state) {
@@ -111,6 +194,7 @@ const slice = createSlice({
       state.error = false;
       state.isRegister = false;
       state.isVerify = false;
+      state.driverApplication = null;
     },
     updateRegisterEmail(state, action) {
       state.user = state.user ? { ...state.user, email: action.payload.email } : { email: action.payload.email };
@@ -146,11 +230,97 @@ const slice = createSlice({
         }
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchUsersAndDrivers.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsersAndDrivers.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.usersAndDrivers = action.payload;
+      })
+      .addCase(fetchUsersAndDrivers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(applyForDriver.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(applyForDriver.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.driverApplication = action.payload.driverApplication;
+        if (state.user && state.user.userId === action.payload.userId) {
+          state.user.driverApplication = action.payload.driverApplication;
+        }
+      })
+      .addCase(applyForDriver.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(approveDriverApplication.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(approveDriverApplication.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.pendingDriverApplications = state.pendingDriverApplications.filter(
+          (app) => app.user._id !== action.payload.userId
+        );
+        state.usersAndDrivers = state.usersAndDrivers.map((user) =>
+          user._id === action.payload.userId
+            ? { ...user, driverApplication: action.payload.driverApplication, role: action.payload.role.roleName }
+            : user
+        );
+        if (state.user && state.user.userId === action.payload.userId) {
+          state.user.driverApplication = action.payload.driverApplication;
+          state.user.role = action.payload.role.roleName;
+        }
+      })
+      .addCase(approveDriverApplication.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchPendingDriverApplications.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPendingDriverApplications.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.pendingDriverApplications = action.payload;
+      })
+      .addCase(fetchPendingDriverApplications.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
 export default slice.reducer;
+
+export function FetchUsersAndDrivers() {
+  return async (dispatch) => {
+    await dispatch(fetchUsersAndDrivers());
+  };
+}
+
+export function ApplyForDriver(userId, formValues) {
+  return async (dispatch) => {
+    await dispatch(applyForDriver({ userId, ...formValues }));
+  };
+}
+
+export function ApproveDriverApplication(userId, status) {
+  return async (dispatch) => {
+    await dispatch(approveDriverApplication({ userId, status }));
+  };
+}
+
+export function FetchPendingDriverApplications() {
+  return async (dispatch) => {
+    await dispatch(fetchPendingDriverApplications());
+  };
+}
 
 export function LoginUser(formValues) {
   return async (dispatch) => {
@@ -177,14 +347,15 @@ export function LoginUser(formValues) {
         phoneNumber: response.data.phoneNumber || "",
         avatar: response.data.avatar || "",
         address: response.data.address || "",
-        role: response.data.role || "User",
-        email: response.data.email || formValues.email,
+        role: response.data.role,
+        email: formValues.email,
       };
 
       dispatch(
         slice.actions.login({
           token: response.data.token,
           user: standardizedUser,
+          loginMethod: "email",
         })
       );
 
@@ -339,7 +510,7 @@ export function EditPassword(userId, formValues) {
     try {
       const { token } = getState().auth;
 
-      const response = await axios.post(
+      const response = await axios.put(
         `/changePassword/${userId}`,
         formValues,
         {

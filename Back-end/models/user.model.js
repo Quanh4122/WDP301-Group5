@@ -2,68 +2,16 @@ const mongoose = require("mongoose");
 const RoleModel = require("./role.model");
 
 const UserSchema = new mongoose.Schema({
-  userName: {
-    type: String,
-    require: true,
-  },
-  password: {
-    type: String,
-    require: true,
-  },
-  passwordConfirm: {
-    type: String,
-  },
-  passwordChangedAt: {
-    type: Date,
-  },
-  passwordResetToken: {
-    type: String,
-  },
-  passwordResetExpires: {
-    type: Date,
-  },
-  fullName: {
-    type: String,
-    require: true,
-  },
-  email: {
-    type: String,
-    require: true,
-  },
-  avatar: {
-    type: String,
-    require: true,
-  },
-  phoneNumber: {
-    type: String,
-    require: true,
-  },
-  address: {
-    type: String,
-  },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
-  otp: {
-    type: String,
-    require: true,
-  },
-  otp_expiry_time: {
-    type: Date,
-  },
-  role: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Role",
-    require: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-  updatedAt: {
-    type: Date,
-  },
+  userName: { type: String, required: true },
+  fullName: { type: String },
+  email: { type: String, required: true },
+  phoneNumber: { type: String },
+  address: { type: String },
+  avatar: { type: String, required: true },
+  role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
+  verified: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date },
 });
 
 UserSchema.pre("save", async function (next) {

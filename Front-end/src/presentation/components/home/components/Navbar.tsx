@@ -10,7 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -20,9 +20,6 @@ const Navbar = () => {
     user: { userId: string; userName: string; avatar: string; role: string } | null;
     tokenExpiration: number | null;
   };
-
-  console.log(user);
-  
 
   const [avatarPreview, setAvatarPreview] = useState("");
   const [userIdPreview, setUserIdPreview] = useState("");
@@ -116,6 +113,13 @@ const Navbar = () => {
                 </Link>
               </li>
             )}
+            {isLoggedIn && user?.role === "User" && (
+              <li>
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.APPLY_DRIVER}/${user?.userId}`}>
+                  <button className="text-lg hover:text-blue-400">Ứng tuyển lái xe</button>
+                </Link>
+              </li>
+            )}
           </ul>
 
           {/* Desktop Actions */}
@@ -183,6 +187,14 @@ const Navbar = () => {
                 onClick={() => setMobileDrawerOpen(false)}
               >
                 <button className="w-full text-left px-4 py-2">Thống kê</button>
+              </Link>
+            )}
+            {isLoggedIn && user?.role === "User" && (
+              <Link
+                to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.APPLY_DRIVER}`}
+                onClick={() => setMobileDrawerOpen(false)}
+              >
+                <button className="w-full text-left px-4 py-2">Ứng tuyển lái xe</button>
               </Link>
             )}
             {isLoggedIn && user ? (
