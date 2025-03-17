@@ -30,15 +30,15 @@ const ModalDriverSelect = ({ isOpen, onCancel, listDriver, onSelectedValue }: pr
                         >
                             <div className="flex items-center w-28 mb-3">
                                 <div>
-                                    {item.image ? (
+                                    {item.user.images ? (
                                         <img
-                                            src={`http://localhost:3030${item.image}`}
+                                            src={`http://localhost:3030${item.user.images}`}
                                             alt="Avatar Preview"
                                             className="w-10 h-10 mx-auto border rounded-full object-cover"
                                         />
                                     ) : <PersonIcon />}
                                 </div>
-                                {item.name}
+                                {item.user.userName}
                             </div>
                         </Checkbox>
                     ))}

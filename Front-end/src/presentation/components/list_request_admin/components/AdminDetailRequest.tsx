@@ -60,8 +60,12 @@ const AdminDetailRequest = () => {
     }, [])
 
     const getListDriver = async () => {
-        await axiosInstance.get("/driverFree")
-            .then(res => setDriverList(res.data))
+        await axiosInstance.get("/approved-drivers")
+            .then(res => {
+                console.log(res.data.data)
+                setDriverList(res.data.data)
+
+            })
             .catch(err => console.log(err))
     }
 
@@ -105,6 +109,7 @@ const AdminDetailRequest = () => {
 
     const [driverSelected, setDriverSelected] = useState<any[]>([])
     const onSelectedValue = (value: any) => {
+        console.log(value.value)
         if (value.isSelect == true) {
             let dt = [...driverSelected, value.value]
             setDriverSelected(dt)
@@ -128,8 +133,9 @@ const AdminDetailRequest = () => {
         }
         await axiosInstance.post('/request/handleCheckAdminAcceptRequest', dataSubmit)
             .then(res => {
-                console.log(res.data)
                 setDpRequest(res.data.isExisted == true ? true : false)
+                res.data.isExisted ? toast.error("Có xe đã được đặt trong thời gian này !!") :
+                    toast.success("Đơn đặt xe có thể được thực hiện !!")
                 setListDuplicate(res.data.duplicateCar)
                 setDpRequestC(false)
             })
@@ -147,9 +153,11 @@ const AdminDetailRequest = () => {
         }
 
         await axiosInstance.post('/request/handleAdminAcceptRequest', dataSubmit)
-            .then(res => console.log(res.status))
+            .then(res => {
+                console.log(res.data)
+            })
             .catch(err => console.log(err))
-        // navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST)
+        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST)
     }
     return (
         <div className="m-4 bg-blue-50 min-h-screen"> {/* Light blue background */}

@@ -45,7 +45,7 @@ const ChangeRoleAccount = () => {
   };
 
   const handleBack = () => {
-    navigate("/app/user-list");
+    navigate("/app/manage-account");
   };
 
   if (isLoading) {
@@ -53,7 +53,9 @@ const ChangeRoleAccount = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="flex items-center gap-3 p-5 bg-white rounded-lg shadow-lg">
           <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-600"></div>
-          <span className="text-lg text-gray-700 font-semibold">Đang tải...</span>
+          <span className="text-lg text-gray-700 font-semibold">
+            Đang tải...
+          </span>
         </div>
       </div>
     );
