@@ -59,14 +59,14 @@ const MainGrid = () => {
           <PageViewsBarChart />
         </Grid>
       </Grid>
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+      {/* <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Details
       </Typography>
       <Grid container spacing={2} columns={12}>
         <Grid size={{ xs: 12 }}>
           <CustomizedDataGrid />
         </Grid>
-      </Grid>
+      </Grid> */}
       <Copyright sx={{ my: 4 }} />
     </Box>
   );
