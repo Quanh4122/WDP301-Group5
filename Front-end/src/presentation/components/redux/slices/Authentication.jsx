@@ -15,6 +15,8 @@ const initialState = {
   loginMethod: null,
   usersAndDrivers: [],
   pendingDriverApplications: [],
+  approvedDriverApplications: [],
+  rejectedDriverApplications: [],
   driverApplication: null,
 };
 
@@ -181,6 +183,65 @@ export const fetchPendingDriverApplications = createAsyncThunk(
   }
 );
 
+export const fetchApprovedDriverApplications = createAsyncThunk(
+  "auth/fetchApprovedDriverApplications",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get("/approved-drivers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch approved applications"
+      );
+    }
+  }
+);
+
+
+export const fetchRejectedDriverApplications = createAsyncThunk(
+  "auth/fetchRejectedDriverApplications",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get("/rejected-drivers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch rejected applications"
+      );
+    }
+  }
+);
+
+export const updateUserRole = createAsyncThunk(
+  "auth/updateUserRole",
+  async ({ userId, role }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.put(
+        `/update-role/${userId}`,
+        { roleName: role },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data.data; // Trả về dữ liệu user đã cập nhật
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update user role"
+      );
+    }
+  }
+);
+
 const slice = createSlice({
   name: "Authentication",
   initialState,
@@ -289,13 +350,13 @@ const slice = createSlice({
             ? {
                 ...user,
                 driverApplication: action.payload.driverApplication,
-                role: action.payload.role.roleName,
+                role: action.payload.role,
               }
             : user
         );
         if (state.user && state.user.userId === action.payload.userId) {
           state.user.driverApplication = action.payload.driverApplication;
-          state.user.role = action.payload.role.roleName;
+          state.user.role = action.payload.role;
         }
       })
       .addCase(approveDriverApplication.rejected, (state, action) => {
@@ -311,6 +372,54 @@ const slice = createSlice({
         state.pendingDriverApplications = action.payload;
       })
       .addCase(fetchPendingDriverApplications.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchApprovedDriverApplications.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchApprovedDriverApplications.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.approvedDriverApplications = action.payload;
+      })
+      .addCase(fetchApprovedDriverApplications.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchRejectedDriverApplications.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchRejectedDriverApplications.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.rejectedDriverApplications = action.payload;
+      })
+      .addCase(fetchRejectedDriverApplications.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUserRole.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUserRole.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Cập nhật usersAndDrivers với thông tin user mới
+        state.usersAndDrivers = state.usersAndDrivers.map((user) =>
+          user._id === action.payload.userId
+            ? {
+                ...user,
+                role: { roleName: action.payload.role }, // Cập nhật role
+              }
+            : user
+        );
+        // Nếu user hiện tại được cập nhật, cũng cập nhật state.user
+        if (state.user && state.user.userId === action.payload.userId) {
+          state.user.role = action.payload.role;
+        }
+      })
+      .addCase(updateUserRole.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
@@ -340,6 +449,18 @@ export function ApproveDriverApplication({ userId, status }) {
 export function FetchPendingDriverApplications() {
   return async (dispatch) => {
     await dispatch(fetchPendingDriverApplications());
+  };
+}
+
+export function FetchApprovedDriverApplications() {
+  return async (dispatch) => {
+    await dispatch(fetchApprovedDriverApplications());
+  };
+};
+
+export function UpdateUserRole(userId, role) {
+  return async (dispatch) => {
+    await dispatch(updateUserRole({ userId, role }));
   };
 }
 
