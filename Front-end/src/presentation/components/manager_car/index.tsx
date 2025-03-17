@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../utils/axios";
+import { message, Form } from "antd";
 import CarTable from "./component/CarTable";
+import CarFormDrawer from "./component/CarFormDrawer";
 
 
-// Định nghĩa kiểu cho CarType
 interface CarType {
     _id: string;
     bunkBed: boolean;
@@ -11,7 +12,6 @@ interface CarType {
     transmissionType: boolean;
 }
 
-// Định nghĩa kiểu cho Car
 interface Car {
     _id: string;
     carName: string;
@@ -27,40 +27,56 @@ interface Car {
 
 const CarList: React.FC = () => {
     const [carList, setCarList] = useState<Car[] | undefined>(undefined);
+    const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+    const [carEdit, setCarEdit] = useState<Car | undefined>()
+    const [form] = Form.useForm();
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axiosInstance.get("/car/getAllCar");
+                setCarList(res.data);
+            } catch (err) {
+                console.log(err);
+            }
+        };
         fetchData();
     }, []);
 
-    const fetchData = async () => {
-        try {
-            const res = await axiosInstance.get("/car/getAllCar");
-            setCarList(res.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
     const handleEdit = (car: Car) => {
-        console.log("Edit car:", car);
-        // Thực hiện logic chỉnh sửa
+        setCarEdit(car)
+        setIsDrawerVisible(true);
     };
 
     const handleDelete = (carId: string) => {
         console.log("Delete car:", carId);
-        // Thực hiện logic xóa
+    };
+
+    const handleCreate = () => {
+        setIsDrawerVisible(true);
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Danh sách xe</h1>
-            {carList && (
+        <div className="min-h-screen bg-gray-100 p-6">
+            {carList ? (
                 <CarTable
                     cars={carList}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onCreate={handleCreate}
                 />
+            ) : (
+                <div className="flex justify-center py-10">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
             )}
+            <CarFormDrawer
+                isDrawerVisible={isDrawerVisible}
+                setIsDrawerVisible={setIsDrawerVisible}
+                form={form}
+                carEdit={carEdit}
+                setCarList={setCarList}
+            />
         </div>
     );
 };
