@@ -131,9 +131,6 @@ export default function SignUp() {
             </Button>
           </Box>
           <Divider>or</Divider>
-          <Button variant="outlined" startIcon={<GoogleIcon />}>
-            Đăng nhập bằng Google
-          </Button>
           <Typography textAlign="center">
             Bạn đã có tài khoản? <RouterLink to="/app/sign-in"><button>Đăng nhập</button></RouterLink>
           </Typography>
