@@ -38,7 +38,7 @@ const RequestInSelected = ({ requestModal }: props) => {
         email: requestData?.user?.email,
         phoneNumber: requestData?.user?.phoneNumber,
         address: requestData?.user?.address,
-        isRequestDriver: requestData.isRequestDriver
+
     }
     const [dateValue, setDateValue] = React.useState<any[]>([dayjs().format('DD/MM/YYYY'), dayjs().add(1, 'day').format('DD/MM/YYYY')]);
     const getDateValue = (value: DateRange<Dayjs>) => {

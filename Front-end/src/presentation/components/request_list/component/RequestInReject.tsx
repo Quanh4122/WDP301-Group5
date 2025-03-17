@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { RequestAcceptForApi, RequestModelFull } from "../../checkout/models";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
-import { CarModels } from '../../car_list/model';
+import { CarModel, RequestAcceptForApi, RequestModelFull } from "../../checkout/models";
 import { Button, Form, Input, Radio } from "antd";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useForm } from "antd/es/form/Form";
@@ -18,6 +13,7 @@ import { Icon } from "@mui/material";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
+import ModalSelectCar from "./ModalSelectCar";
 
 interface props {
     requestModal: RequestModelFull
@@ -28,11 +24,11 @@ const RequestInReject = ({ requestModal }: props) => {
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
     const [requestData, setRequestData] = useState<RequestModelFull>(requestModal)
     const navigate = useNavigate()
+    const [isOpen, setIsOpen] = useState(false)
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
     ]
-    console.log("inreject", requestModal)
     const [form] = useForm()
     const initialValue = {
         userName: requestData?.user?.userName,
@@ -77,6 +73,7 @@ const RequestInReject = ({ requestModal }: props) => {
             startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
             endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
             requestStatus: "2",
+            car: listCarSelected
         }
 
         await axiosInstance.post("/request/userAcceptRequest", requestBookingAccept)
@@ -108,6 +105,26 @@ const RequestInReject = ({ requestModal }: props) => {
                 toast.success("Delete Succesfull")
             })
             .catch((err) => toast.error("Fail to delete !!"))
+    }
+
+    useEffect(() => {
+        getListCarFree()
+    }, [])
+    const [listCarFree, setListCarFree] = useState<CarModel[]>([])
+    const [listCarSelected, setListCarSelected] = useState<string[]>([])
+    const getListCarFree = async () => {
+        await axiosInstance.get('/car/getAllCarFree', {
+            params: {
+                key: [dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]), dayjs(fomatDate(dateValue[1]) + " " + timeValue[1])],
+
+            }
+        })
+            .then(res => setListCarFree(res.data))
+            .catch(err => console.log(err))
+    }
+
+    const onSetListCarSelected = (list: string[]) => {
+        setListCarSelected(list)
     }
 
     return (
@@ -205,6 +222,13 @@ const RequestInReject = ({ requestModal }: props) => {
 
                 {/* Phần List Item */}
                 <div className="w-3/5 pl-8">
+                    <div><Button onClick={() => setIsOpen(true)}>Xem danh sách xe</Button></div>
+                    <ModalSelectCar
+                        isOpen={isOpen}
+                        onCancel={() => setIsOpen(false)}
+                        listCar={listCarFree}
+                        setListCarSelect={onSetListCarSelected}
+                    />
                     {requestData?.car && requestData.car.length > 0 ? (
                         <div className="flex flex-wrap">
                             {requestData.car.map((item, idx) => (

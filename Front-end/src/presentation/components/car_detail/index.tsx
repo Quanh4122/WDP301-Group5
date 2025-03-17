@@ -29,7 +29,7 @@ import axiosInstance from "../utils/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CarModels } from "../car_list/model";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
-import { RequestModalForCallApi, RequestModel, RequestModelFull, UserModel } from "../checkout/models";
+import { RequestModalForCallApi } from "../checkout/models";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../redux/Store";
 import { toast } from "react-toastify";

@@ -43,7 +43,6 @@ const RequestList = () => {
     }
 
     const onCategoryTypeByRequestList = (list: RequestModelFull[]) => {
-        console.log(list)
         setRequestInSelected(list.filter((item) => item.requestStatus == "1")[0])
         setRequestPending(list.filter((item) => item.requestStatus == "2" || item.requestStatus == "3"))
         setRequestInReject(list.filter((item) => item.requestStatus == "4")[0])
