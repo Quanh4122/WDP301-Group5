@@ -25,7 +25,7 @@ interface Car {
 
 interface CarTableProps {
     cars: Car[];
-    onEdit?: (car: Car) => void;
+    onEdit: (car: Car) => void;
     onDelete?: (carId: string) => void;
     onCreate?: () => void;
 }
@@ -126,15 +126,13 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
             key: "action",
             render: (record: Car) => (
                 <Space size="middle">
-                    {onEdit && (
-                        <Button
-                            type="primary"
-                            onClick={() => onEdit(record)}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white border-none rounded-lg shadow-md transition duration-200"
-                        >
-                            Sửa
-                        </Button>
-                    )}
+                    <Button
+                        type="primary"
+                        onClick={() => onEdit(record)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-none rounded-lg shadow-md transition duration-200"
+                    >
+                        Sửa
+                    </Button>
                     {onDelete && (
                         <Button
                             type="primary"
@@ -158,18 +156,14 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                     <h2 className="text-3xl font-semibold text-gray-800">Danh sách xe</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-
                     {onCreate && (
-                        <div>
-                            <Button
-                                type="primary"
-                                onClick={onCreate}
-
-                            >
-                                Tạo xe mới
-                            </Button>
-                        </div>
-
+                        <Button
+                            type="primary"
+                            onClick={onCreate}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-200 mb-4 md:mb-0"
+                        >
+                            Tạo xe mới
+                        </Button>
                     )}
                     <div className="md:col-span-3">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -179,7 +173,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     prefix={<SearchOutlined />}
                                     value={searchText}
                                     onChange={(e) => setSearchText(e.target.value)}
-                                    className="w-full border-gray-300 rounded-lg  focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
+                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
                                 />
                             </div>
                             <div>
@@ -188,7 +182,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     value={flueFilter}
                                     onChange={(value) => setFlueFilter(value)}
                                     options={flueOptions}
-                                    className="w-full h-12 border-gray-300 rounded-lg  focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
+                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
                                 />
                             </div>
                             <div>
@@ -197,7 +191,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     value={seatFilter}
                                     onChange={(value) => setSeatFilter(value)}
                                     options={seatOptions}
-                                    className="w-full h-12 border-gray-300 rounded-lg  focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
+                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
                                 />
                             </div>
                         </div>
@@ -237,8 +231,8 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     return (
                                         <button
                                             className={`px-3 py-1 text-sm rounded-md shadow-sm hover:bg-blue-100 transition duration-200 ${page === Math.ceil(filteredCars.length / 5)
-                                                ? "bg-blue-700 text-white"
-                                                : "bg-gray-200"
+                                                    ? "bg-blue-700 text-white"
+                                                    : "bg-gray-200"
                                                 }`}
                                         >
                                             {page}

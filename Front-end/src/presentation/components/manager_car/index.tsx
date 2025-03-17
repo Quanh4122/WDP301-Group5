@@ -28,8 +28,8 @@ interface Car {
 const CarList: React.FC = () => {
     const [carList, setCarList] = useState<Car[] | undefined>(undefined);
     const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-    const [carEdit, setCarEdit] = useState<Car | undefined>()
     const [form] = Form.useForm();
+    const [selectedCar, setSelectedCar] = useState<Car | undefined>(undefined);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,7 +44,7 @@ const CarList: React.FC = () => {
     }, []);
 
     const handleEdit = (car: Car) => {
-        setCarEdit(car)
+        setSelectedCar(car);
         setIsDrawerVisible(true);
     };
 
@@ -53,6 +53,7 @@ const CarList: React.FC = () => {
     };
 
     const handleCreate = () => {
+        setSelectedCar(undefined);
         setIsDrawerVisible(true);
     };
 
@@ -74,7 +75,7 @@ const CarList: React.FC = () => {
                 isDrawerVisible={isDrawerVisible}
                 setIsDrawerVisible={setIsDrawerVisible}
                 form={form}
-                carEdit={carEdit}
+                carDetail={selectedCar}
                 setCarList={setCarList}
             />
         </div>
