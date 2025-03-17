@@ -18,6 +18,7 @@ import CarList from "../components/car_list";
 import CarDetail from "../components/car_detail";
 import BlogDetail from "../components/blog/BlogDetail";
 import BlogList from "../components/blog/BlogList";
+import BlogManager from "../components/blog/BlogManager";
 import ChangePassword from "../components/auth/ChangePassword";
 import CarCreate from "../components/car_create";
 import DriverList from "../components/driverlist/DriverList";
@@ -104,6 +105,10 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/createBlog",
             element: <ProtectedRoute requiredRole="Admin"><CreateBlog /></ProtectedRoute>
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/blogManager",
+            element: <ProtectedRoute requiredRole="Admin"><BlogManager /></ProtectedRoute>
         },
         {
             path: PRIVATE_ROUTES.PATH + "/blog/:postId",

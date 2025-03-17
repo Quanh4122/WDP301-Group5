@@ -44,6 +44,7 @@ export default function Header() {
         <Link className='btn btn-primary' to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_CREATE}`}>Add new driver</Link>
         <a className='btn btn-primary' href='/app/car-create'>Add new car</a>
         <a className='btn btn-primary' href='/app/transaction'>Bill list</a>
+        <a className='btn btn-primary' href='/app/blogManager'>Blog manager</a>
       </Stack>
     </Stack>
 
