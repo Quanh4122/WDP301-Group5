@@ -38,8 +38,8 @@ export default function Header() {
         </Stack>
       </Stack>
       <Stack direction="row" sx={{ gap: 1 }}>
-        <a className='btn btn-primary' href='/app/transaction'>Danh sach bill</a>
-        <a className='btn btn-primary' href='/app/blogManager'>Quan ly blog</a>
+        <a className='btn btn-primary' href='/app/transaction'>Danh sách bill</a>
+        <a className='btn btn-primary' href='/app/blogManager'>Quản lý blog</a>
         <Link className='btn btn-primary' to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.MANAGER_CAR}`}>Quản lý xe</Link>
         <a className='btn btn-primary' href='/app/manage-account'>Danh sách người dùng</a>
         <a className='btn btn-primary' href='/app/manage-driver-accept'>Quản lý đơn đăng ký tài xế</a>
