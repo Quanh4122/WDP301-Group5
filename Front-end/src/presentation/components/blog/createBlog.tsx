@@ -48,7 +48,7 @@ import {
 import "ckeditor5/ckeditor5.css";
 import { postBlog } from "../blog/blogAPI";
 
-// Define BlogFormData interface for TypeScript type safety
+// Định nghĩa giao diện BlogFormData
 interface BlogFormData {
   title: string;
   description: string;
@@ -56,18 +56,25 @@ interface BlogFormData {
   content: string;
 }
 
-// Error component for better error handling
+// Thành phần thông báo lỗi
 const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
     {message}
   </div>
 );
 
-// Loading component for better UX
+// Thành phần thông báo thành công
+const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
+  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative" role="alert">
+    {message}
+  </div>
+);
+
+// Thành phần tải dữ liệu
 const LoadingSpinner: React.FC = () => (
   <div className="flex justify-center py-10">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
-      <span className="sr-only">Loading...</span>
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500">
+      <span className="sr-only">Đang tải...</span>
     </div>
   </div>
 );
@@ -95,9 +102,8 @@ const CreateBlog: React.FC = () => {
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      // Basic form validation
       if (!formData.title.trim() || !formData.description.trim()) {
-        setError("Title and description are required fields");
+        setError("Tiêu đề và mô tả là các trường bắt buộc");
         return;
       }
 
@@ -105,7 +111,7 @@ const CreateBlog: React.FC = () => {
         title: formData.title.trim(),
         description: formData.description.trim(),
         dateCreate: new Date().toISOString(),
-        author: "67bb8e06a5fe4f4fe85dc19f", // Consider making this dynamic
+        author: "67bb8e06a5fe4f4fe85dc19f", // Nên làm động trong thực tế
         image: formData.image.trim(),
         content: formData.content,
       };
@@ -116,9 +122,8 @@ const CreateBlog: React.FC = () => {
         setSuccess(null);
 
         await postBlog(blogData);
-        setSuccess("Blog post created successfully!");
-        
-        // Reset form after successful submission
+        setSuccess("Đã tạo bài viết thành công!");
+
         setFormData({
           title: "",
           description: "",
@@ -126,8 +131,8 @@ const CreateBlog: React.FC = () => {
           content: "",
         });
       } catch (err) {
-        setError("Failed to create blog post. Please try again.");
-        console.error("Error creating blog:", err);
+        setError("Không thể tạo bài viết. Vui lòng thử lại.");
+        console.error("Lỗi khi tạo bài viết:", err);
       } finally {
         setLoading(false);
       }
@@ -136,26 +141,22 @@ const CreateBlog: React.FC = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-10 min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-          Create New Blog Post
+    <div className="container mx-auto px-4 py-12 max-w-4xl min-h-screen">
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
+          Tạo Bài Viết Mới
         </h1>
 
         {error && <ErrorMessage message={error} />}
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
-            {success}
-          </div>
-        )}
+        {success && <SuccessMessage message={success} />}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
               htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Title
+              Tiêu đề
             </label>
             <input
               type="text"
@@ -163,8 +164,8 @@ const CreateBlog: React.FC = () => {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50"
-              placeholder="Enter blog title"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+              placeholder="Nhập tiêu đề bài viết"
               disabled={loading}
             />
           </div>
@@ -172,9 +173,9 @@ const CreateBlog: React.FC = () => {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Description
+              Mô tả
             </label>
             <input
               type="text"
@@ -182,8 +183,8 @@ const CreateBlog: React.FC = () => {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50"
-              placeholder="Enter blog description"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+              placeholder="Nhập mô tả bài viết"
               disabled={loading}
             />
           </div>
@@ -191,9 +192,9 @@ const CreateBlog: React.FC = () => {
           <div>
             <label
               htmlFor="image"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Image URL
+              URL Hình ảnh
             </label>
             <input
               type="text"
@@ -201,17 +202,17 @@ const CreateBlog: React.FC = () => {
               name="image"
               value={formData.image}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50"
-              placeholder="Enter image URL"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+              placeholder="Nhập URL hình ảnh"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Content
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nội dung
             </label>
-            <div className="rounded-md border border-gray-300">
+            <div className="rounded-lg border border-gray-300 shadow-sm">
               <CKEditor
                 editor={ClassicEditor}
                 config={{
@@ -295,15 +296,15 @@ const CreateBlog: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md transition-all duration-200 hover:shadow-md disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-sky-500 hover:bg-sky-600 text-white px-8 py-3 rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (
                 <>
                   <span className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></span>
-                  Submitting...
+                  Đang gửi...
                 </>
               ) : (
-                "Create Post"
+                "Tạo Bài Viết"
               )}
             </button>
           </div>
