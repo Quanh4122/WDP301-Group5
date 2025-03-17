@@ -32,6 +32,7 @@ export const PRIVATE_ROUTES = {
             MANAGE_DRIVER_ACCEPT: 'manage-driver-accept',
             MANAGE_ACCOUNT: 'manage-account',
             APPLY_DRIVER: 'apply-driver',
-            CHANGE_ROLE_ACCOUNT: 'change-role'
+            CHANGE_ROLE_ACCOUNT: 'change-role',
+            MANAGER_CAR: 'manager-car',
         }
 }

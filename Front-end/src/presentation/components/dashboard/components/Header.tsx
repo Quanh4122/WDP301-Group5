@@ -38,7 +38,7 @@ export default function Header() {
         </Stack>
       </Stack>
       <Stack direction="row" sx={{ gap: 1 }}>
-        <a className='btn btn-primary' href='/app/car-lists'>Danh sách xe</a>
+        <Link className='btn btn-primary' to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.MANAGER_CAR}`}>Quản lý xe</Link>
         <a className='btn btn-primary' href='/app/manage-account'>Danh sách người dùng</a>
         <a className='btn btn-primary' href='/app/manage-driver-accept'>Quản lý đơn đăng ký tài xế</a>
         <Link className='btn btn-primary' to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.ADMIN_REQUEST}`}>Danh sách đặt</Link>
