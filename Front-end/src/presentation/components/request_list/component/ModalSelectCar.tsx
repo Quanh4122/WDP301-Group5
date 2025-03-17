@@ -60,36 +60,14 @@ const ModalSelectCar = ({ isOpen, onCancel, listCar, setListCarSelect }: Props) 
                                     onChange={() => handleCheckboxChange(item._id || idx.toString())}
                                     className="shrink-0 mr-4" // Thêm margin phải cho checkbox
                                 />
-                                <div className="flex items-center w-full">
-                                    <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden"> {/*Thêm overflow hidden để ảnh không tràn ra khỏi div*/}
-                                        <img
-                                            src={item.images[0]}
-                                            alt="car"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col ml-4 w-full"> {/* Thay đổi flex direction sang column và thêm margin trái*/}
-                                        <div className="font-semibold text-lg text-gray-900">
-                                            {item.carName} {item.carVersion}
-                                        </div>
-                                        <div className="text-gray-600 text-sm mt-1">
-                                            {item.licensePlateNumber}
-                                        </div>
-                                        <div className="flex gap-4 text-sm text-gray-700 mt-2">
-                                            <span>
-                                                {radioTransmissionType.find(
-                                                    (dt) => dt.value === item.cartype?.transmissionType
-                                                )?.label}
-                                            </span>
-                                            <span>
-                                                {radioFlue.find((dt) => dt.value === item.cartype?.flue)
-                                                    ?.label}
-                                            </span>
-                                            <span className="font-medium text-blue-600">
-                                                {item.price}/h
-                                            </span>
-                                        </div>
-                                    </div>
+                                <img src={`http://localhost:3030${item?.images[0]}`} alt={item.carName} className="w-32 h-32 object-cover rounded-md" />
+                                <div className="ml-4 flex-grow">
+                                    <h6 className="text-sm font-semibold text-blue-800">{item.carName} {item.carVersion}</h6>
+                                    <ul className="space-y-1">
+                                        <li>Giá thuê: <span className="font-medium text-blue-700">{item.price}k / 1h</span></li>
+                                        <li>Biển số: <span className="font-medium text-blue-700">{item.licensePlateNumber}</span></li>
+                                        <li>Số chỗ: <span className="font-medium text-blue-700">{item.numberOfSeat}</span></li>
+                                    </ul>
                                 </div>
                             </div>
                         ))}

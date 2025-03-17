@@ -63,33 +63,67 @@ const acceptBookingRequest = async (req, res) => {
   const data = req.body;
 
   try {
-    const requestExisted = await RequestModel.findOne({
-      user: data.user,
-      requestStatus: "1",
-    });
-
-    if (requestExisted) {
-      await UserModel.updateOne(
-        { _id: data.user._id },
-        {
-          userName: data.user.userName,
-          email: data.user.email,
-          phoneNumber: data.user.phoneNumber,
-          address: data.user.address,
-        }
-      );
-      await RequestModel.updateOne(
-        { _id: requestExisted._id },
-        {
-          startDate: data.startDate,
-          endDate: data.endDate,
-          isRequestDriver: data.isRequestDriver,
-          requestStatus: data.requestStatus,
-        }
-      );
-      return res.status(200).json({ message: "Request successfull !!" });
+    if (data.car) {
+      const requestExisted = await RequestModel.findOne({
+        user: data.user._id,
+        requestStatus: "4",
+      });
+      if (requestExisted) {
+        await UserModel.updateOne(
+          { _id: data.user._id },
+          {
+            userName: data.user.userName,
+            email: data.user.email,
+            phoneNumber: data.user.phoneNumber,
+            address: data.user.address,
+          }
+        );
+        await RequestModel.updateOne(
+          { _id: requestExisted._id },
+          {
+            startDate: data.startDate,
+            endDate: data.endDate,
+            isRequestDriver: data.isRequestDriver,
+            requestStatus: data.requestStatus,
+            $push: { car: data.car },
+          }
+        );
+        // await RequestModel.updateOne(
+        //   { _id: requestExisted._id },
+        //   {  }
+        // );
+        return res.status(200).json({ message: "Request successfull !!" });
+      } else {
+        return res.status(401).json({ message: "Cannot find your request !!" });
+      }
     } else {
-      return res.status(401).json({ message: "Cannot find your request !!" });
+      const requestExisted = await RequestModel.findOne({
+        user: data.user._id,
+        requestStatus: "1",
+      });
+      if (requestExisted) {
+        await UserModel.updateOne(
+          { _id: data.user._id },
+          {
+            userName: data.user.userName,
+            email: data.user.email,
+            phoneNumber: data.user.phoneNumber,
+            address: data.user.address,
+          }
+        );
+        await RequestModel.updateOne(
+          { _id: requestExisted._id },
+          {
+            startDate: data.startDate,
+            endDate: data.endDate,
+            isRequestDriver: data.isRequestDriver,
+            requestStatus: data.requestStatus,
+          }
+        );
+        return res.status(200).json({ message: "Request successfull !!" });
+      } else {
+        return res.status(401).json({ message: "Cannot find your request !!" });
+      }
     }
   } catch (error) {
     return res.status(500).json({ message: error });
@@ -185,13 +219,13 @@ const handleAdminAcceptRequest = async (req, res) => {
         lstduplicateN
       );
       if (dt.isAccept) {
-        // await RequestModel.updateOne(
-        //   { _id: dt.requestId },
-        //   {
-        //     driver: dt.driver,
-        //     requestStatus: "3",
-        //   }
-        // );
+        await RequestModel.updateOne(
+          { _id: dt.requestId },
+          {
+            driver: dt.driver,
+            requestStatus: "3",
+          }
+        );
         await mailService.sendEmail({
           to: dataRequest.user.email,
           subject: "Thông báo yêu cầu đặt xe",
@@ -234,6 +268,7 @@ const handleCheckRequest = async (req, res) => {
     const listReqInRangeTime = await RequestModel.find(
       {
         _id: { $ne: dataRequest._id },
+        requestStatus: "3",
         $or: [
           {
             startDate: { $lte: dataRequest.startDate },
@@ -266,7 +301,7 @@ const handleCheckRequest = async (req, res) => {
       const val = dataRequestCar.some((element) => arrStr.includes(element));
       return res.status(200).json({ isExisted: val, duplicateCar: existed });
     } else {
-      //return res.status(200).json({ isExisted: false, duplicateCar: [] });
+      return res.status(200).json({ isExisted: false, duplicateCar: [] });
     }
   } catch (error) {
     return res.status(400).json({ message: error });
