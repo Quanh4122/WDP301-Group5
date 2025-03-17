@@ -119,16 +119,18 @@ const AdminDetailRequest = () => {
     const navigate = useNavigate()
     const [dpRequest, setDpRequest] = useState<boolean>()
     const [dpRequestC, setDpRequestC] = useState<boolean>(true)
+    const [listDuplicate, setListDuplicate] = useState<string[]>([])
     const onCheckRequest = async () => {
         const dataSubmit = {
             driver: driverSelected,
             requestId: requestData._id,
-            car: requestData.car
+            car: requestData.car,
         }
         await axiosInstance.post('/request/handleCheckAdminAcceptRequest', dataSubmit)
             .then(res => {
                 console.log(res.data)
-                setDpRequest(res.data == true ? true : false)
+                setDpRequest(res.data.isExisted == true ? true : false)
+                setListDuplicate(res.data.duplicateCar)
                 setDpRequestC(false)
             })
             .catch(err => console.log(err))
@@ -139,13 +141,15 @@ const AdminDetailRequest = () => {
             driver: driverSelected,
             requestId: requestData._id,
             isAccept: isAccept,
-            car: requestData.car
+            car: requestData.car,
+            duplicateCar: listDuplicate,
+            userId: requestData.user?._id,
         }
 
         await axiosInstance.post('/request/handleAdminAcceptRequest', dataSubmit)
             .then(res => console.log(res.status))
             .catch(err => console.log(err))
-        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST)
+        // navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST)
     }
     return (
         <div className="m-4 bg-blue-50 min-h-screen"> {/* Light blue background */}

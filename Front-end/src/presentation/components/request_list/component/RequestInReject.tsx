@@ -23,7 +23,7 @@ interface props {
     requestModal: RequestModelFull
 }
 
-const RequestInSelected = ({ requestModal }: props) => {
+const RequestInReject = ({ requestModal }: props) => {
 
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
     const [requestData, setRequestData] = useState<RequestModelFull>(requestModal)
@@ -32,6 +32,7 @@ const RequestInSelected = ({ requestModal }: props) => {
         { label: "Có", value: true },
         { label: "Không", value: false }
     ]
+    console.log("inreject", requestModal)
     const [form] = useForm()
     const initialValue = {
         userName: requestData?.user?.userName,
@@ -40,7 +41,7 @@ const RequestInSelected = ({ requestModal }: props) => {
         address: requestData?.user?.address,
         isRequestDriver: requestData.isRequestDriver
     }
-    const [dateValue, setDateValue] = React.useState<any[]>([dayjs().format('DD/MM/YYYY'), dayjs().add(1, 'day').format('DD/MM/YYYY')]);
+    const [dateValue, setDateValue] = React.useState<any[]>([dayjs(requestData.startDate).format('DD/MM/YYYY'), dayjs(requestData.endDate).format('DD/MM/YYYY')]);
     const getDateValue = (value: DateRange<Dayjs>) => {
         setDateValue([
             value && value[0] ? dayjs(value[0].toLocaleString()).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY'),
@@ -48,7 +49,7 @@ const RequestInSelected = ({ requestModal }: props) => {
         ])
     }
 
-    const [timeValue, setTimeValue] = React.useState<any[]>([dayjs().hour() + ":" + "00", dayjs().hour() + ":" + "00"]);
+    const [timeValue, setTimeValue] = React.useState<any[]>([dayjs(requestData.startDate).hour() + ":" + "00", dayjs(requestData.endDate).hour() + ":" + "00"]);
 
     const getTimeValue = (value: any[]) => {
         setTimeValue([
@@ -95,7 +96,6 @@ const RequestInSelected = ({ requestModal }: props) => {
         const val = dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]), 'hour')
         setTotalTime(val)
         setTotalPrice(arrprice && arrprice * totalTime)
-        console.log()
     }, [timeValue, dateValue])
 
     const onDeleteCarInRequest = async (carId: any) => {
@@ -157,7 +157,7 @@ const RequestInSelected = ({ requestModal }: props) => {
                                 name="isRequestDriver"
                                 rules={[{ required: true, message: 'Vui lòng chọn tùy chọn!' }]}
                             >
-                                <Radio.Group className="text-blue-600" options={requestDriver} defaultValue={requestData.isRequestDriver} />
+                                <Radio.Group className="text-blue-600" options={requestDriver} />
                             </Form.Item>
                         </div>
                         <div className="w-full h-14 border border-blue-300 rounded-md flex items-center mb-8">
@@ -233,4 +233,4 @@ const RequestInSelected = ({ requestModal }: props) => {
     )
 }
 
-export default RequestInSelected
+export default RequestInReject

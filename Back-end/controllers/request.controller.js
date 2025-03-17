@@ -2,6 +2,7 @@ const RequestModel = require("../models/request.model");
 const UserModel = require("../models/user.model");
 const NotifyRequest = require("../Templates/Mail/notifyRequest");
 const mailService = require("../services/sendMail");
+const dayjs = require("dayjs");
 
 const createRequest = async (req, res) => {
   const data = req.body;
@@ -45,9 +46,8 @@ const createRequest = async (req, res) => {
 
 const getListRequest = async (req, res) => {
   const userId = req.query.key;
-  console.log(userId.userId);
   try {
-    const requestList = await RequestModel.find({ user: userId.userId })
+    const requestList = await RequestModel.find({ user: userId })
       .populate("user", "userName fullName email phoneNumber address avatar")
       .populate(
         "car",
@@ -136,31 +136,70 @@ const handleAdminAcceptRequest = async (req, res) => {
     const dt = req.body;
     const dataRequest = await RequestModel.findOne({
       _id: dt.requestId,
-    }).populate("user", "userName fullName email phoneNumber address avatar");
-    const bookingAgainURL = `http://localhost:3000`;
-    const emailContent = await NotifyRequest(
-      `${dataRequest.user.userName}`,
-      bookingAgainURL,
-      dt.isAccept ? "Accepted" : "Denided"
-    );
+    })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+
     if (dataRequest) {
+      const lsDuplicate = dataRequest.car.map((item) => {
+        const dupid = dt.duplicateCar.find((ele) => ele == item._id);
+        if (dupid) return item;
+      });
+      const lstduplicateN = lsDuplicate.filter((item) => item != undefined);
+      const start = dayjs(dataRequest.startDate);
+      const end = dayjs(dataRequest.endDate);
+      const totalHours = end.diff(start, "hour", true);
+      const startDate = start.format("HH:mm, DD/MM/YYYY");
+      const endDate = end.format("HH:mm, DD/MM/YYYY");
+
+      const carPrices = dataRequest?.car?.map((item) => item.price) ?? [];
+      const totalPrice = carPrices.reduce(
+        (total, current) => total + current,
+        0
+      );
+      const vatFee = totalPrice * totalHours * 0.1;
+      const totalFee = vatFee + totalPrice * totalHours;
+      const displayTotalFee = (totalFee * 1000).toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
+      const bookingAgainURL = `http://localhost:3000/app/booking-list?userId=${dt.userId}`;
+      const emailContent = await NotifyRequest(
+        `${dataRequest.user.userName}`,
+        bookingAgainURL,
+        dt.isAccept,
+        (vatFee * 1000).toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        (totalPrice * totalHours * 1000).toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        displayTotalFee,
+        startDate,
+        endDate,
+        lstduplicateN
+      );
       if (dt.isAccept) {
-        await RequestModel.updateOne(
-          { _id: dt.requestId },
-          {
-            driver: dt.driver,
-            requestStatus: "3",
-          }
-        );
+        // await RequestModel.updateOne(
+        //   { _id: dt.requestId },
+        //   {
+        //     driver: dt.driver,
+        //     requestStatus: "3",
+        //   }
+        // );
         await mailService.sendEmail({
           to: dataRequest.user.email,
           subject: "Thông báo yêu cầu đặt xe",
           html: emailContent,
         });
-
         return res.status(200).json({
           status: "success",
-          message: "Password reset link sent to email.",
+          message: "Successfull !!",
         });
       } else {
         await RequestModel.updateOne(
@@ -174,15 +213,14 @@ const handleAdminAcceptRequest = async (req, res) => {
           subject: "Thông báo yêu cầu đặt xe",
           html: emailContent,
         });
-
         return res.status(200).json({
           status: "success",
-          message: "Password reset link sent to email.",
+          message: "Successfull !!!",
         });
       }
       // return res.status(200).json({ message: "Successfull !!!" });
     } else {
-      return res.status(401).json({ message: "Cannot find this request !!!" });
+      //return res.status(401).json({ message: "Cannot find this request !!!" });
     }
   } catch (error) {
     return res.status(400).json({ message: error });
@@ -205,11 +243,14 @@ const handleCheckRequest = async (req, res) => {
             startDate: { $lte: dataRequest.endDate },
             endDate: { $gte: dataRequest.endDate },
           },
+          {
+            startDate: { $gte: dataRequest.startDate },
+            endDate: { $lte: dataRequest.endDate },
+          },
         ],
       },
       "car -_id"
     );
-    console.log(listReqInRangeTime);
     if (listReqInRangeTime.length > 0) {
       const listReqInRangeTimeOther = listReqInRangeTime.filter(
         (item) => item._id != dataRequest._id
@@ -220,10 +261,12 @@ const handleCheckRequest = async (req, res) => {
       const dataRequestCar = dataRequest.car.map((objectId) =>
         objectId.toString()
       );
+      const set1 = new Set(arrStr);
+      const existed = dataRequestCar.filter((ele) => set1.has(ele));
       const val = dataRequestCar.some((element) => arrStr.includes(element));
-      return res.status(200).json(val);
+      return res.status(200).json({ isExisted: val, duplicateCar: existed });
     } else {
-      return res.status(200).json(false);
+      //return res.status(200).json({ isExisted: false, duplicateCar: [] });
     }
   } catch (error) {
     return res.status(400).json({ message: error });
