@@ -1,6 +1,7 @@
 const UserModel = require("../models/user.model");
 const RequestModel = require("../models/request.model");
-const CarModel = require('../models/car.model');
+const BillModel = require("../models/bill.model")
+const dayjs = require("dayjs");
 
 const getUserTrend = async (req, res) => {
     try {
@@ -195,10 +196,94 @@ const getCarAvailability = async (req, res) => {
     }
 }
 
-
+const getIncomeData = async (req, res) => {
+    try {
+      // Define the 7-month window:
+      // - Past 3 months, current month, next 3 months.
+      const current = dayjs();
+      const months = [];
+      // Start 3 months ago (beginning of that month)
+      const startMonth = current.subtract(3, "month").startOf("month");
+  
+      // Build an array of 7 dayjs objects for each month in the window
+      for (let i = 0; i < 7; i++) {
+        months.push(startMonth.add(i, "month"));
+      }
+  
+      // Initialize two arrays (one for each series) with 7 zeros
+      const completedData = Array(7).fill(0);
+      const pendingData = Array(7).fill(0);
+  
+      // Determine the overall date range
+      const startRange = months[0].startOf("month").toDate();
+      const endRange = months[6].endOf("month").toDate();
+  
+      // Query all bills and populate the requestId field to get its endDate.
+      const bills = await BillModel.find().populate({
+        path: "requestId",
+        select: "endDate"
+      });
+  
+      // Process each bill to sum totals by month based on the Request's endDate.
+      bills.forEach(bill => {
+        // Ensure the bill has an associated Request with an endDate.
+        if (bill.requestId && bill.requestId.endDate) {
+          const billEndDate = dayjs(bill.requestId.endDate);
+  
+          // Only include bills whose Request endDate is in the 7-month window.
+          if (
+            billEndDate.isBefore(dayjs(startRange)) ||
+            billEndDate.isAfter(dayjs(endRange))
+          ) {
+            return; // skip bills outside our window
+          }
+  
+          // Find the corresponding index in the months array.
+          const index = months.findIndex(month => {
+            return (
+              billEndDate.year() === month.year() &&
+              billEndDate.month() === month.month()
+            );
+          });
+  
+          if (index >= 0) {
+            // Add the bill total to the correct series based on billStatus.
+            if (bill.billStatus === true) {
+              completedData[index] += bill.total;
+            } else {
+              pendingData[index] += bill.total;
+            }
+          }
+        }
+      });
+  
+      // Build the response in the required format.
+      // "stack: 'A'" indicates that the two series should stack.
+      const responseData = [
+        {
+          id: "completed",
+          label: "Completed Payments",
+          data: completedData,
+          stack: "A"
+        },
+        {
+          id: "pending",
+          label: "Pending Payments",
+          data: pendingData,
+          stack: "A"
+        }
+      ];
+  
+      return res.status(200).json(responseData);
+    } catch (error) {
+      console.error("Error computing income data:", error);
+      return res.status(500).json({ error: error.message });
+    }
+  };
 
 module.exports = {
     getUserTrend,
     getRequestTrend,
-    getCarAvailability
+    getCarAvailability,
+    getIncomeData
 };
