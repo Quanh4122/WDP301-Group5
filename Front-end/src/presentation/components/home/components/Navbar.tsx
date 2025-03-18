@@ -100,7 +100,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center flex-shrink-0">
             <img className="h-12 w-30 mr-2" src={logo} alt="logo" />
             <Link to="/" className="tracking-tight">
-              <button className="text-2xl font-bold">B-Car</button>
+              <button className="text-2xl">B-Car</button>
             </Link>
           </div>
 
