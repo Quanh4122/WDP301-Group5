@@ -36,142 +36,216 @@ const generateAndSendOTP = async (auth) => {
 
 // [POST] /register
 const register = async (req, res) => {
-  const { userName, phoneNumber, email, password } = req.body;
+  try {
+    const { userName, phoneNumber, email, password } = req.body;
 
-  const existingUser = await UserModel.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({
+    if (!userName || !phoneNumber || !email || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Vui lòng nhập đầy đủ thông tin!",
+      });
+    }
+
+    const existingUser = await UserModel.findOne({ email });
+
+    if (existingUser) {
+      if (!existingUser.verified) {
+        return res.status(400).json({
+          status: "error",
+          message: "Tài khoản của bạn từng đăng ký nhưng chưa xác thực. Vui lòng kiểm tra email để xác thực tài khoản!",
+        });
+      }
+      return res.status(400).json({
+        status: "error",
+        message: "Email này đã được sử dụng. Vui lòng đăng nhập!",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userRole = await RoleModel.findOne({ roleName: "User" });
+
+    const user = new UserModel({
+      userName,
+      phoneNumber,
+      email,
+      role: userRole._id,
+      verified: false,
+    });
+    await user.save();
+
+    const auth = new AuthModel({ user: user._id, password: hashedPassword });
+    await auth.save();
+
+    await generateAndSendOTP(auth);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.",
+      user_id: user._id,
+    });
+
+  } catch (error) {
+    console.error("Lỗi đăng ký:", error);
+    return res.status(500).json({
       status: "error",
-      message: "Email already in use, Please login.",
+      message: "Đã xảy ra lỗi trong quá trình đăng ký. Vui lòng thử lại sau!",
     });
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const userRole = await RoleModel.findOne({ roleName: "User" });
-  const user = new UserModel({
-    userName,
-    phoneNumber,
-    email,
-    role: userRole._id,
-  });
-  await user.save();
-
-  const auth = new AuthModel({ user: user._id, password: hashedPassword });
-  await auth.save();
-
-  await generateAndSendOTP(auth);
-
-  return res.json({
-    status: "success",
-    message: "User registered successfully! OTP sent to email.",
-    user_id: user._id,
-  });
 };
+
 
 // [POST] /verify
 const verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
-  console.log("OTP", otp);
-  
+  try {
+    const { email, otp } = req.body;
 
-  const user = await UserModel.findOne({ email });
-  if (!user) {
-    return res.status(400).json({
+    if (!email || !otp) {
+      return res.status(400).json({
+        status: "error",
+        message: "Vui lòng nhập đầy đủ thông tin!",
+      });
+    }
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email không hợp lệ!",
+      });
+    }
+
+    const auth = await AuthModel.findOne({
+      user: user._id,
+      otp,
+      otp_expiry_time: { $gt: Date.now() }, // OTP chưa hết hạn
+    });
+
+    if (!auth) {
+      return res.status(400).json({
+        status: "error",
+        message: "Mã OTP không hợp lệ hoặc đã hết hạn!",
+      });
+    }
+
+    if (user.verified) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email đã được xác thực trước đó!",
+      });
+    }
+
+    user.verified = true;
+    auth.otp = undefined;
+    await user.save({ new: true, validateModifiedOnly: true });
+    await auth.save({ new: true, validateModifiedOnly: true });
+
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "1h" });
+
+    res.status(200).json({
+      status: "success",
+      message: "Xác thực OTP thành công!",
+      token,
+      user_id: user._id,
+    });
+
+  } catch (error) {
+    console.error("Lỗi xác thực OTP:", error);
+    return res.status(500).json({
       status: "error",
-      message: "Email is invalid",
+      message: "Đã xảy ra lỗi khi xác thực OTP. Vui lòng thử lại!",
     });
   }
-
-  const auth = await AuthModel.findOne({
-    user: user._id,
-    otp,
-    otp_expiry_time: { $gt: Date.now() },
-  });
-
-  if (!auth) {
-    return res.status(400).json({
-      status: "error",
-      message: "OTP is invalid or expired",
-    });
-  }
-
-  if (user.verified) {
-    return res.status(400).json({
-      status: "error",
-      message: "Email is already verified",
-    });
-  }
-
-  user.verified = true;
-  auth.otp = undefined;
-  await user.save({ new: true, validateModifiedOnly: true });
-  await auth.save({ new: true, validateModifiedOnly: true });
-
-  const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "1h" });
-
-  res.status(200).json({
-    status: "success",
-    message: "OTP verified Successfully!",
-    token,
-    user_id: user._id,
-  });
 };
+
 
 // [POST] /login
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await UserModel.findOne({ email }).populate("role");
-  if (!user) {
-    return res.status(401).json({ message: "User not exist" });
-  }
+    if (email === "" && password === "") {
+      return res.status(400).json({ message: "Email và mật khẩu không được để trống" });
+    }
 
-  if (!user.verified) {
-    return res.status(400).json({
-      status: "error",
-      message: "Email is not verified, Please verify.",
+    if (!email) {
+      return res.status(400).json({ message: "Email phải bắt buộc được điền" });
+    }
+
+    if (!password) {
+      return res.status(400).json({ message: "Mật khẩu phải bắt buộc được điền" });
+    }
+
+    if (password.length < 6 || password.length > 20) {
+      return res.status(400).json({ message: "Mật khẩu phải trong khoảng từ 6 đến 20 ký tự" });
+    }
+
+    const user = await UserModel.findOne({ email }).populate("role");
+    if (!user) {
+      return res.status(401).json({ message: "Email không tồn tại trong hệ thống" });
+    }
+
+    if (!user.verified) {
+      return res.status(403).json({ 
+        message: "Email chưa được xác minh, vui lòng xác minh email" 
+      });
+    }
+
+    const auth = await AuthModel.findOne({ user: user._id });
+    if (!auth) {
+      return res.status(500).json({ 
+        message: "Tài khoản của bạn chưa tồn tại. Vui lòng tạo tài khoản mới hoặc sử dụng dịch vụ google" 
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, auth.password);
+    if (!isMatch) {
+      // Increment login attempts
+      await AuthModel.updateOne({ user: user._id }, { $inc: { loginAttempts: 1 } });
+      return res.status(401).json({ message: "Mật khẩu không chính xác" });
+    }
+
+    // Reset login attempts on successful login
+    await AuthModel.updateOne({ user: user._id }, { loginAttempts: 0 });
+
+    const token = jwt.sign(
+      {
+        _id: user._id,
+        email: user.email,
+        username: user.userName,
+        role: user.role.roleName,
+        phoneNumber: user.phoneNumber,
+      },
+      JWT_SECRET,
+      { expiresIn: "10m" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === 'production' // Add secure flag in production
+    });
+
+    return res.json({
+      message: "Đăng nhập thành công",
+      data: {
+        status: "Success",
+        userId: user._id,
+        userName: user.userName,
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        avatar: user.avatar,
+        address: user.address,
+        role: user.role.roleName,
+        token: token, 
+      }
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ 
+      message: "Lỗi hệ thống, vui lòng thử lại sau" 
     });
   }
-
-  const auth = await AuthModel.findOne({ user: user._id });
-  if (!auth) {
-    return res.status(500).json({ message: "Authentication data not found" });
-  }
-
-  const isMatch = await bcrypt.compare(password, auth.password);
-  if (!isMatch) {
-    return res.status(401).json({ message: "Password is incorrect" });
-  }
-
-  const token = jwt.sign(
-    {
-      _id: user._id,
-      email: user.email,
-      username: user.userName,
-      role: user.role.roleName,
-      phoneNumber: user.phoneNumber,
-    },
-    JWT_SECRET,
-    { expiresIn: "10m" }
-  );
-
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "strict",
-  });
-
-  res.json({
-    Status: "Success",
-    userId: user._id,
-    userName: user.userName,
-    fullName: user.fullName,
-    phoneNumber: user.phoneNumber,
-    avatar: user.avatar,
-    address: user.address,
-    role: user.role.roleName,
-    token: token,
-  });
 };
 
 // [POST] LOGIN WITH GOOGLE

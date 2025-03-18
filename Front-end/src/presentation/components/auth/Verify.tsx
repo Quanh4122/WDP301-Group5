@@ -25,7 +25,7 @@ const Verify: React.FC = () => {
       await dispatch(VerifyEmail({ email: user.email, otp }) as any);
       toast.success("Xác minh email thành công!");
     } catch (err) {
-      toast.success("OTP không hợp lệ hoặc đã hết hạn.");
+      toast.error ("OTP không hợp lệ hoặc đã hết hạn.");
     }
   };
 
