@@ -396,7 +396,7 @@ const login = async (req, res) => {
       secure: process.env.NODE_ENV === 'production' // Add secure flag in production
     });
 
-    return res.json({
+    return res.status(200).json({
       message: "Đăng nhập thành công",
       data: {
         status: "Success",

@@ -242,30 +242,6 @@ export const updateUserRole = createAsyncThunk(
   }
 );
 
-export const VerifyEmail = createAsyncThunk(
-  "auth/verifyEmail",
-  async ({ email, otp }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post("/verify", { email, otp });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Verification failed");
-    }
-  }
-);
-
-export const ResendOTP = createAsyncThunk(
-  "auth/resendOTP",
-  async ({ email }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post("/resend-otp", { email });
-      console.log(response);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to resend OTP");
-    }
-  }
-);
 
 const slice = createSlice({
   name: "Authentication",
@@ -313,33 +289,6 @@ const slice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    .addCase(VerifyEmail.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    })
-    .addCase(VerifyEmail.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.isVerify = true;
-      state.isRegister = true;
-      state.error = null;
-    })
-    .addCase(VerifyEmail.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    })
-    // Resend OTP
-    .addCase(ResendOTP.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    })
-    .addCase(ResendOTP.fulfilled, (state) => {
-      state.isLoading = false;
-      state.error = null;
-    })
-    .addCase(ResendOTP.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    })
       .addCase(loginWithGoogle.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -528,10 +477,9 @@ export function LoginUser(formValues) {
           withCredentials: true,
         }
       );
+      const token = response.data.data.token;
 
-      console.log("Login response:", response.data);
-
-      const decodedToken = jwtDecode(response.data.token);
+      const decodedToken = jwtDecode(token);
       const expirationTime = decodedToken.exp * 1000;
 
       const standardizedUser = {
@@ -547,7 +495,7 @@ export function LoginUser(formValues) {
 
       dispatch(
         slice.actions.login({
-          token: response.data.token,
+          token: token,
           user: standardizedUser,
           loginMethod: "email",
         })
@@ -563,12 +511,16 @@ export function LoginUser(formValues) {
           dispatch(LogoutUser());
         }, timeToLogout);
       }
+
+      // Return the result to the caller
+      return { token, user: standardizedUser };
     } catch (error) {
       console.error("Login error:", error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
-      throw error;
+      // Throw a more specific error message
+      throw new Error(error.message || "Đăng nhập thất bại");
     }
   };
 }
@@ -600,24 +552,48 @@ export function RegisterUser(formValues) {
   };
 }
 
-export function VerifyEmailAction({ email, otp }) {
+export function VerifyEmail(formValues) {
   return async (dispatch) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     try {
-      const result = await dispatch(VerifyEmail({ email, otp })).unwrap();
-      return result;
+      const response = await axios.post("/verify", formValues, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      console.log("Verify response:", response.data);
+
+      dispatch(slice.actions.setVerifyStatus(true));
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+
+      return response.data;
     } catch (error) {
-      // throw error;
+      console.error("Verify error:", error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      throw error; // Ném lỗi để component có thể xử lý
     }
   };
 }
 
-export function ResendOTPAction({ email }) {
+export function ResendOTP(email) {
   return async (dispatch) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
     try {
-      const result = await dispatch(ResendOTP({ email })).unwrap();
-      return result;
+      const response = await axios.post(
+        "/resend-otp",
+        { email },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      
+      console.log("Resend OTP response:", response.data);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: false }));
+      
+      return response.data;
     } catch (error) {
-      // throw error;
+      console.error("Resend OTP error:", error);
+      dispatch(slice.actions.updateIsLoading({ isLoading: false, error: true }));
+      throw error; // Ném lỗi để component có thể xử lý
     }
   };
 }

@@ -11,7 +11,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { Divider, IconButton, InputAdornment } from '@mui/material';
-import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
+import { GoogleIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser, loginWithGoogle } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
@@ -42,7 +42,6 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn() {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state: RootState) => state.auth);
@@ -61,32 +60,25 @@ export default function SignIn() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-  
+
     try {
-      await dispatch(LoginUser({ email, password })).then((result: any) => result.unwrap());
+      const result = await dispatch(LoginUser({ email, password }));
       toast.success("Đăng nhập thành công");
       navigate("/");
     } catch (error: any) {
       console.error("Login error:", error);
-  
-      if (error.response) {
-        const errorMessage = error.response.data.message || "Lỗi không xác định!";
-        toast.error(errorMessage);
-      } else {
-        toast.error("Không thể kết nối đến máy chủ, vui lòng thử lại!");
-      }
+      const errorMessage = error.message || "Đăng nhập thất bại";
+      toast.error(errorMessage);
     }
   };
-  
 
   return (
     <>
       <CssBaseline />
-      <SignInContainer direction="column" justifyContent="space-between" style={{marginTop: '40px', marginBottom: '40px'}}>
+      <SignInContainer direction="column" justifyContent="space-between" style={{ marginTop: '40px', marginBottom: '40px' }}>
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
             Đăng nhập

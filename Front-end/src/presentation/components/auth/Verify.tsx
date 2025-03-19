@@ -1,22 +1,44 @@
+import * as React from 'react';
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { VerifyEmailAction, ResendOTPAction } from "../redux/slices/Authentication";
 import { RootState } from "../redux/Store";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import { ResendOTP, VerifyEmail } from "../redux/slices/Authentication";
+import { useNavigate } from "react-router-dom";
+import { Box, Button, CssBaseline, FormControl, FormLabel, TextField, Typography, Stack, Card } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import ColorModeSelect from '../shared-theme/ColorModeSelect';
+
+const VerifyContainer = styled(Stack)(({ theme }) => ({
+  minHeight: '100vh',
+  padding: theme.spacing(2, 4),
+  background: '#fffffffff',
+}));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  padding: theme.spacing(4),
+  gap: theme.spacing(2),
+  margin: 'auto',
+  boxShadow: theme.shadows[5],
+  background: '#ffffff',
+  [theme.breakpoints.up('sm')]: { width: '450px' },
+}));
 
 const Verify: React.FC = () => {
-  const [otp, setOtp] = useState<string>("");
+  const [otp, setOtp] = useState<string>(""); // Thêm state otp
   const [timer, setTimer] = useState<number>(120);
   const [canResend, setCanResend] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const dispatch = useDispatch<any>();
   const { user, isLoading } = useSelector((state: RootState) => ({
     user: state.auth.user as { email: string } | null,
     isLoading: state.auth.isLoading,
-    error: state.auth.error ? "An error occurred" : null,
   }));
 
-  // Timer countdown
   useEffect(() => {
     if (timer > 0) {
       const countdown = setInterval(() => {
@@ -28,7 +50,6 @@ const Verify: React.FC = () => {
     }
   }, [timer]);
 
-
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -37,87 +58,87 @@ const Verify: React.FC = () => {
 
   const handleVerify = async () => {
     try {
-      const result = await dispatch(
-        VerifyEmailAction({ email: user?.email || "", otp })
-      ).unwrap();
-      toast.success(result.response.data.message);
-      setTimeout(() => {
-        window.location.href = "/app/sign-in";
-      }, 1500);
-    } catch (err) {
-      const errorMessage = (err as any)?.response?.data?.message;
+      const result = await dispatch(VerifyEmail({
+        email: user?.email || "",
+        otp
+      }));
+      toast.success("Xác minh thành công");
+      navigate("/app/sign-in");
+    } catch (error) {
+      const errorMessage = (error as any)?.response?.data?.message;
       toast.error(errorMessage);
     }
   };
 
   const handleResend = async () => {
-
     try {
-      const result = await dispatch(
-        ResendOTPAction({ email: user?.email || "" })
-      ).unwrap();
-      toast.success(result.response.data.message);
-      setTimer(120);
-      setCanResend(false);
-    } catch (err) {
-      const errorMessage = (err as any)?.response?.data?.message;
+      const result = await dispatch(ResendOTP(user?.email || ""));
+        toast.success(result?.message);
+        setTimer(120);
+        setCanResend(false);
+    } catch (error) {
+      const errorMessage = (error as any)?.response?.data?.message || "Gửi lại OTP thất bại";
       toast.error(errorMessage);
     }
   };
 
   return (
-    <div className="flex justify-center items-center mt-20 mb-40 bg-gray-100">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold text-center text-gray-700 mb-4">
-          Xác minh Email
-        </h2>
-        <p className="text-sm text-gray-500 text-center mb-4">
-          Nhập mã OTP được gửi đến email{" "}
-          <strong>{user?.email || "Chưa có email"}</strong>.
-        </p>
-
-        <input
-          type="text"
-          maxLength={6}
-          value={otp}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setOtp(e.target.value)
-          }
-          placeholder="Nhập mã OTP"
-          className="w-full p-2 border border-gray-300 rounded-md text-center text-lg tracking-widest"
-        />
-
-        <button
-          onClick={handleVerify}
-          disabled={isLoading || otp.length !== 6}
-          className={`w-full mt-4 p-2 rounded-md text-white font-semibold ${
-            otp.length === 6 && !isLoading
-              ? "bg-blue-500 hover:bg-blue-600"
-              : "bg-gray-400 cursor-not-allowed"
-          }`}
-        >
-          {isLoading ? "Đang xác minh..." : "Xác minh"}
-        </button>
-
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            {timer > 0
-              ? `Mã OTP sẽ hết hạn sau: ${formatTime(timer)}`
-              : "Mã OTP đã hết hạn!"}
-          </p>
-          <button
-            onClick={handleResend}
-            disabled={!canResend || isLoading}
-            className={`mt-2 text-sm underline ${
-              canResend && !isLoading
-                ? "text-blue-500 hover:text-blue-600"
-                : "text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            {isLoading ? "Đang gửi..." : "Gửi lại OTP"}
-          </button>
-        </div>
-      </div>
+    <div>
+      <ToastContainer />
+      <CssBaseline />
+      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+      <VerifyContainer alignItems="center" justifyContent="center">
+        <StyledCard variant="outlined">
+          <Typography component="h1" variant="h4">
+            Xác minh Email
+          </Typography>
+          <Typography textAlign="center" color="text.secondary">
+            Nhập mã OTP được gửi đến email{' '}
+            <strong>{user?.email || "Chưa có email"}</strong>
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <FormControl>
+              <FormLabel>Mã OTP</FormLabel>
+              <TextField
+                value={otp}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setOtp(e.target.value)
+                }
+                placeholder="Nhập mã OTP"
+                inputProps={{ maxLength: 6 }}
+                sx={{ '& .MuiInputBase-input': { textAlign: 'center' } }}
+              />
+            </FormControl>
+            <Button
+              variant="contained"
+              onClick={handleVerify}
+              disabled={isLoading || otp.length !== 6}
+            >
+              {isLoading ? "Đang xác minh..." : "Xác minh"}
+            </Button>
+            <Box textAlign="center">
+              <Typography variant="body2" color="text.secondary">
+                {timer > 0
+                  ? `Mã OTP sẽ hết hạn sau: ${formatTime(timer)}`
+                  : "Mã OTP đã hết hạn!"}
+              </Typography>
+              <Button
+                onClick={handleResend}
+                disabled={!canResend || isLoading}
+                sx={{
+                  mt: 1,
+                  textTransform: 'none',
+                  ...(canResend && !isLoading
+                    ? { color: 'primary.main' }
+                    : { color: 'text.disabled' }),
+                }}
+              >
+                {isLoading ? "Đang gửi..." : "Gửi lại OTP"}
+              </Button>
+            </Box>
+          </Box>
+        </StyledCard>
+      </VerifyContainer>
     </div>
   );
 };
