@@ -37,7 +37,7 @@ const ApplyDriver = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="mt-20 mb-20 flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <ToastContainer />
       <div className="max-w-lg w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
         {/* Header */}

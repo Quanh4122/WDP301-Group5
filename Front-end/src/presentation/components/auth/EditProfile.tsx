@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch } from "../redux/Store";
-import { RootState } from "../redux/Store";
+import { AppDispatch, RootState } from "../redux/Store";
 import { UpdateProfile } from "../redux/slices/Authentication";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -80,75 +79,94 @@ const EditProfile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-20 mb-20">
-      <ToastContainer />
-      <h2 className="text-2xl font-bold mb-4 text-center">Chỉnh sửa hồ sơ</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          {avatarPreview && (
-            <img
-              src={avatarPreview}
-              alt="Avatar Preview"
-              className="w-32 h-32 mx-auto rounded-full border object-cover"
+    <div className="container mx-auto px-4 py-12 max-w-3xl min-h-screen">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Chỉnh sửa hồ sơ</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Avatar */}
+          <div className="flex flex-col items-center space-y-4">
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt="Avatar Preview"
+                className="w-32 h-32 rounded-full object-cover border-4 border-sky-200 shadow-md"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center shadow-md">
+                <span className="text-gray-500 text-sm">Chưa có ảnh</span>
+              </div>
+            )}
+            <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+              Ảnh đại diện
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer"
             />
-          )}
-          <label className="block font-semibold">Ảnh đại diện</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="mt-2 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Tên tài khoản</label>
-          <input
-            type="text"
-            name="userName"
-            value={formData.userName}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Họ và tên</label>
-          <input
-            type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Số điện thoại</label>
-          <input
-            type="text"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Địa chỉ</label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
-        <div>
-          <button
-            type="submit"
-            className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-          >
-            Lưu thông tin
-          </button>
-        </div>
-      </form>
+          </div>
+
+          {/* Form Fields */}
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tên tài khoản</label>
+              <input
+                type="text"
+                name="userName"
+                value={formData.userName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+                placeholder="Nhập tên tài khoản"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Họ và tên</label>
+              <input
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+                placeholder="Nhập họ và tên"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+              <input
+                type="text"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+                placeholder="Nhập số điện thoại"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
+                placeholder="Nhập địa chỉ"
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-center pt-6">
+            <button
+              type="submit"
+              className="bg-sky-500 hover:bg-sky-600 text-white px-8 py-3 rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+            >
+              Lưu thông tin
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -38,8 +38,16 @@ export const getAllPosts = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching posts:", error);
-    alert(error || "Failed to fetch posts");
     return [];
+  }
+};
+
+export const deletePost = async (postId : any) => {
+  try {
+    const response = await axios.delete(`http://localhost:3030/blog/${postId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting posts:", error);
   }
 };
 

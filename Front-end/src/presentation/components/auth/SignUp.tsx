@@ -2,11 +2,10 @@ import * as React from 'react';
 import { Box, Button, CssBaseline, Divider, FormLabel, FormControl, TextField, Typography, Stack, Card, InputAdornment, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { GoogleIcon, FacebookIcon } from './CustomIcons';
 import { toast, ToastContainer } from 'react-toastify';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from '../redux/Store';
-import { RegisterUser } from '../redux/slices/Authentication';
+import { LoginUser, RegisterUser } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -28,58 +27,40 @@ const StyledCard = styled(Card)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: { width: '450px' },
 }));
 
-interface FormDataType {
-  userName: string;
-  phoneNumber: string;
-  email: string;
-  password: string;
-}
-
 export default function SignUp() {
-  const [errors, setErrors] = React.useState<FormDataType>({
-    userName: '',
-    phoneNumber: '',
-    email: '',
-    password: '',
-  });
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = React.useState(false);
-
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
-
-  const validateInputs = (data: FormDataType) => {
-    const newErrors: FormDataType = { userName: '', phoneNumber: '', email: '', password: '' };
-
-    if (!data.userName) newErrors.userName = 'User name is required.';
-    if (data.phoneNumber.length !== 10) newErrors.phoneNumber = 'Phone number must be exactly 10 characters long.';
-    if (!/\S+@\S+\.\S+/.test(data.email)) newErrors.email = 'Please enter a valid email address.';
-    if (data.password.length < 6) newErrors.password = 'Password must be at least 6 characters long.';
-
-    setErrors(newErrors);
-    return !Object.values(newErrors).some(Boolean);
-  };
+  const navigate = useNavigate();
+  const { isLoading, isVerify } = useSelector((state: RootState) => state.auth);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const data: FormDataType = {
-      userName: formData.get('userName') as string,
-
-      phoneNumber: formData.get('phoneNumber') as string,
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-    };
-
-    if (validateInputs(data)) {
-      try {
-        await dispatch(RegisterUser(data));
-        if (!error) {
-          toast.success('Gửi OTP thành công. Vui lý xác minh email.');
-          window.location.href = '/app/verify';
-        }
-      } catch (err) {
-        console.error(err);
-        setErrors((prev) => ({ ...prev, email: 'Vui lòng thử lại.' }));
+    const userName = formData.get('userName') as string;
+    const phoneNumber = formData.get('phoneNumber') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+  
+    setErrorMessage(null);
+  
+    try {
+      const result = await dispatch(RegisterUser({ userName, phoneNumber, email, password })) as any;
+  
+      if (result?.response.data?.status === 'success') {
+        toast.success(result.response.data.message);
+        navigate('/app/verify');
+      }
+    } catch (err: any) {
+      const serverMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
+      if (serverMessage.includes('Tài khoản của bạn từng đăng ký nhưng chưa xác thực')) {
+        toast.error(serverMessage, {
+          autoClose: 2000,
+          onClose: () => navigate('/app/verify'),
+        });
+      } else {
+        setErrorMessage(serverMessage);
+        toast.error(serverMessage);
       }
     }
   };
@@ -95,26 +76,34 @@ export default function SignUp() {
             Đăng ký
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <FormControl error={Boolean(errors.userName)}>
-              <FormLabel>Họ và tên</FormLabel>
-              <TextField name="userName" placeholder="Enter your full name" error={Boolean(errors.userName)} helperText={errors.userName} />
+            <FormControl>
+              <FormLabel>Tên người dùng</FormLabel>
+              <TextField 
+                name="userName" 
+                placeholder="Enter your user name"
+              />
             </FormControl>
-            <FormControl error={Boolean(errors.phoneNumber)}>
+            <FormControl>
               <FormLabel>Số điện thoại</FormLabel>
-              <TextField name="phoneNumber" placeholder="Enter your phone number" error={Boolean(errors.phoneNumber)} helperText={errors.phoneNumber} />
+              <TextField 
+                name="phoneNumber" 
+                placeholder="Enter your phone number"
+              />
             </FormControl>
-            <FormControl error={Boolean(errors.email)}>
+            <FormControl>
               <FormLabel>Email</FormLabel>
-              <TextField name="email" placeholder="Enter your email" error={Boolean(errors.email)} helperText={errors.email} />
+              <TextField 
+                name="email" 
+                placeholder="Enter your email" 
+                type="email"
+              />
             </FormControl>
-            <FormControl error={Boolean(errors.password)}>
-              <FormLabel>Password</FormLabel>
+            <FormControl>
+              <FormLabel>Mật khẩu</FormLabel>
               <TextField
                 name="password"
                 placeholder="Enter your password"
-                type={showPassword ? "text" : "password"} // Thay đổi giữa password và text
-                error={Boolean(errors.password)}
-                helperText={errors.password}
+                type={showPassword ? "text" : "password"}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -126,14 +115,15 @@ export default function SignUp() {
                 }}
               />
             </FormControl>
-            <Button type="submit" variant="contained" disabled={isLoading}>
-              {isLoading ? 'Signing up...' : 'Sign up'}
+            <Button 
+              type="submit" 
+              variant="contained" 
+              disabled={isLoading}
+            >
+              {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
             </Button>
           </Box>
           <Divider>or</Divider>
-          <Button variant="outlined" startIcon={<GoogleIcon />}>
-            Đăng nhập bằng Google
-          </Button>
           <Typography textAlign="center">
             Bạn đã có tài khoản? <RouterLink to="/app/sign-in"><button>Đăng nhập</button></RouterLink>
           </Typography>

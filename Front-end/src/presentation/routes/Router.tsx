@@ -18,9 +18,8 @@ import CarList from "../components/car_list";
 import CarDetail from "../components/car_detail";
 import BlogDetail from "../components/blog/BlogDetail";
 import BlogList from "../components/blog/BlogList";
+import BlogManager from "../components/blog/BlogManager";
 import ChangePassword from "../components/auth/ChangePassword";
-import CarCreate from "../components/car_create";
-import DriverList from "../components/driverlist/DriverList";
 import NotFound from "../components/auth/NotFound";
 import NotAuthentication from "../components/auth/NotAuthentication";
 import NotAuthorization from "../components/auth/NotAuthorization";
@@ -108,6 +107,10 @@ const Router = () => {
             element: <ProtectedRoute requiredRole="Admin"><CreateBlog /></ProtectedRoute>
         },
         {
+            path: PRIVATE_ROUTES.PATH + "/blogManager",
+            element: <ProtectedRoute requiredRole="Admin"><BlogManager /></ProtectedRoute>
+        },
+        {
             path: PRIVATE_ROUTES.PATH + "/blog/:postId",
             element: <BlogDetail />
         },
@@ -122,14 +125,6 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_DETAIL,
             element: <CarDetail />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_CREATE,
-            element: <ProtectedRoute requiredRole="Admin"><CarCreate /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_LIST,
-            element: <DriverList />
         },
         {
             path: "*",

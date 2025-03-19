@@ -36,6 +36,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
     const [seatFilter, setSeatFilter] = useState<number>(0);
     const [filteredCars, setFilteredCars] = useState<Car[]>(cars);
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const pageSize = 5;
 
     const flueOptions = [
         { label: "Tất cả", value: 0 },
@@ -82,7 +83,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
         }
         setFilteredCars(filtered);
         setCurrentPage(1);
-    }, [searchText, flueFilter, seatFilter, cars]);
+    }, [searchText, flueFilter, seatFilter, cars, validSeatValues]);
 
     const getTransmissionLabel = (value: boolean) =>
         value ? "Số tự động" : "Số sàn";
@@ -98,7 +99,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
         value ? "Có giường tầng" : "Không có giường tầng";
 
     const columns: ColumnsType<Car> = [
-        { title: "STT", key: "stt", render: (_, __, index) => (currentPage - 1) * 5 + index + 1, width: 60, align: "center" },
+        { title: "STT", key: "stt", render: (_, __, index) => (currentPage - 1) * pageSize + index + 1, width: 60, align: "center" },
         { title: "Tên xe", dataIndex: "carName", key: "carName", ellipsis: true },
         { title: "Phiên bản", dataIndex: "carVersion", key: "carVersion", ellipsis: true, width: 80 },
         { title: "Màu sắc", dataIndex: "color", key: "color", ellipsis: true, width: 100 },
@@ -117,7 +118,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
             dataIndex: "price",
             key: "price",
             render: (price: number) => (
-                <span className="text-blue-600 font-medium">{price.toLocaleString()}</span>
+                <span className="text-sky-600 font-medium">{price.toLocaleString()}</span>
             ),
             width: 120,
         },
@@ -149,6 +150,64 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
         },
     ];
 
+    const totalPages = Math.ceil(filteredCars.length / pageSize);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return { pages, endPage };
+    };
+
+    const PaginationCustom = () => (
+        <div className="flex justify-center items-center mt-6 space-x-2">
+            <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-lg bg-sky-500 text-white disabled:bg-gray-300 hover:bg-sky-600 transition-all duration-200 disabled:cursor-not-allowed"
+            >
+                Trước
+            </button>
+            {getPageNumbers().pages.map((page) => (
+                <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-4 py-2 rounded-lg ${
+                        currentPage === page
+                            ? "bg-sky-500 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    } transition-all duration-200`}
+                >
+                    {page}
+                </button>
+            ))}
+            {totalPages > 5 && getPageNumbers().endPage < totalPages && (
+                <span className="px-4 py-2 text-gray-500">...</span>
+            )}
+            <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-lg bg-sky-500 text-white disabled:bg-gray-300 hover:bg-sky-600 transition-all duration-200 disabled:cursor-not-allowed"
+            >
+                Sau
+            </button>
+        </div>
+    );
+
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <div className="bg-white rounded-xl shadow-lg p-6">
@@ -160,7 +219,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                         <Button
                             type="primary"
                             onClick={onCreate}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-200 mb-4 md:mb-0"
+                            className="bg-sky-500 hover:bg-sky-600 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-200 mb-4 md:mb-0"
                         >
                             Tạo xe mới
                         </Button>
@@ -173,7 +232,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     prefix={<SearchOutlined />}
                                     value={searchText}
                                     onChange={(e) => setSearchText(e.target.value)}
-                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
+                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:border-sky-500 focus:ring-sky-500 py-2 px-3"
                                 />
                             </div>
                             <div>
@@ -182,7 +241,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     value={flueFilter}
                                     onChange={(value) => setFlueFilter(value)}
                                     options={flueOptions}
-                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
+                                    className="w-full"
                                 />
                             </div>
                             <div>
@@ -191,7 +250,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                                     value={seatFilter}
                                     onChange={(value) => setSeatFilter(value)}
                                     options={seatOptions}
-                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3"
+                                    className="w-full"
                                 />
                             </div>
                         </div>
@@ -202,51 +261,12 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
                         columns={columns}
                         dataSource={filteredCars}
                         rowKey="_id"
-                        pagination={{
-                            pageSize: 5,
-                            showSizeChanger: false,
-                            className: "mt-4",
-                            itemRender: (page, type, originalElement) => {
-                                if (type === "prev") {
-                                    return (
-                                        <button
-                                            className={`px-3 py-1 text-sm rounded-md shadow-sm hover:bg-blue-600 transition duration-200 ${page === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"
-                                                }`}
-                                        >
-                                            Previous
-                                        </button>
-                                    );
-                                }
-                                if (type === "next") {
-                                    return (
-                                        <button
-                                            className={`px-3 py-1 text-sm rounded-md shadow-sm hover:bg-blue-600 transition duration-200 ${page === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"
-                                                }`}
-                                        >
-                                            Next
-                                        </button>
-                                    );
-                                }
-                                if (type === "page") {
-                                    return (
-                                        <button
-                                            className={`px-3 py-1 text-sm rounded-md shadow-sm hover:bg-blue-100 transition duration-200 ${page === Math.ceil(filteredCars.length / 5)
-                                                ? "bg-blue-700 text-white"
-                                                : "bg-gray-200"
-                                                }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    );
-                                }
-                                return originalElement;
-                            },
-                            onChange: (page) => setCurrentPage(page),
-                        }}
+                        pagination={false} // Tắt phân trang mặc định của antd
                         className="w-full"
                         rowClassName="hover:bg-gray-50 transition duration-200"
                     />
                 </div>
+                <PaginationCustom />
             </div>
         </div>
     );
