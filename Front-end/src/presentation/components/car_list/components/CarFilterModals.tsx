@@ -4,7 +4,7 @@ import React from "react";
 interface props {
     title: string,
     option: any[],
-    onSetListData: (list: string[]) => void,
+    onSetListData?: (list: string[]) => void,
     isOpen: boolean;
     onCancel: () => void,
 }

@@ -11,8 +11,6 @@ const createRequest = async (req, res) => {
     user: data.user,
     driver: data.driver || [],
     car: data.car,
-    // startDate: data.startDate,
-    // endDate: data.endDate,
     requestStatus: data.requestStatus,
     isRequestDriver: data.isRequestDriver,
   });
@@ -266,23 +264,13 @@ const handleCheckRequest = async (req, res) => {
   try {
     const dt = req.body;
     const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
+
     const listReqInRangeTime = await RequestModel.find(
       {
         _id: { $ne: dataRequest._id },
-        requestStatus: "3",
-        $or: [
-          {
-            startDate: { $lte: dataRequest.startDate },
-            endDate: { $gte: dataRequest.startDate },
-          },
-          {
-            startDate: { $lte: dataRequest.endDate },
-            endDate: { $gte: dataRequest.endDate },
-          },
-          {
-            startDate: { $gte: dataRequest.startDate },
-            endDate: { $lte: dataRequest.endDate },
-          },
+        $and: [
+          { startDate: { $lt: dt.endDate } },
+          { endDate: { $gt: dt.startDate } },
         ],
       },
       "car -_id"

@@ -200,7 +200,6 @@ export const fetchApprovedDriverApplications = createAsyncThunk(
   }
 );
 
-
 export const fetchRejectedDriverApplications = createAsyncThunk(
   "auth/fetchRejectedDriverApplications",
   async (_, { getState, rejectWithValue }) => {
@@ -249,7 +248,9 @@ export const VerifyEmail = createAsyncThunk(
       const response = await axios.post("/verify", { email, otp });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Verification failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Verification failed"
+      );
     }
   }
 );
@@ -262,7 +263,9 @@ export const ResendOTP = createAsyncThunk(
       console.log(response);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to resend OTP");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to resend OTP"
+      );
     }
   }
 );
@@ -313,33 +316,33 @@ const slice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    .addCase(VerifyEmail.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    })
-    .addCase(VerifyEmail.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.isVerify = true;
-      state.isRegister = true;
-      state.error = null;
-    })
-    .addCase(VerifyEmail.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    })
-    // Resend OTP
-    .addCase(ResendOTP.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    })
-    .addCase(ResendOTP.fulfilled, (state) => {
-      state.isLoading = false;
-      state.error = null;
-    })
-    .addCase(ResendOTP.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    })
+      .addCase(VerifyEmail.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(VerifyEmail.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isVerify = true;
+        state.isRegister = true;
+        state.error = null;
+      })
+      .addCase(VerifyEmail.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Resend OTP
+      .addCase(ResendOTP.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(ResendOTP.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(ResendOTP.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
       .addCase(loginWithGoogle.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -508,7 +511,7 @@ export function FetchApprovedDriverApplications() {
   return async (dispatch) => {
     await dispatch(fetchApprovedDriverApplications());
   };
-};
+}
 
 export function UpdateUserRole(userId, role) {
   return async (dispatch) => {
@@ -529,25 +532,24 @@ export function LoginUser(formValues) {
         }
       );
 
-      console.log("Login response:", response.data);
-
-      const decodedToken = jwtDecode(response.data.token);
+      console.log("Login response:", response.data.data);
+      const decodedToken = jwtDecode(response.data.data.token);
       const expirationTime = decodedToken.exp * 1000;
 
       const standardizedUser = {
-        userId: response.data.userId,
-        userName: response.data.userName,
-        fullName: response.data.fullName || "",
-        phoneNumber: response.data.phoneNumber || "",
-        avatar: response.data.avatar || "",
-        address: response.data.address || "",
-        role: response.data.role,
+        userId: response.data.data.userId,
+        userName: response.data.data.userName,
+        fullName: response.data.data.fullName || "",
+        phoneNumber: response.data.data.phoneNumber || "",
+        avatar: response.data.data.avatar || "",
+        address: response.data.data.address || "",
+        role: response.data.data.role,
         email: formValues.email,
       };
 
       dispatch(
         slice.actions.login({
-          token: response.data.token,
+          token: response.data.data.token,
           user: standardizedUser,
           loginMethod: "email",
         })

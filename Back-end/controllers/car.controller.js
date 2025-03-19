@@ -158,7 +158,7 @@ const getAllCarFree = async (req, res) => {
   if (data[0] && data[1]) {
     const listCarInAcceptRequest = await RequestModel.find(
       {
-        carStatus: false,
+        requestStatus: "3",
         $or: [
           {
             startDate: { $lte: data[0] },
@@ -180,12 +180,16 @@ const getAllCarFree = async (req, res) => {
       const arrStr = listCarInAcceptRequest.flatMap((item) =>
         item.car.map((objectId) => objectId.toString())
       );
+
       const newArrStr = arrStr.filter(
         (item, index) => arrStr.indexOf(item) == index
       );
+
       const carList = await CarModel.find({
         _id: { $nin: newArrStr },
+        carStatus: false,
       }).populate("carType", "bunkBed flue transmissionType");
+      console.log(newArrStr);
       if (carList && carList.length > 0) {
         return res.status(200).json(carList);
       } else {

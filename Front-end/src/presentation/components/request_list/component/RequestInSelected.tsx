@@ -29,6 +29,7 @@ const RequestInSelected = ({ requestModal }: props) => {
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
     const [requestData, setRequestData] = useState<RequestModelFull>(requestModal)
     const navigate = useNavigate()
+    const [driverSelected, setDriverSelected] = useState<any[]>([])
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
@@ -63,7 +64,7 @@ const RequestInSelected = ({ requestModal }: props) => {
         return arr[1] + "/" + arr[0] + "/" + arr[2]
     }
 
-    const onBooking = async () => {
+    const handleBooking = async () => {
         const requestBookingAccept: RequestAcceptForApi = {
             user: {
                 ...requestData?.user,
@@ -79,12 +80,28 @@ const RequestInSelected = ({ requestModal }: props) => {
             requestStatus: "2",
         }
 
+
         await axiosInstance.post("/request/userAcceptRequest", requestBookingAccept)
             .then(res => {
                 toast.success("Bạn đã thành công đặt xe !!")
                 navigate("/")
             })
             .catch(err => console.log(err))
+    }
+
+    const onBooking = async () => {
+        const dataCheckRequest = {
+            driver: driverSelected,
+            requestId: requestData._id,
+            startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
+            endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
+        }
+        try {
+            const dataDupicate = await axiosInstance.post('/request/handleCheckAdminAcceptRequest', dataCheckRequest)
+            console.log(dataDupicate.data)
+        } catch (error) {
+            console.log(error)
+        }
     }
     const arrprice = requestData?.car.length > 0 ? requestData?.car.map((item) => item.price).reduce((total, current) => {
         return total + current
@@ -190,12 +207,12 @@ const RequestInSelected = ({ requestModal }: props) => {
                             <div className="flex justify-between">Tổng thời gian thuê: <span className="text-blue-900">{totalTime}h</span></div>
                             <div className="flex justify-between">
                                 Thuế VAT: <span className="text-blue-900">
-                                    {totalPrice && (totalPrice * 0.1 * 1000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                    {totalPrice && (totalPrice * 0.1).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 Tổng số tiền: <span className="text-blue-900">
-                                    {totalPrice && (totalPrice * 1000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                    {totalPrice && (totalPrice).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                                 </span>
                             </div>
                         </div>

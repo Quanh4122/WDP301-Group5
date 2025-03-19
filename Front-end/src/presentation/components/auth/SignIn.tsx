@@ -61,18 +61,18 @@ export default function SignIn() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-  
+
     try {
-      await dispatch(LoginUser({ email, password })).then((result: any) => result.unwrap());
+      await dispatch(LoginUser({ email, password }))
       toast.success("Đăng nhập thành công");
       navigate("/");
     } catch (error: any) {
       console.error("Login error:", error);
-  
+
       if (error.response) {
         const errorMessage = error.response.data.message || "Lỗi không xác định!";
         toast.error(errorMessage);
@@ -81,12 +81,12 @@ export default function SignIn() {
       }
     }
   };
-  
+
 
   return (
     <>
       <CssBaseline />
-      <SignInContainer direction="column" justifyContent="space-between" style={{marginTop: '40px', marginBottom: '40px'}}>
+      <SignInContainer direction="column" justifyContent="space-between" style={{ marginTop: '40px', marginBottom: '40px' }}>
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
             Đăng nhập
