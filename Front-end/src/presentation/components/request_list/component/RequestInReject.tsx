@@ -116,7 +116,6 @@ const RequestInReject = ({ requestModal }: props) => {
         await axiosInstance.get('/car/getAllCarFree', {
             params: {
                 key: [dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]), dayjs(fomatDate(dateValue[1]) + " " + timeValue[1])],
-
             }
         })
             .then(res => setListCarFree(res.data))

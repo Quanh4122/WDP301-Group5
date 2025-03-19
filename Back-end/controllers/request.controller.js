@@ -1,3 +1,4 @@
+require("dotenv").config();
 const RequestModel = require("../models/request.model");
 const UserModel = require("../models/user.model");
 const NotifyRequest = require("../Templates/Mail/notifyRequest");
@@ -308,6 +309,38 @@ const handleCheckRequest = async (req, res) => {
   }
 };
 
+const getAddress = async (req, res) => {
+  const query = req.query.q; // Từ khóa người dùng nhập
+  if (!query) {
+    return res
+      .status(400)
+      .json({ error: "Vui lòng cung cấp từ khóa tìm kiếm" });
+  }
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        query
+      )}&format=json&addressdetails=1&limit=10&countrycodes=vn`,
+      {
+        headers: {
+          "User-Agent": "MyAddressApp/1.0 (quangmanh279@gmail.com)", // Header của bạn
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Lỗi khi gọi API Nominatim: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return res.status(200).json(data); // Trả về danh sách gợi ý địa chỉ
+  } catch (error) {
+    console.error("Lỗi khi tìm kiếm:", error);
+    return res.status(500).json({ error: "Lỗi khi tìm kiếm địa chỉ" });
+  }
+};
+
 module.exports = {
   createRequest,
   getListRequest,
@@ -316,4 +349,5 @@ module.exports = {
   listAdminAcceptRequest,
   handleAdminAcceptRequest,
   handleCheckRequest,
+  getAddress,
 };

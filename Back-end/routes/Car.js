@@ -19,5 +19,6 @@ router.put(
   upload.array("images", 4),
   CarController.updateCar
 );
+router.delete("/deleteCar/:carId", CarController.onDeleteCar);
 
 module.exports = router;

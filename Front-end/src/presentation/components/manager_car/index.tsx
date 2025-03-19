@@ -34,6 +34,7 @@ const CarList: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
     const fetchData = async () => {
         try {
             const res = await axiosInstance.get("/car/getAllCar");
@@ -47,8 +48,11 @@ const CarList: React.FC = () => {
         setIsDrawerVisible(true);
     };
 
-    const handleDelete = (carId: string) => {
-        console.log("Delete car:", carId);
+    const handleDelete = async (carId: string) => {
+        await axiosInstance.delete(`/car/deleteCar/${carId}`)
+            .then(res => fetchData())
+            .catch(err => console.log(err))
+
     };
 
     const handleCreate = () => {

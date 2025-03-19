@@ -18,6 +18,7 @@ import { Icon } from "@mui/material";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
+import AddressSearch from "./AddressSearch";
 
 interface props {
     requestModal: RequestModelFull
@@ -181,6 +182,9 @@ const RequestInSelected = ({ requestModal }: props) => {
                                 title="Thời gian thuê xe"
                                 element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
                             />
+                        </div>
+                        <div>
+                            <AddressSearch />
                         </div>
                         <div className="text-gray-700 font-medium">
                             <div className="flex justify-between">Tổng thời gian thuê: <span className="text-blue-900">{totalTime}h</span></div>

@@ -34,4 +34,6 @@ router.post(
   RequestController.handleCheckRequest
 );
 
+router.get("/search-address", RequestController.getAddress);
+
 module.exports = router;

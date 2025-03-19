@@ -3,7 +3,7 @@ const CarTypeModel = require("../models/cartype.model");
 const RequestModel = require("../models/request.model");
 
 const getAllCar = async (req, res) => {
-  const carList = await CarModel.find().populate(
+  const carList = await CarModel.find({ carStatus: false }).populate(
     "carType",
     "bunkBed flue transmissionType"
   );
@@ -21,6 +21,7 @@ const filterCarByNumberOfSeat = async (req, res) => {
   const listReq = req.body;
   const carListFilter = await CarModel.find({
     numberOfSeat: { $in: listReq },
+    carStatus: false,
   }).populate("carType", "bunkBed flue transmissionType");
   if (carListFilter && carListFilter.length > 0) {
     return res.status(200).json(carListFilter);
@@ -46,6 +47,7 @@ const filterCarByTransmissionType = async (req, res) => {
     {
       $match: {
         "carType.transmissionType": { $in: listReq }, // Lọc theo danh sách giá trị bunkBed
+        carStatus: false,
       },
     },
   ]);
@@ -73,6 +75,7 @@ const filterCarByFlue = async (req, res) => {
     {
       $match: {
         "carType.flue": { $in: listReq }, // Lọc theo danh sách giá trị bunkBed
+        carStatus: false,
       },
     },
   ]);
@@ -155,6 +158,7 @@ const getAllCarFree = async (req, res) => {
   if (data[0] && data[1]) {
     const listCarInAcceptRequest = await RequestModel.find(
       {
+        carStatus: false,
         $or: [
           {
             startDate: { $lte: data[0] },
@@ -265,6 +269,16 @@ const updateCar = async (req, res) => {
   }
 };
 
+const onDeleteCar = async (req, res) => {
+  const { carId } = req.params;
+  try {
+    await CarModel.updateOne({ _id: carId }, { carStatus: true });
+    return res.status(200).json({ message: "Delete successfull !!" });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports = {
   getAllCar,
   filterCarByNumberOfSeat,
@@ -274,4 +288,5 @@ module.exports = {
   createCar,
   getAllCarFree,
   updateCar,
+  onDeleteCar,
 };
