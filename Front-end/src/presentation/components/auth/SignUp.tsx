@@ -5,7 +5,7 @@ import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import { toast, ToastContainer } from 'react-toastify';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from '../redux/Store';
-import { LoginUser, RegisterUser } from '../redux/slices/Authentication';
+import { RegisterUser } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -31,7 +31,7 @@ export default function SignUp() {
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
-  const { isLoading, isVerify } = useSelector((state: RootState) => state.auth);
+  const { isLoading } = useSelector((state: RootState) => state.auth);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -41,16 +41,13 @@ export default function SignUp() {
     const phoneNumber = formData.get('phoneNumber') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-  
+
     setErrorMessage(null);
-  
+
     try {
       const result = await dispatch(RegisterUser({ userName, phoneNumber, email, password })) as any;
-  
-      if (result?.response.data?.status === 'success') {
-        toast.success(result.response.data.message);
-        navigate('/app/verify');
-      }
+      toast.success('Bạn đăng ký tài khoản thành công');
+      navigate('/app/verify');
     } catch (err: any) {
       const serverMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
       if (serverMessage.includes('Tài khoản của bạn từng đăng ký nhưng chưa xác thực')) {
@@ -78,23 +75,23 @@ export default function SignUp() {
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <FormControl>
               <FormLabel>Tên người dùng</FormLabel>
-              <TextField 
-                name="userName" 
+              <TextField
+                name="userName"
                 placeholder="Enter your user name"
               />
             </FormControl>
             <FormControl>
               <FormLabel>Số điện thoại</FormLabel>
-              <TextField 
-                name="phoneNumber" 
+              <TextField
+                name="phoneNumber"
                 placeholder="Enter your phone number"
               />
             </FormControl>
             <FormControl>
               <FormLabel>Email</FormLabel>
-              <TextField 
-                name="email" 
-                placeholder="Enter your email" 
+              <TextField
+                name="email"
+                placeholder="Enter your email"
                 type="email"
               />
             </FormControl>
@@ -115,9 +112,9 @@ export default function SignUp() {
                 }}
               />
             </FormControl>
-            <Button 
-              type="submit" 
-              variant="contained" 
+            <Button
+              type="submit"
+              variant="contained"
               disabled={isLoading}
             >
               {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
