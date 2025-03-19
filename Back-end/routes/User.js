@@ -8,7 +8,7 @@ const upload = require("../middlewares/Upload");
 
 router.post("/register", userController.register);
 router.post("/verify", userController.verifyOTP);
-router.post('/resend-otp', userController.resendOTP);
+// router.post('/sendOtp', verifyToken, userController.sendOTP);
 router.post("/login", userController.login);
 router.post("/google-login", userController.googleLogin);
 router.get("/logout", verifyToken, userController.logout);

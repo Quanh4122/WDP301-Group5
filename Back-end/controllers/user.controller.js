@@ -11,8 +11,6 @@ const ResetPassword = require("../Templates/Mail/resetPassword");
 const crypto = require("crypto");
 const admin = require("../services/firebaseAdmin");
 const RoleModel = require("../models/role.model");
-const validator = require('validator');
-
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -41,125 +39,30 @@ const register = async (req, res) => {
   try {
     const { userName, phoneNumber, email, password } = req.body;
 
-    // Kiểm tra xem tất cả các trường có được gửi lên hay không
-    if (!userName && !phoneNumber && !email && !password) {
+    if (!userName || !phoneNumber || !email || !password) {
       return res.status(400).json({
         status: "error",
-        message: "Vui lòng nhập đầy đủ thông tin (tên, số điện thoại, email, mật khẩu)!",
+        message: "Vui lòng nhập đầy đủ thông tin!",
       });
     }
 
-    // Kiểm tra userName
-    if (typeof userName !== "string" || userName.trim() === "") {
-      return res.status(400).json({
-        status: "error",
-        message: "Tên người dùng không được để trống!",
-      });
-    }
-    if (userName.length < 3 || userName.length > 12) {
-      return res.status(400).json({
-        status: "error",
-        message: "Tên người dùng phải trong khoảng từ 3 đến 12 ký tự!",
-      });
-    }
-    const userNameRegex = /^[a-zA-Z0-9._-]+$/;
-    if (!userNameRegex.test(userName)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Tên người dùng chỉ được chứa chữ cái, số, dấu chấm, gạch dưới hoặc gạch ngang!",
-      });
-    }
-
-    // Kiểm tra phoneNumber
-    if (typeof phoneNumber !== "string" || phoneNumber.trim() === "") {
-      return res.status(400).json({
-        status: "error",
-        message: "Số điện thoại không được để trống!",
-      });
-    }
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Số điện thoại phải là 10 chữ số và chỉ chứa số!",
-      });
-    }
-
-    // Kiểm tra email
-    if (typeof email !== "string" || email.trim() === "") {
-      return res.status(400).json({
-        status: "error",
-        message: "Email không được để trống!",
-      });
-    }
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Email không đúng định dạng!",
-      });
-    }
-
-    // Kiểm tra password
-    if (typeof password !== "string" || password.trim() === "") {
-      return res.status(400).json({
-        status: "error",
-        message: "Mật khẩu không được để trống!",
-      });
-    }
-    if (password.length < 6 || password.length > 20) {
-      return res.status(400).json({
-        status: "error",
-        message: "Mật khẩu phải trong khoảng từ 6 đến 20 ký tự!",
-      });
-    }
-
-    // Kiểm tra email đã tồn tại chưa
     const existingUser = await UserModel.findOne({ email });
+
     if (existingUser) {
       if (!existingUser.verified) {
-        // Trường hợp đã đăng ký nhưng chưa xác thực
-        const auth = await AuthModel.findOne({ user: existingUser._id });
-        if (!auth) {
-          return res.status(500).json({
-            status: "error",
-            message: "Không tìm thấy thông tin xác thực cho người dùng này!",
-          });
-        }
-
-        // Gửi lại OTP
-        await generateAndSendOTP(auth);
-
-        return res.status(200).json({
-          status: "success",
-          message: "Tài khoản của bạn từng đăng ký nhưng chưa xác thực. Mã OTP mới đã được gửi đến email của bạn!",
-          user_id: existingUser._id,
+        return res.status(400).json({
+          status: "error",
+          message: "Tài khoản của bạn từng đăng ký nhưng chưa xác thực. Vui lòng kiểm tra email để xác thực tài khoản!",
         });
       }
-      // Trường hợp đã xác thực
       return res.status(400).json({
         status: "error",
         message: "Email này đã được sử dụng. Vui lòng đăng nhập!",
       });
     }
 
-    // Kiểm tra số điện thoại đã tồn tại chưa
-    const existingPhone = await UserModel.findOne({ phoneNumber });
-    if (existingPhone) {
-      return res.status(400).json({
-        status: "error",
-        message: "Số điện thoại này đã được sử dụng!",
-      });
-    }
-
-    // Hash mật khẩu và tạo user
     const hashedPassword = await bcrypt.hash(password, 10);
     const userRole = await RoleModel.findOne({ roleName: "User" });
-    if (!userRole) {
-      return res.status(500).json({
-        status: "error",
-        message: "Không tìm thấy vai trò người dùng trong hệ thống!",
-      });
-    }
 
     const user = new UserModel({
       userName,
@@ -191,7 +94,6 @@ const register = async (req, res) => {
 };
 
 
-
 // [POST] /verify
 const verifyOTP = async (req, res) => {
   try {
@@ -215,7 +117,7 @@ const verifyOTP = async (req, res) => {
     const auth = await AuthModel.findOne({
       user: user._id,
       otp,
-      otp_expiry_time: { $gt: Date.now() },
+      otp_expiry_time: { $gt: Date.now() }, // OTP chưa hết hạn
     });
 
     if (!auth) {
@@ -245,81 +147,12 @@ const verifyOTP = async (req, res) => {
       token,
       user_id: user._id,
     });
+
   } catch (error) {
     console.error("Lỗi xác thực OTP:", error);
     return res.status(500).json({
       status: "error",
       message: "Đã xảy ra lỗi khi xác thực OTP. Vui lòng thử lại!",
-    });
-  }
-};
-
-// New Resend OTP endpoint
-const resendOTP = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        status: "error",
-        message: "Vui lòng cung cấp email!",
-      });
-    }
-
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        status: "error",
-        message: "Email không tồn tại!",
-      });
-    }
-
-    if (user.verified) {
-      return res.status(400).json({
-        status: "error",
-        message: "Email đã được xác thực!",
-      });
-    }
-
-    // Tìm auth record tương ứng
-    const auth = await AuthModel.findOne({ user: user._id });
-    if (!auth) {
-      return res.status(400).json({
-        status: "error",
-        message: "Không tìm thấy thông tin xác thực cho người dùng này!",
-      });
-    }
-
-    // Tạo OTP mới
-    const newOtp = otpGenerator.generate(6, {
-      upperCaseAlphabets: false,
-      specialChars: false,
-      lowerCaseAlphabets: false,
-    });
-    const otpExpiryTime = Date.now() + 10 * 60 * 1000; // 10 phút hết hạn
-
-    // Cập nhật OTP và thời gian hết hạn
-    auth.otp = newOtp;
-    auth.otp_expiry_time = otpExpiryTime;
-    await auth.save({ new: true, validateModifiedOnly: true });
-
-    // Gửi email chứa OTP
-    await mailService.sendEmail({
-      to: user.email,
-      subject: "Mã OTP mới",
-      text: "Hello",
-      html: otp(`${user.userName}`, newOtp), // Sử dụng template OTP
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "Đã gửi lại mã OTP mới đến email của bạn!",
-    });
-  } catch (error) {
-    console.error("Lỗi gửi lại OTP:", error);
-    return res.status(500).json({
-      status: "error",
-      message: "Đã xảy ra lỗi khi gửi lại OTP. Vui lòng thử lại!",
     });
   }
 };
@@ -338,10 +171,6 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Email phải bắt buộc được điền" });
     }
 
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ message: "Email không đúng định dạng" });
-    }
-
     if (!password) {
       return res.status(400).json({ message: "Mật khẩu phải bắt buộc được điền" });
     }
@@ -356,15 +185,15 @@ const login = async (req, res) => {
     }
 
     if (!user.verified) {
-      return res.status(403).json({
-        message: "Email chưa được xác minh, vui lòng xác minh email"
+      return res.status(403).json({ 
+        message: "Email chưa được xác minh, vui lòng xác minh email" 
       });
     }
 
     const auth = await AuthModel.findOne({ user: user._id });
     if (!auth) {
-      return res.status(500).json({
-        message: "Tài khoản của bạn chưa tồn tại. Vui lòng tạo tài khoản mới hoặc sử dụng dịch vụ google"
+      return res.status(500).json({ 
+        message: "Tài khoản của bạn chưa tồn tại. Vui lòng tạo tài khoản mới hoặc sử dụng dịch vụ google" 
       });
     }
 
@@ -407,14 +236,14 @@ const login = async (req, res) => {
         avatar: user.avatar,
         address: user.address,
         role: user.role.roleName,
-        token: token,
+        token: token, 
       }
     });
 
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({
-      message: "Lỗi hệ thống, vui lòng thử lại sau"
+    return res.status(500).json({ 
+      message: "Lỗi hệ thống, vui lòng thử lại sau" 
     });
   }
 };
@@ -1009,7 +838,6 @@ const updateUserRole = async (req, res) => {
 module.exports = {
   register,
   verifyOTP,
-  resendOTP,
   forgotPassword,
   resetPassword,
   login,
