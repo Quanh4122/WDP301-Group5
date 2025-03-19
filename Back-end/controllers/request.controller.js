@@ -60,73 +60,75 @@ const getListRequest = async (req, res) => {
 
 const acceptBookingRequest = async (req, res) => {
   const data = req.body;
-
-  try {
-    if (data.car) {
-      const requestExisted = await RequestModel.findOne({
-        user: data.user._id,
-        requestStatus: "4",
-      });
-      if (requestExisted) {
-        await UserModel.updateOne(
-          { _id: data.user._id },
-          {
-            userName: data.user.userName,
-            email: data.user.email,
-            phoneNumber: data.user.phoneNumber,
-            address: data.user.address,
-          }
-        );
-        await RequestModel.updateOne(
-          { _id: requestExisted._id },
-          {
-            startDate: data.startDate,
-            endDate: data.endDate,
-            isRequestDriver: data.isRequestDriver,
-            requestStatus: data.requestStatus,
-            $push: { car: data.car },
-          }
-        );
-        // await RequestModel.updateOne(
-        //   { _id: requestExisted._id },
-        //   {  }
-        // );
-        return res.status(200).json({ message: "Request successfull !!" });
-      } else {
-        return res.status(401).json({ message: "Cannot find your request !!" });
-      }
-    } else {
-      const requestExisted = await RequestModel.findOne({
-        user: data.user._id,
-        requestStatus: "1",
-      });
-      if (requestExisted) {
-        await UserModel.updateOne(
-          { _id: data.user._id },
-          {
-            userName: data.user.userName,
-            email: data.user.email,
-            phoneNumber: data.user.phoneNumber,
-            address: data.user.address,
-          }
-        );
-        await RequestModel.updateOne(
-          { _id: requestExisted._id },
-          {
-            startDate: data.startDate,
-            endDate: data.endDate,
-            isRequestDriver: data.isRequestDriver,
-            requestStatus: data.requestStatus,
-          }
-        );
-        return res.status(200).json({ message: "Request successfull !!" });
-      } else {
-        return res.status(401).json({ message: "Cannot find your request !!" });
-      }
-    }
-  } catch (error) {
-    return res.status(500).json({ message: error });
-  }
+  console.log(data);
+  // try {
+  //   if (data.car) {
+  //     const requestExisted = await RequestModel.findOne({
+  //       user: data.user._id,
+  //       requestStatus: "4",
+  //     });
+  //     if (requestExisted) {
+  //       await UserModel.updateOne(
+  //         { _id: data.user._id },
+  //         {
+  //           userName: data.user.userName,
+  //           email: data.user.email,
+  //           phoneNumber: data.user.phoneNumber,
+  //           address: data.user.address,
+  //         }
+  //       );
+  //       await RequestModel.updateOne(
+  //         { _id: requestExisted._id },
+  //         {
+  //           startDate: data.startDate,
+  //           endDate: data.endDate,
+  //           isRequestDriver: data.isRequestDriver,
+  //           requestStatus: data.requestStatus,
+  //           $push: { car: data.car },
+  //           pickUpLocation: data.pickUpLocation,
+  //         }
+  //       );
+  //       // await RequestModel.updateOne(
+  //       //   { _id: requestExisted._id },
+  //       //   {  }
+  //       // );
+  //       return res.status(200).json({ message: "Request successfull !!" });
+  //     } else {
+  //       return res.status(401).json({ message: "Cannot find your request !!" });
+  //     }
+  //   } else {
+  //     const requestExisted = await RequestModel.findOne({
+  //       user: data.user._id,
+  //       requestStatus: "1",
+  //     });
+  //     if (requestExisted) {
+  //       await UserModel.updateOne(
+  //         { _id: data.user._id },
+  //         {
+  //           userName: data.user.userName,
+  //           email: data.user.email,
+  //           phoneNumber: data.user.phoneNumber,
+  //           address: data.user.address,
+  //         }
+  //       );
+  //       await RequestModel.updateOne(
+  //         { _id: requestExisted._id },
+  //         {
+  //           startDate: data.startDate,
+  //           endDate: data.endDate,
+  //           isRequestDriver: data.isRequestDriver,
+  //           requestStatus: data.requestStatus,
+  //           pickUpLocation: data.pickUpLocation,
+  //         }
+  //       );
+  //       return res.status(200).json({ message: "Request successfull !!" });
+  //     } else {
+  //       return res.status(401).json({ message: "Cannot find your request !!" });
+  //     }
+  //   }
+  // } catch (error) {
+  //   return res.status(500).json({ message: error });
+  // }
 };
 
 const userDeleteCarInRequest = async (req, res) => {

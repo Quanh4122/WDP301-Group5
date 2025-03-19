@@ -35,8 +35,11 @@ const FeatureSection = ({ listContent }: props) => {
           </div>
         ))} */}
         {
-          listCarItem.map((item) => (
-            <CarItem />
+          listCarItem.map((item, indx) => (
+            <div key={indx}>
+              <CarItem />
+            </div>
+
           ))
         }
       </div>

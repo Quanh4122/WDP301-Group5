@@ -10,7 +10,13 @@ interface Address {
     lon: string;
 }
 
-function AddressSearch() {
+interface props {
+    addressBooking: (value: string) => void,
+    title: string,
+    isRequire: boolean
+}
+
+const AddressSearch = ({ addressBooking, title, isRequire }: props) => {
     const [query, setQuery] = useState<string>(''); // Từ khóa tìm kiếm, đồng thời là giá trị hiển thị trong Input
     const [suggestions, setSuggestions] = useState<Address[]>([]); // Danh sách gợi ý hiển thị
     const [tempSuggestions, setTempSuggestions] = useState<Address[]>([]); // Trạng thái tạm thời để lưu dữ liệu từ API
@@ -55,23 +61,14 @@ function AddressSearch() {
         const addressString = address.display_name; // Lấy chuỗi địa chỉ
         setQuery(addressString); // Cập nhật giá trị trong Input
         setSuggestions([]); // Ẩn danh sách gợi ý sau khi chọn
-        console.log(addressString);
-
-        // Gửi địa chỉ về backend để lưu (bỏ comment nếu muốn bật)
-        // try {
-        //   await axios.post('http://localhost:5000/api/save-address', {
-        //     address: addressString,
-        //   });
-        //   console.log('Địa chỉ đã được lưu vào backend:', addressString);
-        // } catch (error) {
-        //   console.error('Lỗi khi gửi địa chỉ về backend:', error);
-        // }
+        // console.log(addressString);
+        addressBooking(addressString)
     };
 
     return (
-        <div className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-sm">
+        <div className="max-w-md mx-auto bg-white">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tìm kiếm địa chỉ <span className="text-red-500">*</span>
+                {title} {isRequire && <span className="text-red-500">*</span>}
             </label>
             <Input
                 value={query}

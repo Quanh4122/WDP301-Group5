@@ -44,7 +44,10 @@ export type RequestAcceptForApi = {
     endDate: any,
     requestStatus: string,
     isRequestDriver?: Boolean,
-    car? :string[]
+    car? :string[],
+    pickUpLocation?: string,
+    dropLocation?: string,
+    _id?: string
 }
 
 export type CarModel = {

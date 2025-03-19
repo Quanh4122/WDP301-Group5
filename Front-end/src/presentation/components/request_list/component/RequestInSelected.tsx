@@ -28,8 +28,10 @@ const RequestInSelected = ({ requestModal }: props) => {
 
     const [isOpenModalN, setIsOpenModalN] = React.useState(false)
     const [requestData, setRequestData] = useState<RequestModelFull>(requestModal)
+    const [dataCheck, setDataCheck] = useState<{ isExisted: boolean, duplicateCar: string[] } | undefined>()
     const navigate = useNavigate()
     const [driverSelected, setDriverSelected] = useState<any[]>([])
+    const [addressBooking, setAddressBooking] = useState<string>("")
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
@@ -78,13 +80,14 @@ const RequestInSelected = ({ requestModal }: props) => {
             startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
             endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
             requestStatus: "2",
+            pickUpLocation: addressBooking,
+            _id: requestData._id
         }
-
 
         await axiosInstance.post("/request/userAcceptRequest", requestBookingAccept)
             .then(res => {
                 toast.success("Bạn đã thành công đặt xe !!")
-                navigate("/")
+                // navigate("/")
             })
             .catch(err => console.log(err))
     }
@@ -98,7 +101,10 @@ const RequestInSelected = ({ requestModal }: props) => {
         }
         try {
             const dataDupicate = await axiosInstance.post('/request/handleCheckAdminAcceptRequest', dataCheckRequest)
-            console.log(dataDupicate.data)
+            setDataCheck(dataDupicate.data)
+            if (dataDupicate.data.isExisted == false) {
+                handleBooking()
+            }
         } catch (error) {
             console.log(error)
         }
@@ -152,7 +158,7 @@ const RequestInSelected = ({ requestModal }: props) => {
                                 name="email"
                                 rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
                             >
-                                <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" />
+                                <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" readOnly />
                             </Form.Item>
                             <Form.Item
                                 label={<span className="text-blue-600 font-semibold">Số điện thoại</span>}
@@ -161,13 +167,13 @@ const RequestInSelected = ({ requestModal }: props) => {
                             >
                                 <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" />
                             </Form.Item>
-                            <Form.Item
+                            {/* <Form.Item
                                 label={<span className="text-blue-600 font-semibold">Địa chỉ</span>}
                                 name="address"
                                 rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
                             >
                                 <Input className="border border-blue-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200" />
-                            </Form.Item>
+                            </Form.Item> */}
                         </div>
                         <div className="mb-8">
                             <Form.Item
@@ -175,7 +181,7 @@ const RequestInSelected = ({ requestModal }: props) => {
                                 name="isRequestDriver"
                                 rules={[{ required: true, message: 'Vui lòng chọn tùy chọn!' }]}
                             >
-                                <Radio.Group className="text-blue-600" options={requestDriver} defaultValue={requestData.isRequestDriver} />
+                                <Radio.Group className="text-blue-600" options={requestDriver} />
                             </Form.Item>
                         </div>
                         <div className="w-full h-14 border border-blue-300 rounded-md flex items-center mb-8">
@@ -201,7 +207,16 @@ const RequestInSelected = ({ requestModal }: props) => {
                             />
                         </div>
                         <div>
-                            <AddressSearch />
+                            <Form.Item
+                                name="addressSearch"
+                            >
+                                <AddressSearch
+                                    addressBooking={setAddressBooking}
+                                    title="Vị trí nhận xe"
+                                    isRequire={true}
+                                />
+                            </Form.Item>
+
                         </div>
                         <div className="text-gray-700 font-medium">
                             <div className="flex justify-between">Tổng thời gian thuê: <span className="text-blue-900">{totalTime}h</span></div>
@@ -230,11 +245,17 @@ const RequestInSelected = ({ requestModal }: props) => {
                         <div className="flex flex-wrap">
                             {requestData.car.map((item, idx) => (
                                 <div key={idx} className="flex items-center border-b border-blue-200 w-full mb-4 p-4 rounded-md shadow-sm">
+
                                     <img src={`http://localhost:3030${item?.images[0]}`} alt={item.carName} className="w-32 h-32 object-cover rounded-md" />
                                     <div className="ml-4 flex-grow">
+                                        {
+                                            dataCheck?.isExisted && dataCheck.duplicateCar.find(ele => ele == item._id) ?
+                                                <p className="text-red-700">Xe này đã bận trong khoảng thời gian bạn đặt !!!</p>
+                                                : <></>
+                                        }
                                         <h6 className="text-sm font-semibold text-blue-800">{item.carName} {item.carVersion}</h6>
                                         <ul className="space-y-1">
-                                            <li>Giá thuê: <span className="font-medium text-blue-700">{item.price}k / 1h</span></li>
+                                            <li>Giá thuê: <span className="font-medium text-blue-700">{item.price && item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}/ 1h</span></li>
                                             <li>Biển số: <span className="font-medium text-blue-700">{item.licensePlateNumber}</span></li>
                                             <li>Số chỗ: <span className="font-medium text-blue-700">{item.numberOfSeat}</span></li>
                                         </ul>

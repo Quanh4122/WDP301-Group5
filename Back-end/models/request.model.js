@@ -31,8 +31,21 @@ const RequestSchema = new mongoose.Schema({
     type: Boolean,
     require: true,
   },
-  timeCreated: { 
-    type: Date, default: Date.now
+  timeCreated: {
+    type: Date,
+    default: Date.now,
+  },
+  pickUpLocation: {
+    type: String,
+    require: false,
+  },
+  pickUpLocation: {
+    type: String,
+    require: false,
+  },
+  dropLocation: {
+    type: String,
+    require: false,
   },
 });
 
