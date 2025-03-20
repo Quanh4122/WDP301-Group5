@@ -26,6 +26,7 @@ export type RequestModelFull = {
     requestStatus: string,
     isRequestDriver?: Boolean,
     timeCreated? : string,
+    pickUpLocation: string,
 }
 
 export type RequestModalForCallApi = {

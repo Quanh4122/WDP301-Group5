@@ -109,25 +109,25 @@ const acceptBookingRequest = async (req, res) => {
         subject: "Thông báo yêu cầu đặt xe",
         html: emailContent,
       });
-      // await UserModel.updateOne(
-      //   { _id: data.user._id },
-      //   {
-      //     userName: data.user.userName,
-      //     phoneNumber: data.user.phoneNumber,
-      //   }
-      // );
-      // await RequestModel.updateOne(
-      //   { _id: requestExisted._id },
-      //   {
-      //     startDate: data.startDate,
-      //     endDate: data.endDate,
-      //     isRequestDriver: data.isRequestDriver,
-      //     requestStatus: data.requestStatus,
-      //     $push: { car: data.car },
-      //     pickUpLocation: data.pickUpLocation,
-      //     emailRequest: data.emailRequest,
-      //   }
-      // );
+      await UserModel.updateOne(
+        { _id: data.user._id },
+        {
+          userName: data.user.userName,
+          phoneNumber: data.user.phoneNumber,
+        }
+      );
+      await RequestModel.updateOne(
+        { _id: requestExisted._id },
+        {
+          startDate: data.startDate,
+          endDate: data.endDate,
+          isRequestDriver: data.isRequestDriver,
+          requestStatus: data.requestStatus,
+          $push: { car: data.car },
+          pickUpLocation: data.pickUpLocation,
+          emailRequest: data.emailRequest,
+        }
+      );
       return res.status(200).json({ message: "Successfull" });
     }
   } catch (error) {
@@ -257,9 +257,9 @@ const handleAdminAcceptRequest = async (req, res) => {
           message: "Successfull !!!",
         });
       }
-      // return res.status(200).json({ message: "Successfull !!!" });
+      return res.status(200).json({ message: "Successfull !!!" });
     } else {
-      //return res.status(401).json({ message: "Cannot find this request !!!" });
+      return res.status(401).json({ message: "Cannot find this request !!!" });
     }
   } catch (error) {
     return res.status(400).json({ message: error });
@@ -335,6 +335,21 @@ const getAddress = async (req, res) => {
   }
 };
 
+const getRequestById = async (req, res) => {
+  const requestId = req.query.key;
+  try {
+    const requestList = await RequestModel.findOne({ _id: requestId })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+    return res.status(200).json(requestList);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   createRequest,
   getListRequest,
@@ -344,4 +359,5 @@ module.exports = {
   handleAdminAcceptRequest,
   handleCheckRequest,
   getAddress,
+  getRequestById,
 };

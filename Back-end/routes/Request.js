@@ -36,4 +36,6 @@ router.post(
 
 router.get("/search-address", RequestController.getAddress);
 
+router.get("/getRequestById", VerifyToken, RequestController.getRequestById);
+
 module.exports = router;

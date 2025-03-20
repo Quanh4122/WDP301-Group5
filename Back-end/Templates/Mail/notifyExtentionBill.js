@@ -140,7 +140,7 @@ module.exports = (name, start, end, location, link) => {
                       <p><strong>Nơi nhận xe:</strong> ${location}</p>
                   </div>
                   <p class="cta">Bạn có muốn gia hạn thêm thời gian không?</p>
-                  <a href="${link}" class="button">Click để gia hạn</a>
+                  <a href="${link}" class="button">Chi tiết đơn</a>
               </div>
               <div class="footer">
                   <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>

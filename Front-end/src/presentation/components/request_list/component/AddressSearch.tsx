@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { debounce } from 'lodash';
 import { Input, List } from 'antd';
 import axiosInstance from '../../utils/axios';
@@ -10,17 +9,26 @@ interface Address {
     lon: string;
 }
 
-interface props {
-    addressBooking: (value: string) => void,
-    title: string,
-    isRequire: boolean
+interface AddressSearchProps {
+    addressBooking: (value: string) => void;
+    title: string;
+    isRequire: boolean;
+    value?: string; // Giá trị từ component cha
 }
 
-const AddressSearch = ({ addressBooking, title, isRequire }: props) => {
-    const [query, setQuery] = useState<string>(''); // Từ khóa tìm kiếm, đồng thời là giá trị hiển thị trong Input
-    const [suggestions, setSuggestions] = useState<Address[]>([]); // Danh sách gợi ý hiển thị
-    const [tempSuggestions, setTempSuggestions] = useState<Address[]>([]); // Trạng thái tạm thời để lưu dữ liệu từ API
-    const [isLoading, setIsLoading] = useState<boolean>(false); // Trạng thái loading để biết API đang gọi
+const AddressSearch: React.FC<AddressSearchProps> = ({ addressBooking, title, isRequire, value }) => {
+    const [query, setQuery] = useState<string>(value || '');
+    const [suggestions, setSuggestions] = useState<Address[]>([]);
+    const [tempSuggestions, setTempSuggestions] = useState<Address[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    // Đồng bộ query với value từ props khi value thay đổi
+    useEffect(() => {
+        console.log('AddressSearch - Received value from props:', value);
+        if (value !== undefined && value !== query) {
+            setQuery(value); // Cập nhật query khi value thay đổi
+        }
+    }, [value]);
 
     // Gọi API backend để tìm kiếm địa chỉ với debounce
     const debouncedSearch = debounce(async (searchQuery: string) => {
@@ -31,23 +39,23 @@ const AddressSearch = ({ addressBooking, title, isRequire }: props) => {
         }
 
         try {
-            setIsLoading(true); // Bắt đầu gọi API, hiển thị trạng thái loading
+            setIsLoading(true);
             const response = await axiosInstance.get('/request/search-address', {
                 params: { q: searchQuery },
             });
-            setTempSuggestions(response.data); // Lưu dữ liệu vào trạng thái tạm thời
+            setTempSuggestions(response.data);
         } catch (error) {
             console.error('Lỗi khi tìm kiếm:', error);
             setTempSuggestions([]);
         } finally {
-            setIsLoading(false); // API trả về, tắt trạng thái loading
+            setIsLoading(false);
         }
     }, 500);
 
     // Khi tempSuggestions thay đổi, cập nhật suggestions
     useEffect(() => {
         if (!isLoading) {
-            setSuggestions(tempSuggestions); // Chỉ cập nhật suggestions khi API trả về đầy đủ
+            setSuggestions(tempSuggestions);
         }
     }, [tempSuggestions, isLoading]);
 
@@ -56,13 +64,12 @@ const AddressSearch = ({ addressBooking, title, isRequire }: props) => {
         debouncedSearch(searchQuery);
     };
 
-    // Khi người dùng chọn địa chỉ
     const handleSelect = (address: Address) => {
-        const addressString = address.display_name; // Lấy chuỗi địa chỉ
-        setQuery(addressString); // Cập nhật giá trị trong Input
-        setSuggestions([]); // Ẩn danh sách gợi ý sau khi chọn
-        // console.log(addressString);
-        addressBooking(addressString)
+        const addressString = address.display_name;
+        setQuery(addressString);
+        setSuggestions([]);
+        addressBooking(addressString); // Cập nhật giá trị ra ngoài
+        console.log('AddressSearch - Selected address:', addressString);
     };
 
     return (
@@ -78,7 +85,7 @@ const AddressSearch = ({ addressBooking, title, isRequire }: props) => {
                 size="large"
             />
             {isLoading ? (
-                <p className="text-gray-500 text-xs mt-1">Đang tải...</p> // Hiển thị trạng thái loading
+                <p className="text-gray-500 text-xs mt-1">Đang tải...</p>
             ) : suggestions.length > 0 ? (
                 <List
                     dataSource={suggestions}
@@ -95,6 +102,6 @@ const AddressSearch = ({ addressBooking, title, isRequire }: props) => {
             ) : null}
         </div>
     );
-}
+};
 
 export default AddressSearch;

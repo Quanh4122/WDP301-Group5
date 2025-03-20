@@ -7,13 +7,10 @@ import RequestInSelected from "./component/RequestInSelected";
 import { Button } from "antd";
 import { AlertTriangle } from "lucide-react";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
-import RequestInReject from "./component/RequestInReject";
 
 const RequestList: React.FC = () => {
-    const [requestList, setRequestList] = useState<RequestModelFull[] | undefined>(undefined);
     const [requestInSelected, setRequestInSelected] = useState<RequestModelFull | undefined>(undefined);
     const [requestInPending, setRequestPending] = useState<RequestModelFull[] | undefined>(undefined);
-    const [requestInReject, setRequestInReject] = useState<RequestModelFull | undefined>(undefined);
     const [display, setDisplay] = useState<boolean>(false);
     const [isDisplayReject, setIsDisplayReject] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(1); // State cho phân trang
@@ -51,7 +48,6 @@ const RequestList: React.FC = () => {
     const onCategoryTypeByRequestList = (list: RequestModelFull[]) => {
         setRequestInSelected(list.filter((item) => item.requestStatus === "1")[0] || undefined);
         setRequestPending(list.filter((item) => item.requestStatus === "2" || item.requestStatus === "3"));
-        setRequestInReject(list.filter((item) => item.requestStatus === "4")[0] || undefined);
     };
 
     // Tính toán phân trang
@@ -99,9 +95,7 @@ const RequestList: React.FC = () => {
 
             {/* Nội dung chính */}
             <div className="w-full px-6 md:px-20 py-6">
-                {isDisplayReject && requestInReject ? (
-                    <RequestInReject requestModal={requestInReject} />
-                ) : display === false ? (
+                {display === false ? (
                     requestInSelected ? (
                         <RequestInSelected requestModal={requestInSelected} />
                     ) : (
@@ -148,8 +142,8 @@ const RequestList: React.FC = () => {
                                             onClick={handlePrevious}
                                             disabled={currentPage === 1}
                                             className={`px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-200 ${currentPage === 1
-                                                    ? "bg-gray-300 cursor-not-allowed"
-                                                    : "bg-blue-500 text-white"
+                                                ? "bg-gray-300 cursor-not-allowed"
+                                                : "bg-blue-500 text-white"
                                                 }`}
                                         >
                                             Previous
@@ -172,8 +166,8 @@ const RequestList: React.FC = () => {
                                             onClick={handleNext}
                                             disabled={currentPage === totalPages}
                                             className={`px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-200 ${currentPage === totalPages
-                                                    ? "bg-gray-300 cursor-not-allowed"
-                                                    : "bg-blue-500 text-white"
+                                                ? "bg-gray-300 cursor-not-allowed"
+                                                : "bg-blue-500 text-white"
                                                 }`}
                                         >
                                             Next

@@ -40,10 +40,6 @@ const RequestSchema = new mongoose.Schema({
     type: String,
     require: false,
   },
-  pickUpLocation: {
-    type: String,
-    require: false,
-  },
   dropLocation: {
     type: String,
     require: false,
