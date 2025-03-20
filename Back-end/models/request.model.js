@@ -6,6 +6,7 @@ const RequestSchema = new mongoose.Schema({
     ref: "User",
     require: true,
   },
+  emailRequest: { type: String, required: true },
   driver: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Driver",
@@ -47,7 +48,13 @@ const RequestSchema = new mongoose.Schema({
     type: String,
     require: false,
   },
+  nextCheckTime: {
+    type: Date,
+    default: null,
+  },
 });
+
+RequestSchema.index({ nextCheckTime: 1 });
 
 const RequestModel = mongoose.model("Request", RequestSchema);
 

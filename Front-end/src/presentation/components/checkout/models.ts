@@ -47,7 +47,8 @@ export type RequestAcceptForApi = {
     car? :string[],
     pickUpLocation?: string,
     dropLocation?: string,
-    _id?: string
+    _id?: string,
+    emailRequest?: string,
 }
 
 export type CarModel = {

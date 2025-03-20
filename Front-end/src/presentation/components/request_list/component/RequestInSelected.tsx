@@ -71,11 +71,9 @@ const RequestInSelected = ({ requestModal }: props) => {
             user: {
                 ...requestData?.user,
                 userName: form.getFieldValue("userName"),
-                email: form.getFieldValue("email"),
                 phoneNumber: form.getFieldValue("phoneNumber"),
-                address: form.getFieldValue("address")
             },
-            // user: requestData.user,
+            emailRequest: form.getFieldValue("email") ? form.getFieldValue("email") : requestData.user?.email,
             isRequestDriver: form.getFieldValue("isRequestDriver") || false,
             startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
             endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
@@ -87,7 +85,6 @@ const RequestInSelected = ({ requestModal }: props) => {
         await axiosInstance.post("/request/userAcceptRequest", requestBookingAccept)
             .then(res => {
                 toast.success("Bạn đã thành công đặt xe !!")
-                // navigate("/")
             })
             .catch(err => console.log(err))
     }

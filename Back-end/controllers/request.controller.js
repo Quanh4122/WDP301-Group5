@@ -2,6 +2,7 @@ require("dotenv").config();
 const RequestModel = require("../models/request.model");
 const UserModel = require("../models/user.model");
 const NotifyRequest = require("../Templates/Mail/notifyRequest");
+const NotifyBill = require("../Templates/Mail/notifyBill");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
 
@@ -60,75 +61,78 @@ const getListRequest = async (req, res) => {
 
 const acceptBookingRequest = async (req, res) => {
   const data = req.body;
-  console.log(data);
-  // try {
-  //   if (data.car) {
-  //     const requestExisted = await RequestModel.findOne({
-  //       user: data.user._id,
-  //       requestStatus: "4",
-  //     });
-  //     if (requestExisted) {
-  //       await UserModel.updateOne(
-  //         { _id: data.user._id },
-  //         {
-  //           userName: data.user.userName,
-  //           email: data.user.email,
-  //           phoneNumber: data.user.phoneNumber,
-  //           address: data.user.address,
-  //         }
-  //       );
-  //       await RequestModel.updateOne(
-  //         { _id: requestExisted._id },
-  //         {
-  //           startDate: data.startDate,
-  //           endDate: data.endDate,
-  //           isRequestDriver: data.isRequestDriver,
-  //           requestStatus: data.requestStatus,
-  //           $push: { car: data.car },
-  //           pickUpLocation: data.pickUpLocation,
-  //         }
-  //       );
-  //       // await RequestModel.updateOne(
-  //       //   { _id: requestExisted._id },
-  //       //   {  }
-  //       // );
-  //       return res.status(200).json({ message: "Request successfull !!" });
-  //     } else {
-  //       return res.status(401).json({ message: "Cannot find your request !!" });
-  //     }
-  //   } else {
-  //     const requestExisted = await RequestModel.findOne({
-  //       user: data.user._id,
-  //       requestStatus: "1",
-  //     });
-  //     if (requestExisted) {
-  //       await UserModel.updateOne(
-  //         { _id: data.user._id },
-  //         {
-  //           userName: data.user.userName,
-  //           email: data.user.email,
-  //           phoneNumber: data.user.phoneNumber,
-  //           address: data.user.address,
-  //         }
-  //       );
-  //       await RequestModel.updateOne(
-  //         { _id: requestExisted._id },
-  //         {
-  //           startDate: data.startDate,
-  //           endDate: data.endDate,
-  //           isRequestDriver: data.isRequestDriver,
-  //           requestStatus: data.requestStatus,
-  //           pickUpLocation: data.pickUpLocation,
-  //         }
-  //       );
-  //       return res.status(200).json({ message: "Request successfull !!" });
-  //     } else {
-  //       return res.status(401).json({ message: "Cannot find your request !!" });
-  //     }
-  //   }
-  // } catch (error) {
-  //   return res.status(500).json({ message: error });
-  // }
+  try {
+    const requestExisted = await RequestModel.findOne({
+      _id: data._id,
+    })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+    if (requestExisted) {
+      const start = dayjs(data.startDate);
+      const end = dayjs(data.endDate);
+      const totalHours = end.diff(start, "hour", true);
+      const startDate = start.format("HH:mm, DD/MM/YYYY");
+      const endDate = end.format("HH:mm, DD/MM/YYYY");
+
+      const carPrices = requestExisted?.car?.map((item) => item.price) ?? [];
+      const totalPrice = carPrices.reduce(
+        (total, current) => total + current,
+        0
+      );
+      const vatFee = totalPrice * totalHours * 0.1;
+      const totalFee = vatFee + totalPrice * totalHours;
+      const displayTotalFee = totalFee.toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
+      const emailContent = await NotifyBill(
+        `${data.user.userName}`,
+        vatFee.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        (totalPrice * totalHours).toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        displayTotalFee,
+        startDate,
+        endDate,
+        data.pickUpLocation
+      );
+
+      await mailService.sendEmail({
+        to: data.emailRequest,
+        subject: "Thông báo yêu cầu đặt xe",
+        html: emailContent,
+      });
+      // await UserModel.updateOne(
+      //   { _id: data.user._id },
+      //   {
+      //     userName: data.user.userName,
+      //     phoneNumber: data.user.phoneNumber,
+      //   }
+      // );
+      // await RequestModel.updateOne(
+      //   { _id: requestExisted._id },
+      //   {
+      //     startDate: data.startDate,
+      //     endDate: data.endDate,
+      //     isRequestDriver: data.isRequestDriver,
+      //     requestStatus: data.requestStatus,
+      //     $push: { car: data.car },
+      //     pickUpLocation: data.pickUpLocation,
+      //     emailRequest: data.emailRequest,
+      //   }
+      // );
+      return res.status(200).json({ message: "Successfull" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
 };
 
 const userDeleteCarInRequest = async (req, res) => {
