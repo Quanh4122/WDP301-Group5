@@ -10,6 +10,10 @@ const { UserController } = require("./controllers");
 const WebSocket = require("ws");
 const RequestModel = require("./models/request.model");
 const http = require("http");
+const moment = require("moment-timezone");
+const NotifyExtendBill = require("./Templates/Mail/notifyExtentionBill");
+const mailService = require("./services/sendMail");
+const dayjs = require("dayjs");
 
 require("dotenv").config();
 const { db } = require("./models");
@@ -51,15 +55,66 @@ const broadcast = (data) => {
   });
 };
 
+// Hàm cập nhật requestStatus
+const updateRequestStatus = async (request) => {
+  if (request.requestStatus == "2") {
+    request.requestStatus = "3";
+    await request.save();
+
+    broadcast({
+      event: "request-status-updated",
+      data: {
+        requestId: request._id,
+        requestStatus: request.requestStatus,
+        endDate: request.endDate,
+      },
+    });
+    console.log(`Đã cập nhật trạng thái request ${request._id}`);
+  }
+};
+
+const sendEmail = async (item) => {
+  const start = dayjs(item.startDate);
+  const end = dayjs(item.endDate);
+  const totalHours = end.diff(start, "hour", true);
+  const startDate = start.format("HH:mm, DD/MM/YYYY");
+  const endDate = end.format("HH:mm, DD/MM/YYYY");
+
+  console.log("start date : ", startDate, "end date : ", endDate);
+  const bookingAgainURL = `http://localhost:3000`;
+  const emailContent = await NotifyExtendBill(
+    `${item.user.userName}`,
+    startDate,
+    endDate,
+    item.pickUpLocation,
+    bookingAgainURL
+  );
+  await mailService.sendEmail({
+    to: item.user.email,
+    subject: "Thông báo yêu cầu đặt xe",
+    html: emailContent,
+  });
+};
+
 setInterval(async () => {
   try {
-    const currentTime = new Date();
+    const currentTime = moment().tz("Asia/Ho_Chi_Minh").toDate();
+    const threeHoursBefore = 3 * 60 * 60 * 1000;
+    const checkTime = new Date(currentTime - threeHoursBefore);
     const request = await RequestModel.find({
       requestStatus: "2",
-    });
-    console.log(request);
+      endDate: { $gte: checkTime },
+    })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+
+    request.map((item) => sendEmail(item));
+    console.log("oke");
   } catch (error) {}
-}, 600000000);
+}, 600000);
 
 route(server);
 

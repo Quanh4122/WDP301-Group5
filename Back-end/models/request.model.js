@@ -48,10 +48,6 @@ const RequestSchema = new mongoose.Schema({
     type: String,
     require: false,
   },
-  nextCheckTime: {
-    type: Date,
-    default: null,
-  },
 });
 
 RequestSchema.index({ nextCheckTime: 1 });
