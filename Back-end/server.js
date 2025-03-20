@@ -73,48 +73,50 @@ const updateRequestStatus = async (request) => {
   }
 };
 
-const sendEmail = async (item) => {
+const sendEmailRequestStatus3 = async (item) => {
+  const now = dayjs();
+  const threeHoursLater = now.add(3, "hour");
   const start = dayjs(item.startDate);
   const end = dayjs(item.endDate);
-  const totalHours = end.diff(start, "hour", true);
-  const startDate = start.format("HH:mm, DD/MM/YYYY");
-  const endDate = end.format("HH:mm, DD/MM/YYYY");
+  if (end.isAfter(now) && end.isBefore(threeHoursLater)) {
+    console.log(item);
+    const startDate = start.format("HH:mm, DD/MM/YYYY");
+    const endDate = end.format("HH:mm, DD/MM/YYYY");
+    // Thêm phần update Item lên status 3 ( gần đến lúc trả xe)
+    const detailRequestURL = `http://localhost:3000/app/request-in-expire?requestId=${item._id}`;
+    const emailContent = await NotifyExtendBill(
+      `${item.user.userName}`,
+      startDate,
+      endDate,
+      item.pickUpLocation,
+      detailRequestURL
+    );
+    await mailService.sendEmail({
+      to: item.user.email,
+      subject: "Thông báo yêu cầu đặt xe",
+      html: emailContent,
+    });
+  }
+};
 
-  console.log("start date : ", startDate, "end date : ", endDate);
-  const bookingAgainURL = `http://localhost:3000`;
-  const emailContent = await NotifyExtendBill(
-    `${item.user.userName}`,
-    startDate,
-    endDate,
-    item.pickUpLocation,
-    bookingAgainURL
-  );
-  await mailService.sendEmail({
-    to: item.user.email,
-    subject: "Thông báo yêu cầu đặt xe",
-    html: emailContent,
-  });
+const getListRequestStatus2AndSendMai = async () => {
+  const request = await RequestModel.find({
+    requestStatus: "2",
+  })
+    .populate("user", "userName fullName email phoneNumber address avatar")
+    .populate(
+      "car",
+      "carName color licensePlateNumber price carVersion images numberOfSeat"
+    );
+  request.map((item) => sendEmailRequestStatus3(item));
+  //console.log("Check status 2");
 };
 
 setInterval(async () => {
   try {
-    const currentTime = moment().tz("Asia/Ho_Chi_Minh").toDate();
-    const threeHoursBefore = 3 * 60 * 60 * 1000;
-    const checkTime = new Date(currentTime - threeHoursBefore);
-    const request = await RequestModel.find({
-      requestStatus: "2",
-      endDate: { $gte: checkTime },
-    })
-      .populate("user", "userName fullName email phoneNumber address avatar")
-      .populate(
-        "car",
-        "carName color licensePlateNumber price carVersion images numberOfSeat"
-      );
-
-    request.map((item) => sendEmail(item));
-    console.log("oke");
+    getListRequestStatus2AndSendMai();
   } catch (error) {}
-}, 600000);
+}, 6000000);
 
 route(server);
 

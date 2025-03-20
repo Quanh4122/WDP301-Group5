@@ -34,6 +34,7 @@ import ManageAccount from "../components/admin/ManageAccount";
 import UserList from "../components/admin/UserList";
 import ChangeRoleAccount from "../components/admin/ChangeRoleAccount";
 import ManagerCar from "../components/manager_car";
+import RequestInExpire from "../components/request_list/component/RequestInExpire";
 
 const Router = () => {
 
@@ -173,6 +174,10 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGER_CAR,
             element: <ProtectedRoute requiredRole="Admin"><ManagerCar /></ProtectedRoute>
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REQUEST_IN_EXPIRE,
+            element: <ProtectedRoute requiredRole="User"><RequestInExpire /></ProtectedRoute>
         },
 
     ]
