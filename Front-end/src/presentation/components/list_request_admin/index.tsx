@@ -11,9 +11,9 @@ const AdminRequest = () => {
     const [dataDisplay, setDataDisplay] = useState<RequestModelFull[] | []>(requestDataPending); // Initialize with pending data
 
     const optionRequest = [
-        { label: "Pending", value: "Pending" },
-        { label: "Accepted", value: "Accepted" },
-        { label: "Denied", value: "Denied" },
+        { label: "Đang thực hiện", value: "Đang thực hiện" },
+        { label: "Chờ xác nhận thanh toán", value: "Chờ xác nhận thanh toán" },
+        { label: "Hoàn thành thanh toán", value: "Hoàn thành thanh toán" },
     ];
 
     useEffect(() => {
@@ -40,9 +40,9 @@ const AdminRequest = () => {
     };
 
     const onChangeValue = (value: string) => {
-        if (value === 'Pending') {
+        if (value === 'Đang thực hiện') {
             setDataDisplay(requestDataPending);
-        } else if (value === 'Accepted') {
+        } else if (value === 'Chờ xác nhận thanh toán') {
             setDataDisplay(requestDataAccepted);
         } else {
             setDataDisplay(requestDataDenied);

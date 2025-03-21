@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { RequestAcceptForApi, RequestModelFull } from "../../checkout/models";
+import { RequestAcceptForApi, RequestModelFull, RequestUserBookingToBill } from "../../checkout/models";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
 import AddressSearch from "./AddressSearch";
+import ModalDeposit from "./ModalDeposit";
 
 interface props {
     requestModal: RequestModelFull
@@ -31,7 +32,8 @@ const RequestInSelected = ({ requestModal }: props) => {
     const [dataCheck, setDataCheck] = useState<{ isExisted: boolean, duplicateCar: string[] } | undefined>()
     const navigate = useNavigate()
     const [driverSelected, setDriverSelected] = useState<any[]>([])
-    const [addressBooking, setAddressBooking] = useState<string>("")
+    const [pickUpLocation, setPickUpLocation] = useState<string>("")
+    const [dropLocation, setDropLocation] = useState<string>("")
     const requestDriver = [
         { label: "Có", value: true },
         { label: "Không", value: false }
@@ -78,7 +80,7 @@ const RequestInSelected = ({ requestModal }: props) => {
             startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
             endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
             requestStatus: "2",
-            pickUpLocation: addressBooking,
+            pickUpLocation: pickUpLocation,
             _id: requestData._id
         }
 
@@ -130,6 +132,52 @@ const RequestInSelected = ({ requestModal }: props) => {
             })
             .catch((err) => toast.error("Fail to delete !!"))
     }
+
+    const [isModalDepositOpen, setIsModalDepositOpen] = useState(false);
+
+    const handleSubmit = async (amount: number) => {
+        console.log(`Số tiền thanh toán: ${amount}`);
+        setIsModalDepositOpen(false);
+        const requestBookingAccept: RequestAcceptForApi = {
+            user: {
+                ...requestData?.user,
+                userName: form.getFieldValue("userName"),
+                phoneNumber: form.getFieldValue("phoneNumber"),
+            },
+            emailRequest: form.getFieldValue("email") ? form.getFieldValue("email") : requestData.user?.email,
+            isRequestDriver: form.getFieldValue("isRequestDriver") || false,
+            startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
+            endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
+            requestStatus: "2",
+            pickUpLocation: pickUpLocation,
+            _id: requestData._id
+        }
+
+        const dataUserBookingToBill: RequestUserBookingToBill = {
+            request: {
+                _id: requestData._id,
+                requestStatus: "2",
+                pickUpLocation: pickUpLocation,
+                isRequestDriver: form.getFieldValue("isRequestDriver") || false,
+                startDate: dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]),
+                endDate: dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]),
+                emailRequest: form.getFieldValue("email") ? form.getFieldValue("email") : requestData.user?.email,
+                dropLocation: dropLocation,
+            },
+            billData: {
+                vatFee: totalPrice * 0.1,
+                depositFee: amount,
+                totalCarFee: totalPrice
+            },
+            userName: requestData.user?.userName,
+        }
+
+        await axiosInstance.post("/bill/userBookingBill", dataUserBookingToBill)
+            .then(res => {
+                toast.success("Bạn đã thành công đặt xe !!")
+            })
+            .catch(err => console.log(err))
+    };
 
     return (
         <div className="bg-white p-10    rounded-lg shadow-md">
@@ -208,8 +256,20 @@ const RequestInSelected = ({ requestModal }: props) => {
                                 name="addressSearch"
                             >
                                 <AddressSearch
-                                    addressBooking={setAddressBooking}
+                                    addressBooking={setPickUpLocation}
                                     title="Vị trí nhận xe"
+                                    isRequire={true}
+                                />
+                            </Form.Item>
+
+                        </div>
+                        <div>
+                            <Form.Item
+                                name="addressSearch"
+                            >
+                                <AddressSearch
+                                    addressBooking={setDropLocation}
+                                    title="Vị trí trả xe"
                                     isRequire={true}
                                 />
                             </Form.Item>
@@ -228,12 +288,23 @@ const RequestInSelected = ({ requestModal }: props) => {
                                 </span>
                             </div>
                         </div>
-                        <div className="w-full flex justify-end mt-6">
-                            <Button htmlType="submit" type="primary" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">
-                                Đặt xe
-                            </Button>
-                        </div>
+
                     </Form>
+
+                    <div className="w-full flex justify-end mt-6">
+                        <Button
+                            onClick={() => setIsModalDepositOpen(true)}
+                            type="primary"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md"
+                        >
+                            Đặt xe
+                        </Button>
+                    </div>
+                    <ModalDeposit
+                        isOpen={isModalDepositOpen}
+                        onCancel={() => setIsModalDepositOpen(false)}
+                        onSubmit={handleSubmit}
+                    />
                 </div>
 
                 {/* Phần List Item */}

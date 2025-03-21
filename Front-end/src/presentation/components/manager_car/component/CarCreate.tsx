@@ -37,10 +37,6 @@ const CarCreate = () => {
         { label: 9, value: 9 },
     ]
     const onFinish = (value: any) => {
-        console.log(value.images)
-        const listImage = value.images.fileList.map((item: any) => {
-            return (item.name + "")
-        })
         const data: CarModelsNoId = {
             carName: form.getFieldValue("carName"),
             color: form.getFieldValue("color"),
@@ -56,7 +52,6 @@ const CarCreate = () => {
             },
             images: arrFile
         }
-        console.log(data)
         createCar(data)
     }
 
