@@ -14,8 +14,9 @@ interface props {
 
 const CarCalendar = ({ setDateValue, setTimeValue, onSubmit }: props) => {
     const [dateDislayModal, setDateDisplayModal] = useState<any[]>([dayjs().format('DD/MM/YYYY'), dayjs().add(1, 'day').format('DD/MM/YYYY')])
-    const [timeStart, setTimeStart] = useState([dayjs().hour() + ":" + dayjs().minute(), dayjs().hour() + ":" + dayjs().minute()]);
-    const [timeEnd, setTimeEnd] = useState();
+    const [timeStart, setTimeStart] = useState(dayjs().hour() + ":00");
+    const [timeEnd, setTimeEnd] = useState(dayjs().hour() + ":00");
+
     const optionSelectTime = [
         { label: "00:00", value: "00:00" },
         { label: "01:00", value: "01:00" },
@@ -47,18 +48,7 @@ const CarCalendar = ({ setDateValue, setTimeValue, onSubmit }: props) => {
         setTimeValue([timeStart, timeEnd])
     }, [timeStart, timeEnd])
 
-
     const fomatData = (value: DateRange<Dayjs>[]) => {
-        if (value && value[0]) {
-            const dt = dayjs(value[0].toLocaleString()).format('DD/MM/YYYY')
-
-            console.log(dt)
-        }
-
-        if (value && value[1]) {
-            const dt = dayjs(value[1].toLocaleString()).format('DD/MM/YYYY')
-            console.log(dt)
-        }
         const arrDt = [
             value && value[0] ? dayjs(value[0].toLocaleString()).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY'),
             value && value[1] ? dayjs(value[1].toLocaleString()).format('DD/MM/YYYY') : dayjs().add(1, 'day').format('DD/MM/YYYY')
@@ -67,20 +57,17 @@ const CarCalendar = ({ setDateValue, setTimeValue, onSubmit }: props) => {
         setDateValue(value)
     }
 
-
     return (
         <div>
             <div className="w-full flex justify-center border-2 rounded-md">
-                <LocalizationProvider
-                    dateAdapter={AdapterDayjs}
-                >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DateRangeCalendar
                         onChange={(newValue) => fomatData(newValue)}
+                        minDate={dayjs()} // Thêm thuộc tính này để disable các ngày trước ngày hiện tại
                     />
                 </LocalizationProvider>
-
             </div>
-            <div className="flex items-center justify-between  mt-3">
+            <div className="flex items-center justify-between mt-3">
                 <div className="flex">
                     <div className="text-xs text-gray-500">
                         Từ
@@ -124,7 +111,6 @@ const CarCalendar = ({ setDateValue, setTimeValue, onSubmit }: props) => {
                 </div>
             </div>
         </div>
-
     )
 }
 

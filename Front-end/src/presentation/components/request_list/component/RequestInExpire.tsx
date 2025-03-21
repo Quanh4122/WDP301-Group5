@@ -262,7 +262,7 @@ const RequestInExpire: React.FC = () => {
                     </Form>
 
                     <div className="w-full flex justify-end mt-6 gap-4">
-                        <Button
+                        {/* <Button
                             type="primary"
                             className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md"
                             onClick={() => {
@@ -270,7 +270,7 @@ const RequestInExpire: React.FC = () => {
                             }}
                         >
                             Từ chối
-                        </Button>
+                        </Button> */}
                         <Button
                             type="primary"
                             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md"
