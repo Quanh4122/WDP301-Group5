@@ -54,9 +54,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
     ]);
 
     // Kiểm tra tính hợp lệ của form và các trường bổ sung
-    const validateForm = async () => {
+    const validateForm = () => {
         try {
-            await form.validateFields(); // Kiểm tra tất cả các trường trong form
+            form.validateFields(); // Kiểm tra tất cả các trường trong form
             const allFieldsFilled = pickUpLocation && dropLocation ? true : false; // Kiểm tra pickUpLocation và dropLocation
             setIsFormValid(allFieldsFilled);
         } catch (error) {
@@ -66,6 +66,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
 
     useEffect(() => {
         validateForm(); // Kiểm tra lần đầu khi component mount
+        console.log("check", pickUpLocation, pickUpLocation)
     }, [pickUpLocation, dropLocation]); // Theo dõi thay đổi của các trường bổ sung
 
     const getDateValue = (value: DateRange<Dayjs>) => {
@@ -87,29 +88,29 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
         return `${arr[1]}/${arr[0]}/${arr[2]}`;
     };
 
-    const handleBooking = async () => {
-        const requestBookingAccept: RequestAcceptForApi = {
-            user: {
-                ...requestData?.user,
-                userName: form.getFieldValue("userName"),
-                phoneNumber: form.getFieldValue("phoneNumber"),
-            },
-            emailRequest: form.getFieldValue("email") || requestData.user?.email,
-            isRequestDriver: form.getFieldValue("isRequestDriver") || false,
-            startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
-            endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
-            requestStatus: "2",
-            pickUpLocation,
-            _id: requestData._id,
-        };
+    // const handleBooking = async () => {
+    //     const requestBookingAccept: RequestAcceptForApi = {
+    //         user: {
+    //             ...requestData?.user,
+    //             userName: form.getFieldValue("userName"),
+    //             phoneNumber: form.getFieldValue("phoneNumber"),
+    //         },
+    //         emailRequest: form.getFieldValue("email") || requestData.user?.email,
+    //         isRequestDriver: form.getFieldValue("isRequestDriver") || false,
+    //         startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
+    //         endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
+    //         requestStatus: "2",
+    //         pickUpLocation,
+    //         _id: requestData._id,
+    //     };
 
-        await axiosInstance
-            .post("/request/userAcceptRequest", requestBookingAccept)
-            .then((res) => {
-                toast.success("Bạn đã thành công đặt xe !!");
-            })
-            .catch((err) => console.log(err));
-    };
+    //     await axiosInstance
+    //         .post("/request/userAcceptRequest", requestBookingAccept)
+    //         .then((res) => {
+    //             toast.success("Bạn đã thành công đặt xe !!");
+    //         })
+    //         .catch((err) => console.log(err));
+    // };
 
     const onBooking = async () => {
         const dataCheckRequest = {
@@ -118,11 +119,12 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
             endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
         };
+        console.log(dataCheckRequest)
         try {
             const dataDuplicate = await axiosInstance.post("/request/handleCheckAdminAcceptRequest", dataCheckRequest);
             setDataCheck(dataDuplicate.data);
             if (!dataDuplicate.data.isExisted) {
-                handleBooking();
+                setIsModalDepositOpen(true)
             }
         } catch (error) {
             console.log(error);
@@ -139,6 +141,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
         const val = dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour");
         setTotalTime(val);
         setTotalPrice(arrPrice * val);
+        if (dayjs(dateValue[0]).isSame(dayjs())) {
+            form.setFieldValue("isRequestDriver", false)
+        }
     }, [timeValue, dateValue, arrPrice]);
 
     const onDeleteCarInRequest = async (carId: string) => {
@@ -159,20 +164,20 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
     const handleSubmit = async (amount: number) => {
         console.log(`Số tiền thanh toán: ${amount}`);
         setIsModalDepositOpen(false);
-        const requestBookingAccept: RequestAcceptForApi = {
-            user: {
-                ...requestData?.user,
-                userName: form.getFieldValue("userName"),
-                phoneNumber: form.getFieldValue("phoneNumber"),
-            },
-            emailRequest: form.getFieldValue("email") || requestData.user?.email,
-            isRequestDriver: form.getFieldValue("isRequestDriver") || false,
-            startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
-            endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
-            requestStatus: "2",
-            pickUpLocation,
-            _id: requestData._id,
-        };
+        // const requestBookingAccept: RequestAcceptForApi = {
+        //     user: {
+        //         ...requestData?.user,
+        //         userName: form.getFieldValue("userName"),
+        //         phoneNumber: form.getFieldValue("phoneNumber"),
+        //     },
+        //     emailRequest: form.getFieldValue("email") || requestData.user?.email,
+        //     isRequestDriver: form.getFieldValue("isRequestDriver") || false,
+        //     startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
+        //     endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
+        //     requestStatus: "2",
+        //     pickUpLocation,
+        //     _id: requestData._id,
+        // };
 
         const dataUserBookingToBill: RequestUserBookingToBill = {
             request: {
@@ -210,7 +215,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
                         className="w-full"
                         initialValues={initialValue}
                         form={form}
-                        onFinish={onBooking}
+                        // onFinish={onBooking}
                         onValuesChange={validateForm} // Gọi validate mỗi khi giá trị thay đổi
                     >
                         <div className="grid grid-cols-2 gap-4 mb-6">
@@ -298,9 +303,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
 
                     <div className="w-full flex justify-end mt-6">
                         <Button
-                            onClick={() => setIsModalDepositOpen(true)}
+                            onClick={onBooking}
                             type="primary"
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md"
+                            className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md"
                             disabled={!isFormValid} // Disable nút nếu form không hợp lệ
                         >
                             Đặt xe
