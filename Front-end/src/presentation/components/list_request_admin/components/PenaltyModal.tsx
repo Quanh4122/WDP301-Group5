@@ -153,25 +153,29 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
         )}
 
         {/* Form nhập phí phạt */}
-        <Form form={form} onFinish={onSubmit} layout="vertical">
-          <Form.Item
-            name="penaltyFee"
-            label={<span className="font-medium text-gray-700">Phí phạt (VNĐ)</span>}
-            rules={[
-              { required: true, message: "Vui lòng nhập số tiền phạt" },
-              { type: "number", min: 0, message: "Phí phạt không thể âm" },
-            ]}
-          >
-            <InputNumber
-              value={penaltyFee}
-              onChange={(value) => setPenaltyFee(value)}
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
-              className="w-full"
-              placeholder="Nhập số tiền phạt"
-            />
-          </Form.Item>
-        </Form>
+        {
+          billData?.request.requestStatus == "3" &&
+          <Form form={form} onFinish={onSubmit} layout="vertical">
+            <Form.Item
+              name="penaltyFee"
+              label={<span className="font-medium text-gray-700">Phí phạt (VNĐ)</span>}
+              rules={[
+                { required: true, message: "Vui lòng nhập số tiền phạt" },
+                { type: "number", min: 0, message: "Phí phạt không thể âm" },
+              ]}
+            >
+              <InputNumber
+                value={penaltyFee}
+                onChange={(value) => setPenaltyFee(value)}
+                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
+                className="w-full"
+                placeholder="Nhập số tiền phạt"
+              />
+            </Form.Item>
+          </Form>
+        }
+
       </div>
     );
   };
@@ -181,7 +185,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       title={<span className="text-xl font-bold">Thông Tin Hóa Đơn và Phí Phạt</span>}
       open={visible}
       onCancel={onClose}
-      footer={[
+      footer={billData?.request.requestStatus == "3" && [
         <Button key="cancel" onClick={onClose} disabled={loading}>
           Hủy
         </Button>,
