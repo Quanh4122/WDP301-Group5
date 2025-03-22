@@ -12,5 +12,8 @@ router.post(
   billController.userConfirmDoneBill
 );
 router.get("/bill/getBillByReuqestId", billController.getBillByRequestId);
+router.get("/bill/getBillById", billController.getBillById);
+router.put("/bill/adminUpdatePenaltyFee", billController.adminUpdatePenaltyFee);
+router.post("/bill/userPayment/:billId", billController.userpayment);
 
 module.exports = router;

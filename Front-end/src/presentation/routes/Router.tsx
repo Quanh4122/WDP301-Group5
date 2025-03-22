@@ -35,6 +35,7 @@ import UserList from "../components/admin/UserList";
 import ChangeRoleAccount from "../components/admin/ChangeRoleAccount";
 import ManagerCar from "../components/manager_car";
 import RequestInExpire from "../components/request_list/component/RequestInExpire";
+import BillDetailPage from "../components/request_list/component/BillPayment";
 
 const Router = () => {
 
@@ -179,7 +180,10 @@ const Router = () => {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REQUEST_IN_EXPIRE,
             element: <ProtectedRoute requiredRole="User"><RequestInExpire /></ProtectedRoute>
         },
-
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BILL_PAYMENT,
+            element: <ProtectedRoute requiredRole="User"><BillDetailPage /></ProtectedRoute>
+        },
     ]
 
     return (

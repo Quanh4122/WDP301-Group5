@@ -64,13 +64,17 @@ const RequestInExpire: React.FC = () => {
 
             // Gửi request lên server (thêm logic API nếu cần)
             await axiosInstance.post('/bill/userConfirmDoneBill', formData)
-                .then(res => console.log(res.data))
+                .then(res => {
+                    toast.success('Xác nhận trả xe thành công!');
+                    form.resetFields();
+                    setAddressBooking('');
+                    setArrFile([]);
+                    setTimeout(() => navigate("/"), 2000);
+
+                })
                 .catch(err => console.log(err))
 
-            // toast.success('Xác nhận trả xe thành công!');
-            // form.resetFields();
-            // setAddressBooking('');
-            // setArrFile([]);
+
 
         } catch (error) {
             console.log(error);

@@ -35,8 +35,8 @@ const AdminRequest = () => {
 
     const setListRequest = (listRequest: RequestModelFull[]) => {
         setRequestDataPending(listRequest.filter((item) => item.requestStatus === '2'));
-        setRequestDataAccepted(listRequest.filter((item) => item.requestStatus === '3'));
-        setRequestDataDenied(listRequest.filter((item) => item.requestStatus === '4'));
+        setRequestDataAccepted(listRequest.filter((item) => item.requestStatus === '4'));
+        setRequestDataDenied(listRequest.filter((item) => item.requestStatus === '5'));
     };
 
     const onChangeValue = (value: string) => {

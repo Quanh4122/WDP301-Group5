@@ -7,6 +7,8 @@ import RequestInSelected from "./component/RequestInSelected";
 import { Button } from "antd";
 import { AlertTriangle } from "lucide-react";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
+import { RootState } from "../redux/Store";
+import { useSelector } from "react-redux";
 
 const RequestList: React.FC = () => {
     const [requestInSelected, setRequestInSelected] = useState<RequestModelFull | undefined>(undefined);
@@ -17,11 +19,15 @@ const RequestList: React.FC = () => {
     const itemsPerPage: number = 5; // Số lượng request trên mỗi trang
     const location = useLocation();
     const navigate = useNavigate();
+    const userId = useSelector((state: RootState) => (state.auth?.user as { userId: string } | null)?.userId);
 
-
+    useEffect(() => {
+        getListCar(userId)
+    }, [])
 
     // Reset trang về 1 khi danh sách requestInPending thay đổi
     useEffect(() => {
+
         setCurrentPage(1);
     }, [requestInPending]);
 

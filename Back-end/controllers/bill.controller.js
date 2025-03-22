@@ -1,7 +1,7 @@
 require("dotenv").config();
 const BillModel = require("../models/bill.model");
 const RequestModel = require("../models/request.model");
-const NotifyBill = require("../Templates/Mail/notifyBill");
+const NotifyPayment = require("../Templates/Mail/notifyPayment");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
 
@@ -41,8 +41,8 @@ const toggleBillStatus = async (req, res) => {
 };
 
 const useBookingBill = async (req, res) => {
+  const data = req.body;
   try {
-    console.log(data);
     await RequestModel.updateOne(
       {
         _id: data.request._id,
@@ -146,10 +146,110 @@ const getBillByRequestId = async (req, res) => {
   }
 };
 
+const adminUpdatePenaltyFee = async (req, res) => {
+  const data = req.body;
+
+  try {
+    if (data) {
+      const bill = await BillModel.findOneAndUpdate(
+        {
+          _id: data.billId,
+        },
+        {
+          penaltyFee: data.penaltyFee,
+        }
+      );
+      const requestModal = await RequestModel.findOneAndUpdate(
+        {
+          _id: bill.request._id,
+        },
+        {
+          requestStatus: "4",
+        }
+      ).populate("user", "userName fullName email phoneNumber address avatar");
+      const bookingAgainURL = `http://localhost:3000/app/bill-payment?billId=${bill._id}`;
+      const total = bill.vatFee + bill.totalCarFee - bill.depositFee;
+      const emailContent = await NotifyPayment(
+        `${requestModal.user.userName}`,
+        bookingAgainURL,
+        bill.vatFee.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        bill.totalCarFee.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        bill.depositFee.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        total.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        })
+      );
+      await mailService.sendEmail({
+        to: requestModal.user.email,
+        subject: "Thông báo yêu cầu đặt xe",
+        html: emailContent,
+      });
+      return res.status(200).json({
+        status: "success",
+        message: "Successfull !!!",
+      });
+    }
+
+    return res.status(401).json({ message: "Have no data to update !!" });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
+const getBillById = async (req, res) => {
+  const billId = req.query.key;
+  try {
+    if (billId) {
+      const bill = await BillModel.findOne({ request: billId })
+        .populate({
+          path: "request", // Populate trường request từ Bill
+          populate: {
+            path: "car", // Populate trường car từ Request
+            model: "Car",
+          },
+        })
+        .exec();
+      return res.status(200).json({ bill });
+    } else {
+      return res
+        .status(401)
+        .json({ message: "Request status have no data !!" });
+    }
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+};
+
+const userpayment = async (req, res) => {
+  const { billId } = req.params;
+  console.log(billId);
+  try {
+    return res.send(`
+    <h1>Thanh toán thành công!</h1>
+    <p>Cảm ơn bạn đã thanh toán.</p>
+  `);
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports = {
   getAllBill,
   toggleBillStatus,
   useBookingBill,
   userConfirmDoneBill,
   getBillByRequestId,
+  adminUpdatePenaltyFee,
+  userpayment,
+  getBillById,
 };

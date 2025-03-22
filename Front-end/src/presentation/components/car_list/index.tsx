@@ -64,7 +64,7 @@ const CarList: React.FC = () => {
   };
 
   useEffect(() => {
-    onGetData();
+    getListCarFree();
   }, []);
 
   const onGetData = async () => {
@@ -81,59 +81,15 @@ const CarList: React.FC = () => {
   const getListCarFree = async () => {
     await axiosInstance.get('/car/getAllCarFree', {
       params: {
-        key: [dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]), dayjs(fomatDate(dateValue[1]) + " " + timeValue[1])],
+        key: [dayjs(fomatDate(dateValue[0]) + " " + timeValue[0]).toDate(), dayjs(fomatDate(dateValue[1]) + " " + timeValue[1]).toDate()],
       }
     })
-      .then(res => setCarList(res.data))
+      .then(res => {
+        setFilteredCars(res.data);
+      })
       .catch(err => console.log(err))
   }
 
-  // const onSetListDataNumberOfSeat = async (list: number[]) => {
-  //   if (list.length > 0) {
-  //     try {
-  //       const res = await axiosInstance.post("/car/filterCarByNumberOfSeat", list);
-  //       setCarList(res.data);
-  //       setFilteredCars(res.data);
-  //     } catch (err) {
-  //       console.log(err);
-  //       message.error("Lỗi khi lọc theo số chỗ!");
-  //     }
-  //   } else {
-  //     onGetData();
-  //   }
-  // };
-
-  // const onSetListDataTransmissionType = async (list: boolean[]) => {
-  //   if (list.length > 0) {
-  //     try {
-  //       const res = await axiosInstance.post("/car/filterCarByTransmissionType", list);
-  //       setCarList(res.data);
-  //       setFilteredCars(res.data);
-  //     } catch (err) {
-  //       console.log(err);
-  //       message.error("Lỗi khi lọc theo loại xe!");
-  //     }
-  //   } else {
-  //     onGetData();
-  //   }
-  // };
-
-  // const onSetListDataFlue = async (list: number[]) => {
-  //   if (list.length > 0) {
-  //     try {
-  //       const res = await axiosInstance.post("/car/filterCarByFlue", list);
-  //       setCarList(res.data);
-  //       setFilteredCars(res.data);
-  //     } catch (err) {
-  //       console.log(err);
-  //       message.error("Lỗi khi lọc theo nhiên liệu!");
-  //     }
-  //   } else {
-  //     onGetData();
-  //   }
-  // };
-
-  // Pagination logic
   const indexOfLastCar = currentPage * itemsPerPage;
   const indexOfFirstCar = indexOfLastCar - itemsPerPage;
   const currentCars = filteredCars?.slice(indexOfFirstCar, indexOfLastCar) || [];
