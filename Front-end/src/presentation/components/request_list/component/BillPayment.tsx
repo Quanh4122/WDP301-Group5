@@ -4,19 +4,25 @@ import { useLocation, useNavigate } from "react-router-dom";
 import dayjs from "dayjs"; // Để định dạng ngày giờ
 import axiosInstance from "../../utils/axios";
 import { BillModal } from "../../list_request_admin/Modals";
+import { toast } from "react-toastify";
 
 
 const BillDetail: React.FC<{ bill?: BillModal }> = ({ bill }) => {
 
     const navigate = useNavigate();
-
-
-
     // Hàm xử lý khi nhấn nút Submit
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         console.log("Submitted bill:", bill);
-        // Thêm logic gọi API hoặc chuyển hướng nếu cần
-        // Ví dụ: navigate("/success");
+        const data = {
+            billId: bill?._id,
+            requestId: bill?.request._id
+        }
+        await axiosInstance.put("/bill/userAcceptPayment", data)
+            .then(res => {
+                toast.success("Thanh toán thành công !!!")
+                setTimeout(() => navigate("/"), 2000);
+            })
+            .catch(err => toast.error("Thanh toán thất bại !!!"))
     };
 
     return (

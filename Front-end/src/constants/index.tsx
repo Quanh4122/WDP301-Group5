@@ -314,3 +314,11 @@ export const TranmissionType = [
   { lable: "Số tự động", value: true },
   { lable: "Số sàn", value: false },
 ]
+
+export const statusRequestAdminView = [
+  { lable: "Trong thời gian thực hiện", value: "2" },
+  { lable: "Đợi đánh giá tình trạng và thông báo tiền", value: "3" },
+  { lable: "Đợi khách thanh toán", value: "4" },
+  { lable: "Đã thanh toán thành công", value: "5" },
+  { lable: "Đã bị hủy", value: "6" },
+]

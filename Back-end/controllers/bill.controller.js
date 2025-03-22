@@ -85,8 +85,8 @@ const useBookingBill = async (req, res) => {
           style: "currency",
           currency: "VND",
         }),
-      data.request.startDate,
-      data.request.endDate,
+      dayjs(data.request.startDate).format("HH:mm DD/MM/YYYY"),
+      dayjs(data.request.endDate).format("HH:mm DD/MM/YYYY"),
       data.request.pickUpLocation
     );
 
@@ -230,14 +230,30 @@ const getBillById = async (req, res) => {
   }
 };
 
-const userpayment = async (req, res) => {
-  const { billId } = req.params;
-  console.log(billId);
+const userAcceptPayment = async (req, res) => {
+  const data = req.body;
   try {
-    return res.send(`
-    <h1>Thanh toán thành công!</h1>
-    <p>Cảm ơn bạn đã thanh toán.</p>
-  `);
+    if (data.billId && data.requestId) {
+      await BillModel.updateOne(
+        {
+          _id: data.billId,
+        },
+        {
+          billStatus: true,
+        }
+      );
+      await RequestModel.updateOne(
+        {
+          _id: data.requestId,
+        },
+        {
+          requestStatus: "5",
+        }
+      );
+      return res.status(200).json({ message: "Successfull Pay !!!" });
+    } else {
+      res.status(300).json({ message: "BillID or RequestID may be null !!" });
+    }
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -250,6 +266,6 @@ module.exports = {
   userConfirmDoneBill,
   getBillByRequestId,
   adminUpdatePenaltyFee,
-  userpayment,
   getBillById,
+  userAcceptPayment,
 };
