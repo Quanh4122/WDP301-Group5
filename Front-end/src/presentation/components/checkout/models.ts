@@ -76,3 +76,28 @@ export type CarType = {
     flue: number,
     transmissionType: boolean,
 }
+
+export type RequestUserBookingToBill = {
+    request : RequestDataToBill,
+    billData: BillInfoUserBooking
+    userName?: string,
+}
+
+export type RequestDataToBill = {
+    _id?: string,
+    userId?: string,
+    startDate: any,
+    endDate: any,
+    requestStatus: string,
+    isRequestDriver?: Boolean,
+    car? :string[],
+    pickUpLocation?: string,
+    dropLocation?: string,
+    emailRequest?: string,
+}
+
+export type BillInfoUserBooking = {
+    vatFee: number,
+    totalCarFee: number,
+    depositFee: number
+}

@@ -9,6 +9,7 @@ const CLIENT_URL = process.env.CLIENT_PORT;
 const { UserController } = require("./controllers");
 const WebSocket = require("ws");
 const RequestModel = require("./models/request.model");
+const BillModel = require("./models/bill.model");
 const http = require("http");
 const moment = require("moment-timezone");
 const NotifyExtendBill = require("./Templates/Mail/notifyExtentionBill");
@@ -75,20 +76,30 @@ const updateRequestStatus = async (request) => {
 
 const sendEmailRequestStatus3 = async (item) => {
   const now = dayjs();
-  const threeHoursLater = now.add(3, "hour");
+  const hoursLater = now.add(2, "hour");
   const start = dayjs(item.startDate);
   const end = dayjs(item.endDate);
-  if (end.isAfter(now) && end.isBefore(threeHoursLater)) {
-    console.log(item);
+  if (end.isAfter(now) && end.isBefore(hoursLater)) {
     const startDate = start.format("HH:mm, DD/MM/YYYY");
     const endDate = end.format("HH:mm, DD/MM/YYYY");
-    // Thêm phần update Item lên status 3 ( gần đến lúc trả xe)
-    const detailRequestURL = `http://localhost:3000/app/request-in-expire?requestId=${item._id}`;
+
+    await RequestModel.updateOne(
+      {
+        _id: item._id,
+      },
+      {
+        requestStatus: "3",
+      }
+    );
+
+    const bill = await BillModel.findOne({ request: item._id });
+    const detailRequestURL = `http://localhost:3000/app/request-in-expire?requestId=${item._id}&billId=${bill._id}`;
     const emailContent = await NotifyExtendBill(
       `${item.user.userName}`,
       startDate,
       endDate,
       item.pickUpLocation,
+      item.dropLocation,
       detailRequestURL
     );
     await mailService.sendEmail({
@@ -99,7 +110,7 @@ const sendEmailRequestStatus3 = async (item) => {
   }
 };
 
-const getListRequestStatus2AndSendMai = async () => {
+const getListRequestStatus2AndSendMail = async () => {
   const request = await RequestModel.find({
     requestStatus: "2",
   })
@@ -109,14 +120,13 @@ const getListRequestStatus2AndSendMai = async () => {
       "carName color licensePlateNumber price carVersion images numberOfSeat"
     );
   request.map((item) => sendEmailRequestStatus3(item));
-  //console.log("Check status 2");
 };
 
 setInterval(async () => {
   try {
-    getListRequestStatus2AndSendMai();
+    getListRequestStatus2AndSendMail();
   } catch (error) {}
-}, 6000000);
+}, 10000);
 
 route(server);
 

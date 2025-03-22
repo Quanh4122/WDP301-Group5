@@ -18,16 +18,7 @@ const RequestList: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const uId = queryParams.get("userId");
-        if (uId) {
-            setIsDisplayReject(true);
-            getListCar(uId);
-        } else {
-            getListCar(location.state?.userId);
-        }
-    }, []);
+
 
     // Reset trang về 1 khi danh sách requestInPending thay đổi
     useEffect(() => {

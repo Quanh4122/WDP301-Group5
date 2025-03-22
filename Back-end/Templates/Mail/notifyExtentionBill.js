@@ -1,4 +1,4 @@
-module.exports = (name, start, end, location, link) => {
+module.exports = (name, start, end, pickUplocation, dropLocation, link) => {
   return `<!DOCTYPE html>
       <html>
       <head>
@@ -137,9 +137,10 @@ module.exports = (name, start, end, location, link) => {
                       <h3>Chi tiết đặt xe</h3>
                       <p><strong>Từ:</strong> ${start}</p>
                       <p><strong>Đến:</strong> ${end}</p>
-                      <p><strong>Nơi nhận xe:</strong> ${location}</p>
+                      <p><strong>Nơi nhận xe:</strong> ${pickUplocation}</p>
+                      <p><strong>Nơi trả xe:</strong> ${dropLocation}</p>
                   </div>
-                  <p class="cta">Bạn có muốn gia hạn thêm thời gian không?</p>
+                  <p class="cta">Hãy click nút để xác nhận bạn đã trả xe nhé</p>
                   <a href="${link}" class="button">Chi tiết đơn</a>
               </div>
               <div class="footer">

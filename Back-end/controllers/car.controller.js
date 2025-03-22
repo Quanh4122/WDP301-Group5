@@ -108,7 +108,6 @@ const createCar = async (req, res) => {
     carStatus,
     carVersion,
     color,
-    images,
     licensePlateNumber,
     numberOfSeat,
     price,

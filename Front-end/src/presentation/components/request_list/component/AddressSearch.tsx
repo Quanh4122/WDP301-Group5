@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { debounce } from 'lodash';
 import { Input, List } from 'antd';
 import axiosInstance from '../../utils/axios';
@@ -10,30 +10,26 @@ interface Address {
 }
 
 interface AddressSearchProps {
-    addressBooking: (value: string) => void;
-    title: string;
-    isRequire: boolean;
-    value?: string; // Giá trị từ component cha
+    addressBooking?: (value: string) => void; // Optional callback ra ngoài
+    title?: string;
+    isRequire?: boolean;
+    value?: string; // Giá trị từ Form.Item
+    onChange?: (value: string) => void; // Hàm để cập nhật giá trị cho Form.Item
 }
 
-const AddressSearch: React.FC<AddressSearchProps> = ({ addressBooking, title, isRequire, value }) => {
-    const [query, setQuery] = useState<string>(value || '');
-    const [suggestions, setSuggestions] = useState<Address[]>([]);
-    const [tempSuggestions, setTempSuggestions] = useState<Address[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    // Đồng bộ query với value từ props khi value thay đổi
-    useEffect(() => {
-        console.log('AddressSearch - Received value from props:', value);
-        if (value !== undefined && value !== query) {
-            setQuery(value); // Cập nhật query khi value thay đổi
-        }
-    }, [value]);
+const AddressSearch: React.FC<AddressSearchProps> = ({
+    addressBooking,
+    title,
+    isRequire,
+    value = '', // Giá trị mặc định nếu không có
+    onChange,
+}) => {
+    const [suggestions, setSuggestions] = React.useState<Address[]>([]);
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
     // Gọi API backend để tìm kiếm địa chỉ với debounce
     const debouncedSearch = debounce(async (searchQuery: string) => {
         if (searchQuery.length < 3) {
-            setTempSuggestions([]);
             setSuggestions([]);
             return;
         }
@@ -43,32 +39,31 @@ const AddressSearch: React.FC<AddressSearchProps> = ({ addressBooking, title, is
             const response = await axiosInstance.get('/request/search-address', {
                 params: { q: searchQuery },
             });
-            setTempSuggestions(response.data);
+            setSuggestions(response.data);
         } catch (error) {
             console.error('Lỗi khi tìm kiếm:', error);
-            setTempSuggestions([]);
+            setSuggestions([]);
         } finally {
             setIsLoading(false);
         }
     }, 500);
 
-    // Khi tempSuggestions thay đổi, cập nhật suggestions
-    useEffect(() => {
-        if (!isLoading) {
-            setSuggestions(tempSuggestions);
-        }
-    }, [tempSuggestions, isLoading]);
-
     const handleSearch = (searchQuery: string) => {
-        setQuery(searchQuery);
+        if (onChange) {
+            onChange(searchQuery); // Cập nhật giá trị cho Form.Item
+        }
         debouncedSearch(searchQuery);
     };
 
     const handleSelect = (address: Address) => {
         const addressString = address.display_name;
-        setQuery(addressString);
+        if (onChange) {
+            onChange(addressString); // Cập nhật giá trị cho Form.Item
+        }
         setSuggestions([]);
-        addressBooking(addressString); // Cập nhật giá trị ra ngoài
+        if (addressBooking) {
+            addressBooking(addressString); // Gọi callback ra ngoài nếu có
+        }
         console.log('AddressSearch - Selected address:', addressString);
     };
 
@@ -78,7 +73,7 @@ const AddressSearch: React.FC<AddressSearchProps> = ({ addressBooking, title, is
                 {title} {isRequire && <span className="text-red-500">*</span>}
             </label>
             <Input
-                value={query}
+                value={value} // Sử dụng value từ Form.Item
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Nhập địa chỉ (ví dụ: Ninh Bình)"
                 className="w-full mb-2 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"

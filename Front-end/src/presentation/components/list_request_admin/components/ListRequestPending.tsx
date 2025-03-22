@@ -6,6 +6,7 @@ import { statusRequest } from "../../../../constants";
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
+import PenaltyModal from "./PenaltyModal";
 
 interface Props {
     requestList: RequestModelFull[] | [];
@@ -14,10 +15,26 @@ interface Props {
 const ListRequestPending = ({ requestList }: Props) => {
     const [listData, setListData] = useState<RequestModelFull[] | []>([]);
     const navigate = useNavigate();
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     useEffect(() => {
         setListData(requestList);
     }, [requestList]);
+
+
+
+    const handleOpenModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleSuccess = () => {
+        console.log("Cập nhật phí phạt thành công!");
+        // Có thể reload dữ liệu hoặc điều hướng
+    };
 
     return (
         <div className="w-full mt-5">
@@ -43,15 +60,21 @@ const ListRequestPending = ({ requestList }: Props) => {
                         <div className="flex items-center space-x-4">
                             <div className="text-sm text-gray-600">{dayjs(item.timeCreated).format("DD/MM/YYYY")}</div>
                             <div className="text-sm text-blue-600">{statusRequest.find((dt) => dt.value == item.requestStatus)?.lable}</div> {/* Blue text */}
-                            {item.requestStatus === "2" && (
+                            {item.requestStatus === "3" && (
                                 <Button
-                                    onClick={() => navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST, { state: item })}
+                                    onClick={() => setIsModalVisible(true)}
                                     className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md px-3 py-1" // Light blue button
                                 >
-                                    Chi tiết
+                                    Xem báo cáo
                                 </Button>
                             )}
                         </div>
+                        <PenaltyModal
+                            visible={isModalVisible}
+                            requestId={item._id} // Thay bằng requestId thực tế
+                            onClose={handleCloseModal}
+                            onSuccess={handleSuccess}
+                        />
                     </div>
 
                     {/* Car Info */}
