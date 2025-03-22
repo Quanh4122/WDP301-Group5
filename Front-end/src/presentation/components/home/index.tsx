@@ -12,8 +12,8 @@ const HomePage = () => {
             <CarLogoCarousel />
             <HeroSection />
             <FeatureSection listContent={"Xe được yêu thích nhất"} />
-            <FeatureSection listContent={"Xe có ngay"} />
-            <Feature/>
+            {/* <FeatureSection listContent={"Xe có ngay"} /> */}
+            <Feature />
         </>
     )
 }

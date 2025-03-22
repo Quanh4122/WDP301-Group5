@@ -1,7 +1,7 @@
 export type CarType = {
     _id ? : string,
     bunkBed : Boolean,
-    flue : Number,
+    flue : number,
     transmissionType : Boolean,
 }
 

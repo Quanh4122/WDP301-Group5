@@ -75,10 +75,19 @@ const CarDetail = () => {
         ])
     }
 
-    const fomatDate = (date: string) => {
-        const arr = date.split('/')
-        return arr[1] + "/" + arr[0] + "/" + arr[2]
-    }
+    const formatDate = (date: string): string => {
+        const arr = date.split("/");
+        return `${arr[1]}/${arr[0]}/${arr[2]}`;
+    };
+    const [totalTime, setTotalTime] = useState(
+        dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour")
+    );
+    const [totalPrice, setTotalPrice] = useState((carDetail?.price || 0) * totalTime);
+    useEffect(() => {
+        const val = dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour");
+        setTotalTime(val);
+        setTotalPrice((carDetail?.price || 0) * val);
+    }, [timeValue, dateValue]);
 
     const onBooking = async () => {
         const data = {
@@ -288,15 +297,15 @@ const CarDetail = () => {
                 <div className="w-1/3 h-fit p-2">
                     <div className="w-full h-auto shadow-lg p-3 rounded-lg border">
                         <div className="w-3/4 flex flex-wrap items-center">
-                            <div className="text-2xl font-semibold text-sky-500 w-1/2">500k/4 giờ</div>
-                            <div className="text-gray-500 w-1/2">700K/8 giờ</div>
-                            <div className="text-gray-500 w-1/2">800K/12 giờ</div>
-                            <div className="text-gray-500 w-1/2" >1100K/24 giờ</div>
+                            <div className="text-2xl font-semibold text-sky-500 w-1/2">{((carDetail?.price || 0) * 4 / 1000).toLocaleString()}k/4 giờ</div>
+                            <div className="text-gray-500 w-1/2">{((carDetail?.price || 0) * 8 / 1000 * 0.3).toLocaleString()}k/8 giờ</div>
+                            <div className="text-gray-500 w-1/2">{((carDetail?.price || 0) * 12 / 1000 * 0.3).toLocaleString()}k/12 giờ</div>
+                            <div className="text-gray-500 w-1/2" >{((carDetail?.price || 0) * 24 / 1000 * 0.5).toLocaleString()}k/24 giờ</div>
                         </div>
                         <p className="text-xs text-gray-500 mt-5">
                             Đơn giá gói chỉ áp dụng cho ngày thường. Giá ngày Lễ/Tết có thể điều chỉnh theo nhu cầu.
                         </p>
-                        {/* <div
+                        <div
                             className="w-full border-2 h-16  rounded-md flex items-center"
 
                         >
@@ -318,7 +327,7 @@ const CarDetail = () => {
                                 title={"Thời gian thuê xe"}
                                 element={<CarCalendar setDateValue={getDateValue} setTimeValue={getTimeValue} onSubmit={() => setIsOpenModalN(false)} />}
                             />
-                        </div> */}
+                        </div>
                         <div className="mt-5 flex justify-between border-b-2 h-10">
                             <p className="font-semibold text-sm text-gray-600">
                                 Phí thuê xe
@@ -330,20 +339,28 @@ const CarDetail = () => {
                                     element={<CarRentalFeeModal />}
                                 />
                             </p>
-                            <div className="font-semibold text-sm text-gray-700">2.700.000₫</div>
+                            <div className="font-semibold text-sm text-gray-700">{carDetail?.price.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            })
+                            }</div>
                         </div>
                         <div className="mt-5 flex justify-between h-10">
                             <p className="font-semibold text-sm text-gray-600">
-                                Phí thuê xe
+                                Tổng thời gian thuê
                                 <span></span>
                             </p>
-                            <div className="font-semibold text-sm text-gray-700">2.700.000₫</div>
+                            <div className="font-semibold text-sm text-gray-700">{totalTime}</div>
                         </div>
                         <div className="flex justify-between h-10">
                             <p className="font-semibold text-sm text-gray-600">
                                 Tổng cộng tiền thuê
                             </p>
-                            <div className="font-semibold text-sm text-gray-700">2.592.000₫</div>
+                            <div className="font-semibold text-sm text-gray-700">{totalPrice.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            })}
+                            </div>
                         </div>
                         <div className="flex justify-between h-10 items-end">
                             <p className="font-semibold text-sm text-gray-600">
@@ -360,7 +377,7 @@ const CarDetail = () => {
                                 Cọc xe
                                 <span></span>
                             </p>
-                            <div className="font-semibold text-sm text-gray-700">3.000.000₫</div>
+                            <div className="font-semibold text-sm text-gray-700">500.000₫</div>
                         </div>
                         <p className="text-xs text-gray-500">
                             Thanh toán sau khi nhận và kiểm tra xe, không nhận cọc xe máy.

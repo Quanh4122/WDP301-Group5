@@ -61,7 +61,7 @@ export type CarModel = {
     numberOfSeat?: string,
     price: number,
     images: string[],
-    cartype?: CarType
+    carType?: CarType
 }
 
 export type DriverModel = {

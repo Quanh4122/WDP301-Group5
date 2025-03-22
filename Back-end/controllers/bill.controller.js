@@ -210,7 +210,7 @@ const getBillById = async (req, res) => {
   const billId = req.query.key;
   try {
     if (billId) {
-      const bill = await BillModel.findOne({ request: billId })
+      const bill = await BillModel.findOne({ _id: billId })
         .populate({
           path: "request", // Populate trường request từ Bill
           populate: {
@@ -219,7 +219,7 @@ const getBillById = async (req, res) => {
           },
         })
         .exec();
-      return res.status(200).json({ bill });
+      return res.status(200).json(bill);
     } else {
       return res
         .status(401)

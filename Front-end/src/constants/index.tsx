@@ -295,3 +295,22 @@ export const statusRequest = [
   { lable: "Accepted", value: "3" },
   { lable: "Denined", value: "4" },
 ]
+
+export const NumberOfSeat = [
+  { lable: "4 chỗ", value: "4" },
+  { lable: "5 chỗ", value: "5" },
+  { lable: "7 chỗ", value: "7" },
+  { lable: "9 chỗ", value: "9" },
+]
+
+export const Flue = [
+  { lable: "Máy xăng", value: 1 },
+  { lable: "Máy dầu", value: 2 },
+  { lable: "Máy điện", value: 3 },
+]
+
+
+export const TranmissionType = [
+  { lable: "Số tự động", value: true },
+  { lable: "Số sàn", value: false },
+]
