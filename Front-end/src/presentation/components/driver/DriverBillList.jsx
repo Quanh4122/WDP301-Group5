@@ -7,16 +7,19 @@ const DriverBill = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Get driver ID from Redux auth slice
-  const driverId = useSelector((state) => state.auth.user?._id);
+  // Get auth state from Redux
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
+  const driverId = user?.userId; // Adjust based on your auth slice structure
 
   useEffect(() => {
+    console.log("Auth State:", { isLoggedIn, user, driverId });
+
     const fetchRequests = async () => {
       console.log("Fetching requests for driverId:", driverId);
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:3030/api/getRequestsByDriverId?driverId=${driverId}`
+          `http://localhost:3030/request/getRequestsByDriverId?driverId=${driverId}`
         );
         console.log("API Response:", response.data);
         setDriverRequests(response.data);
@@ -31,12 +34,20 @@ const DriverBill = () => {
     if (driverId) {
       fetchRequests();
     } else {
-      console.log("No driverId found");
       setError("Driver ID not found. Please log in.");
     }
   }, [driverId]);
 
-  console.log("Current driverRequests:", driverRequests);
+  // Check if not logged in
+  if (!isLoggedIn || !driverId) {
+    return (
+      <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-red-600 text-lg">Vui lòng đăng nhập để xem yêu cầu của bạn.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
