@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { RequestModelFull } from "../../checkout/models";
 import PersonIcon from '@mui/icons-material/Person';
 import dayjs from "dayjs";
-import { statusRequest } from "../../../../constants";
+import { statusRequest, statusRequestAdminView } from "../../../../constants";
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
@@ -59,8 +59,8 @@ const ListRequestPending = ({ requestList }: Props) => {
                         </div>
                         <div className="flex items-center space-x-4">
                             <div className="text-sm text-gray-600">{dayjs(item.timeCreated).format("DD/MM/YYYY")}</div>
-                            <div className="text-sm text-blue-600">{statusRequest.find((dt) => dt.value == item.requestStatus)?.lable}</div> {/* Blue text */}
-                            {item.requestStatus === "3" && (
+                            <div className="text-sm text-blue-600">{statusRequestAdminView.find((dt) => dt.value == item.requestStatus)?.lable}</div> {/* Blue text */}
+                            {(
                                 <Button
                                     onClick={() => setIsModalVisible(true)}
                                     className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md px-3 py-1" // Light blue button
@@ -96,7 +96,7 @@ const ListRequestPending = ({ requestList }: Props) => {
                                         <div className="text-sm text-gray-600">Số chỗ: {carItem.numberOfSeat}</div>
                                         <div className="text-sm text-gray-600">Biển số: {carItem.licensePlateNumber}</div>
                                         <div className="text-sm text-gray-600">
-                                            {(carItem.price * 1000).toLocaleString('vi-VN', {
+                                            {(carItem.price).toLocaleString('vi-VN', {
                                                 style: 'currency',
                                                 currency: 'VND',
                                             })}

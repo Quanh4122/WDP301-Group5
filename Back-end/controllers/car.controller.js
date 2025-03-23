@@ -157,7 +157,7 @@ const getAllCarFree = async (req, res) => {
   if (data[0] && data[1]) {
     const listCarInAcceptRequest = await RequestModel.find(
       {
-        requestStatus: "3",
+        requestStatus: { $nin: ["1", "5"] },
         $or: [
           {
             startDate: { $lte: data[0] },

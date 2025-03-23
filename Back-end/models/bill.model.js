@@ -10,13 +10,13 @@ const BillSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
-  vatFeed: {
+  vatFee: {
     type: Number,
-    required: true,
+    required: false,
   },
   totalCarFee: {
     type: Number,
-    required: true,
+    required: false,
   },
   depositFee: {
     type: Number,
@@ -32,6 +32,10 @@ const BillSchema = new mongoose.Schema({
   },
   realImage: {
     type: String,
+    required: false,
+  },
+  penaltyFee: {
+    type: Number,
     required: false,
   },
 });

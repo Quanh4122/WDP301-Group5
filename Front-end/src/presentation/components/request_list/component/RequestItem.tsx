@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RequestModelFull } from "../../checkout/models";
 import dayjs from "dayjs";
-import { statusRequest } from "../../../../constants";
+import { statusRequest, statusRequestAdminView } from "../../../../constants";
 import PersonIcon from '@mui/icons-material/Person';
 import DetailRequestItem from "./DetailRequestItem";
 import { Button, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PRIVATE_ROUTES } from "../../../routes/CONSTANTS";
+import axiosInstance from "../../utils/axios";
+import { BillModal } from "../../list_request_admin/Modals";
 
 interface Props {
     requestModel: RequestModelFull;
@@ -15,22 +17,32 @@ interface Props {
 const RequestItem = ({ requestModel }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
+    const [billData, setBillData] = useState<BillModal>()
 
     const startDate = dayjs(requestModel.startDate).format("HH:mm, DD/MM/YYYY");
     const endDate = dayjs(requestModel.endDate).format("HH:mm, DD/MM/YYYY");
 
-    const onGoToBooking = () => {
-        navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING, {
-            state: requestModel,
-        });
-    };
+    useEffect(() => {
+        getBillByRequestId(requestModel._id)
+    }, [])
+
+    const getBillByRequestId = async (id: string) => {
+        axiosInstance.get("/bill/getBillByReuqestId", {
+            params: {
+                key: id
+            }
+        })
+            .then(res => setBillData(res.data))
+            .catch(err => console.log(err))
+    }
 
     return (
         <div className="w-full rounded-lg shadow-md mb-4 bg-white">
             {/* Header */}
             <div className="p-4 border-b flex items-center justify-between">
                 <div className="font-semibold text-lg">
-                    {statusRequest.find((item) => item.value === requestModel.requestStatus)?.lable}
+                    <div className="text-sm text-gray-600">{dayjs(requestModel.timeCreated).format("DD/MM/YYYY")}</div>
+                    <div className="text-sm text-blue-600">{statusRequestAdminView.find((dt) => dt.value == requestModel.requestStatus)?.lable}</div> {/* Blue text */}
                 </div>
                 <Button onClick={() => setIsOpen(true)}>Xem chi tiết</Button>
             </div>
@@ -63,7 +75,7 @@ const RequestItem = ({ requestModel }: Props) => {
 
                     {/* Price */}
                     <div className="font-semibold">
-                        {(item.price * 1000).toLocaleString('vi-VN', {
+                        {(item.price).toLocaleString('vi-VN', {
                             style: 'currency',
                             currency: 'VND'
                         })}
@@ -74,7 +86,7 @@ const RequestItem = ({ requestModel }: Props) => {
             {/* Total */}
             <div className="p-4 flex justify-end">
                 <div className="font-semibold text-lg">
-                    Tổng: {(requestModel.car.reduce((acc, car) => acc + car.price * 1000, 0)).toLocaleString('vi-VN', {
+                    Tổng: {(requestModel.car.reduce((acc, car) => acc + car.price, 0)).toLocaleString('vi-VN', {
                         style: 'currency',
                         currency: 'VND'
                     })}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, InputNumber, Spin, Typography, List } from "antd";
+import { Modal, Button, Form, InputNumber, Spin, Typography, List, Image } from "antd";
 import { useForm } from "antd/es/form/Form";
 import axiosInstance from "../../utils/axios"; // Đường dẫn đến axios instance của bạn
 import { toast } from "react-toastify";
@@ -22,7 +22,6 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
   onSuccess,
 }) => {
   const [billData, setBillData] = useState<BillModal | null>(null);
-  const [requestData, setRequestData] = useState<RequestModal | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [penaltyFee, setPenaltyFee] = useState<number | null>(null);
   const [form] = useForm();
@@ -69,16 +68,21 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
   const onSubmit = async (values: { penaltyFee: number }) => {
     setLoading(true);
     try {
-      // Gửi dữ liệu lên server
-      const response = await axiosInstance.post("/bill/getBillByReuqestId", {
-        // billId,
-        penaltyFee: values.penaltyFee,
-      });
+      if (billData?._id) {
+        const dataSubmit = {
+          billId: billData?._id,
+          penaltyFee: values.penaltyFee
+        }
+        // Gửi dữ liệu lên server
+        const response = await axiosInstance.put("/bill/adminUpdatePenaltyFee", dataSubmit);
+        toast.success("Cập nhật phí phạt thành công!");
+        form.resetFields();
+        onClose(); // Đóng modal
+        if (onSuccess) onSuccess(); // Gọi callback nếu có
+      } else {
+        console.log("Have no bill")
+      }
 
-      toast.success("Cập nhật phí phạt thành công!");
-      form.resetFields();
-      onClose(); // Đóng modal
-      if (onSuccess) onSuccess(); // Gọi callback nếu có
     } catch (error) {
       console.error(error);
       toast.error("Đã có lỗi xảy ra, vui lòng thử lại.");
@@ -138,34 +142,40 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
         {billData?.realImage && (
           <div>
             <Text strong>Ảnh xác nhận:</Text>
-            <img
-              src={billData?.realImage}
+            <Image
+              src={`http://localhost:3030${billData?.realImage}`}
               alt={`Real Image`}
-              className="w-full h-24 object-cover rounded-md shadow-sm"
+              className="w-10 h-10 object-cover rounded-md shadow-sm"
+              width={40}
+              height={40}
             />
           </div>
         )}
 
         {/* Form nhập phí phạt */}
-        <Form form={form} onFinish={onSubmit} layout="vertical">
-          <Form.Item
-            name="penaltyFee"
-            label={<span className="font-medium text-gray-700">Phí phạt (VNĐ)</span>}
-            rules={[
-              { required: true, message: "Vui lòng nhập số tiền phạt" },
-              { type: "number", min: 0, message: "Phí phạt không thể âm" },
-            ]}
-          >
-            <InputNumber
-              value={penaltyFee}
-              onChange={(value) => setPenaltyFee(value)}
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
-              className="w-full"
-              placeholder="Nhập số tiền phạt"
-            />
-          </Form.Item>
-        </Form>
+        {
+          billData?.request.requestStatus == "3" &&
+          <Form form={form} onFinish={onSubmit} layout="vertical">
+            <Form.Item
+              name="penaltyFee"
+              label={<span className="font-medium text-gray-700">Phí phạt (VNĐ)</span>}
+              rules={[
+                { required: true, message: "Vui lòng nhập số tiền phạt" },
+                { type: "number", min: 0, message: "Phí phạt không thể âm" },
+              ]}
+            >
+              <InputNumber
+                value={penaltyFee}
+                onChange={(value) => setPenaltyFee(value)}
+                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
+                className="w-full"
+                placeholder="Nhập số tiền phạt"
+              />
+            </Form.Item>
+          </Form>
+        }
+
       </div>
     );
   };
@@ -175,7 +185,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       title={<span className="text-xl font-bold">Thông Tin Hóa Đơn và Phí Phạt</span>}
       open={visible}
       onCancel={onClose}
-      footer={[
+      footer={billData?.request.requestStatus == "3" && [
         <Button key="cancel" onClick={onClose} disabled={loading}>
           Hủy
         </Button>,

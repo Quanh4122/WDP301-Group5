@@ -1,9 +1,10 @@
 export type BillModal = {
     _id: string,
     billStatus: boolean,
-    vatFee: Number,
-    totalCarFee: Number,
-    depositFee: Number,
+    vatFee: number,
+    totalCarFee: number,
+    depositFee: number,
+    penaltyFee: number,
     realImage:string,
     realTimeDrop: string,
     realLocationDrop: string,

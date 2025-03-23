@@ -8,11 +8,16 @@ const AdminRequest = () => {
     const [requestDataPending, setRequestDataPending] = useState<RequestModelFull[] | []>([]);
     const [requestDataAccepted, setRequestDataAccepted] = useState<RequestModelFull[] | []>([]);
     const [requestDataDenied, setRequestDataDenied] = useState<RequestModelFull[] | []>([]);
-    const [dataDisplay, setDataDisplay] = useState<RequestModelFull[] | []>(requestDataPending); // Initialize with pending data
+    const [requestDataInBooking, setRequestInBooking] = useState<RequestModelFull[] | []>([]);
+    const [requestDataInAdminFee, setRequestInAdminFee] = useState<RequestModelFull[] | []>([]);
+    const [requestDataInAdminWatiToPay, setRequestInAdminWatiToPay] = useState<RequestModelFull[] | []>([]);
+    const [requestDataDoneBill, setRequestDoneBill] = useState<RequestModelFull[] | []>([]);
+    const [dataDisplay, setDataDisplay] = useState<RequestModelFull[] | []>(requestDataInBooking); // Initialize with pending data
 
     const optionRequest = [
         { label: "Đang thực hiện", value: "Đang thực hiện" },
-        { label: "Chờ xác nhận thanh toán", value: "Chờ xác nhận thanh toán" },
+        { label: "Đang chờ đánh giá", value: "Đang chờ đánh giá" },
+        { label: "Đang chờ người dùng thanh toán", value: "Đang chờ người dùng thanh toán" },
         { label: "Hoàn thành thanh toán", value: "Hoàn thành thanh toán" },
     ];
 
@@ -35,17 +40,25 @@ const AdminRequest = () => {
 
     const setListRequest = (listRequest: RequestModelFull[]) => {
         setRequestDataPending(listRequest.filter((item) => item.requestStatus === '2'));
-        setRequestDataAccepted(listRequest.filter((item) => item.requestStatus === '3'));
-        setRequestDataDenied(listRequest.filter((item) => item.requestStatus === '4'));
+        setRequestDataAccepted(listRequest.filter((item) => item.requestStatus === '4'));
+        setRequestDataDenied(listRequest.filter((item) => item.requestStatus === '5'));
+
+        // Sửa
+        setRequestInBooking(listRequest.filter((item) => item.requestStatus == '2'))
+        setRequestInAdminFee(listRequest.filter((item) => item.requestStatus == '3'))
+        setRequestInAdminWatiToPay(listRequest.filter((item) => item.requestStatus == '4'))
+        setRequestDoneBill(listRequest.filter((item) => item.requestStatus == '5'))
     };
 
     const onChangeValue = (value: string) => {
         if (value === 'Đang thực hiện') {
-            setDataDisplay(requestDataPending);
-        } else if (value === 'Chờ xác nhận thanh toán') {
-            setDataDisplay(requestDataAccepted);
+            setDataDisplay(requestDataInBooking);
+        } else if (value === 'Đang chờ đánh giá') {
+            setDataDisplay(requestDataInAdminFee);
+        } else if (value === 'Đang chờ người dùng thanh toán') {
+            setDataDisplay(requestDataInAdminWatiToPay);
         } else {
-            setDataDisplay(requestDataDenied);
+            setDataDisplay(requestDataDoneBill);
         }
     };
 
