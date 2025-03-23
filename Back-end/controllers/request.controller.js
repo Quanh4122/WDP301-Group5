@@ -6,6 +6,7 @@ const NotifyRequest = require("../Templates/Mail/notifyRequest");
 const NotifyBill = require("../Templates/Mail/notifyBill");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
+const mongoose = require("mongoose");
 
 const createRequest = async (req, res) => {
   const data = req.body;
@@ -351,7 +352,44 @@ const getRequestById = async (req, res) => {
   }
 };
 
-const selectFavoritCar = async (req, res) => {
+const getRequestsByDriverId = async (req, res) => {
+  const { driverId } = req.query; // Lấy driverId từ query params
+
+  if (!mongoose.Types.ObjectId.isValid(driverId)) {
+    return res.status(400).json({ message: "Invalid driverId format" });
+  }
+
+  try {
+    const requestList = await RequestModel.find({ driver: new mongoose.Types.ObjectId(driverId) })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+
+    return res.status(200).json(requestList.length ? requestList : []);
+  } catch (error) {
+    console.error("Error fetching requests by driver ID:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getAllRequests = async (req, res) => {
+  try {
+    const requests = await RequestModel.find();
+
+    if (!requests.length) {
+      return res.status(404).json({ message: "No requests found" });
+    }
+
+    res.status(200).json(requests);
+  } catch (error) {
+    console.error("Error fetching requests:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const selectFavoriteCar = async (req, res) => {
   try {
     // // Bước 1: Lấy top 3 xe xuất hiện nhiều nhất trong request
     // const topCarsFromRequests = await RequestModel.aggregate([
@@ -483,5 +521,7 @@ module.exports = {
   handleCheckRequest,
   getAddress,
   getRequestById,
-  selectFavoritCar,
+  selectFavoriteCar,
+  getRequestsByDriverId,
+  getAllRequests
 };

@@ -10,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ReceiptIcon from '@mui/icons-material/Receipt'; // Thêm icon cho bill
 
 const Navbar: React.FC = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -142,6 +143,14 @@ const Navbar: React.FC = () => {
                 </li>
               </>
             )}
+            {/* Thêm nút Xem Bill cho Driver */}
+            {isLoggedIn && user?.role === "Driver" && (
+              <li>
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`}>
+                  <button className="text-lg hover:text-sky-500 transition-colors duration-200">Xem Chuyến Xe</button>
+                </Link>
+              </li>
+            )}
           </ul>
 
           {/* Desktop Actions */}
@@ -149,10 +158,7 @@ const Navbar: React.FC = () => {
             {isLoggedIn && user ? (
               <>
                 <div className="relative">
-                  <button
-                    onClick={toggleModal}
-                    className="focus:outline-none"
-                  >
+                  <button onClick={toggleModal} className="focus:outline-none">
                     {avatarPreview ? (
                       <img
                         src={avatarPreview}
@@ -165,7 +171,6 @@ const Navbar: React.FC = () => {
                   </button>
                   {isModalOpen && (
                     <div className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-xl z-50 border border-gray-200 overflow-hidden">
-                      {/* Header */}
                       <div className="bg-gradient-to-r from-sky-500 to-sky-700 p-4 flex items-center space-x-3">
                         {avatarPreview ? (
                           <img
@@ -181,7 +186,6 @@ const Navbar: React.FC = () => {
                           <p className="text-sm opacity-80">{user.role}</p>
                         </div>
                       </div>
-                      {/* Menu */}
                       <ul className="py-2">
                         <li>
                           <button
@@ -194,14 +198,26 @@ const Navbar: React.FC = () => {
                         </li>
                         {user.role === "User" && (
                           <li>
-                          <button
-                            onClick={onViewListRequest}
-                            className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-600 transition-colors duration-200 flex items-center space-x-3"
-                          >
-                            <ShoppingCartIcon className="text-gray-500" />
-                            <span className="font-medium">Giỏ hàng</span>
-                          </button>
-                        </li>
+                            <button
+                              onClick={onViewListRequest}
+                              className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-600 transition-colors duration-200 flex items-center space-x-3"
+                            >
+                              <ShoppingCartIcon className="text-gray-500" />
+                              <span className="font-medium">Giỏ hàng</span>
+                            </button>
+                          </li>
+                        )}
+                        {/* Thêm nút Xem Bill trong dropdown cho Driver */}
+                        {user.role === "Driver" && (
+                          <li>
+                            <Link
+                              to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`}
+                              className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-600 transition-colors duration-200 flex items-center space-x-3"
+                            >
+                              <ReceiptIcon className="text-gray-500" />
+                              <span className="font-medium">Xem Chuyến Xe</span>
+                            </Link>
+                          </li>
                         )}
                         <li>
                           <button
@@ -239,30 +255,26 @@ const Navbar: React.FC = () => {
         {/* Mobile Drawer */}
         {mobileDrawerOpen && (
           <div className="lg:hidden mt-4 flex flex-col space-y-4 border-t pt-4">
-            <Link
-              to="/"
-              onClick={() => setMobileDrawerOpen(false)}
-            >
-              <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">Trang chủ</button>
+            <Link to="/" onClick={() => setMobileDrawerOpen(false)}>
+              <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
+                Trang chủ
+              </button>
             </Link>
-            <Link
-              to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.CAR_LIST}`}
-              onClick={() => setMobileDrawerOpen(false)}
-            >
-              <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">Danh sách xe</button>
+            <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.CAR_LIST}`} onClick={() => setMobileDrawerOpen(false)}>
+              <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
+                Danh sách xe
+              </button>
             </Link>
-            <Link
-              to="app/blog"
-              onClick={() => setMobileDrawerOpen(false)}
-            >
-              <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">B-Car Blog</button>
+            <Link to="app/blog" onClick={() => setMobileDrawerOpen(false)}>
+              <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
+                B-Car Blog
+              </button>
             </Link>
             {isLoggedIn && user?.role === "Admin" && (
-              <Link
-                to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DASH_BOARD}`}
-                onClick={() => setMobileDrawerOpen(false)}
-              >
-                <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">Thống kê</button>
+              <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DASH_BOARD}`} onClick={() => setMobileDrawerOpen(false)}>
+                <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
+                  Thống kê
+                </button>
               </Link>
             )}
             {isLoggedIn && user?.role === "User" && (
@@ -270,7 +282,17 @@ const Navbar: React.FC = () => {
                 to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.APPLY_DRIVER}/${userIdPreview}`}
                 onClick={() => setMobileDrawerOpen(false)}
               >
-                <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">Ứng tuyển lái xe</button>
+                <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
+                  Ứng tuyển lái xe
+                </button>
+              </Link>
+            )}
+            {/* Thêm nút Xem Bill cho Driver trong Mobile Drawer */}
+            {isLoggedIn && user?.role === "Driver" && (
+              <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`} onClick={() => setMobileDrawerOpen(false)}>
+                <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
+                  Xem Chuyến Xe
+                </button>
               </Link>
             )}
             {isLoggedIn && user ? (
@@ -281,11 +303,7 @@ const Navbar: React.FC = () => {
                   onClick={() => setMobileDrawerOpen(false)}
                 >
                   {avatarPreview ? (
-                    <img
-                      src={avatarPreview}
-                      alt="Avatar Preview"
-                      className="w-8 h-8 rounded-full mr-2 object-cover"
-                    />
+                    <img src={avatarPreview} alt="Avatar Preview" className="w-8 h-8 rounded-full mr-2 object-cover" />
                   ) : (
                     <PersonIcon className="mr-2" />
                   )}

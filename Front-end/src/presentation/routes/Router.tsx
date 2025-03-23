@@ -36,6 +36,7 @@ import ChangeRoleAccount from "../components/admin/ChangeRoleAccount";
 import ManagerCar from "../components/manager_car";
 import RequestInExpire from "../components/request_list/component/RequestInExpire";
 import BillDetailPage from "../components/request_list/component/BillPayment";
+import DriverBill from "../components/driver/DriverBillList";
 
 const Router = () => {
 
@@ -183,6 +184,10 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BILL_PAYMENT,
             element: <ProtectedRoute requiredRole="User"><BillDetailPage /></ProtectedRoute>
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_BILL,
+            element: <ProtectedRoute requiredRole="Driver"><DriverBill /></ProtectedRoute>
         },
     ]
 
