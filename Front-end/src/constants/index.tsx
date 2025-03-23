@@ -295,3 +295,30 @@ export const statusRequest = [
   { lable: "Accepted", value: "3" },
   { lable: "Denined", value: "4" },
 ]
+
+export const NumberOfSeat = [
+  { lable: "4 chỗ", value: "4" },
+  { lable: "5 chỗ", value: "5" },
+  { lable: "7 chỗ", value: "7" },
+  { lable: "9 chỗ", value: "9" },
+]
+
+export const Flue = [
+  { lable: "Máy xăng", value: 1 },
+  { lable: "Máy dầu", value: 2 },
+  { lable: "Máy điện", value: 3 },
+]
+
+
+export const TranmissionType = [
+  { lable: "Số tự động", value: true },
+  { lable: "Số sàn", value: false },
+]
+
+export const statusRequestAdminView = [
+  { lable: "Trong thời gian thực hiện", value: "2" },
+  { lable: "Đợi đánh giá tình trạng và thông báo tiền", value: "3" },
+  { lable: "Đợi khách thanh toán", value: "4" },
+  { lable: "Đã thanh toán thành công", value: "5" },
+  { lable: "Đã bị hủy", value: "6" },
+]

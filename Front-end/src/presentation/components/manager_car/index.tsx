@@ -32,24 +32,27 @@ const CarList: React.FC = () => {
     const [selectedCar, setSelectedCar] = useState<Car | undefined>(undefined);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await axiosInstance.get("/car/getAllCar");
-                setCarList(res.data);
-            } catch (err) {
-                console.log(err);
-            }
-        };
         fetchData();
     }, []);
 
+    const fetchData = async () => {
+        try {
+            const res = await axiosInstance.get("/car/getAllCar");
+            setCarList(res.data);
+        } catch (err) {
+            console.log(err);
+        }
+    };
     const handleEdit = (car: Car) => {
         setSelectedCar(car);
         setIsDrawerVisible(true);
     };
 
-    const handleDelete = (carId: string) => {
-        console.log("Delete car:", carId);
+    const handleDelete = async (carId: string) => {
+        await axiosInstance.delete(`/car/deleteCar/${carId}`)
+            .then(res => fetchData())
+            .catch(err => console.log(err))
+
     };
 
     const handleCreate = () => {

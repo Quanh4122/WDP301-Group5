@@ -11,9 +11,9 @@ const HomePage = () => {
             <BannerSwiper />
             <CarLogoCarousel />
             <HeroSection />
-            <FeatureSection listContent={"Xe được yêu thích nhất"} />
-            <FeatureSection listContent={"Xe có ngay"} />
-            <Feature/>
+            <FeatureSection listContent={"Xe mới nhất"} />
+            {/* <FeatureSection listContent={"Xe có ngay"} /> */}
+            <Feature />
         </>
     )
 }

@@ -26,6 +26,7 @@ export type RequestModelFull = {
     requestStatus: string,
     isRequestDriver?: Boolean,
     timeCreated? : string,
+    pickUpLocation: string,
 }
 
 export type RequestModalForCallApi = {
@@ -44,7 +45,11 @@ export type RequestAcceptForApi = {
     endDate: any,
     requestStatus: string,
     isRequestDriver?: Boolean,
-    car? :string[]
+    car? :string[],
+    pickUpLocation?: string,
+    dropLocation?: string,
+    _id?: string,
+    emailRequest?: string,
 }
 
 export type CarModel = {
@@ -56,7 +61,7 @@ export type CarModel = {
     numberOfSeat?: string,
     price: number,
     images: string[],
-    cartype?: CarType
+    carType?: CarType
 }
 
 export type DriverModel = {
@@ -70,4 +75,29 @@ export type CarType = {
     bunkBed: boolean,
     flue: number,
     transmissionType: boolean,
+}
+
+export type RequestUserBookingToBill = {
+    request : RequestDataToBill,
+    billData: BillInfoUserBooking
+    userName?: string,
+}
+
+export type RequestDataToBill = {
+    _id?: string,
+    userId?: string,
+    startDate: any,
+    endDate: any,
+    requestStatus: string,
+    isRequestDriver?: Boolean,
+    car? :string[],
+    pickUpLocation?: string,
+    dropLocation?: string,
+    emailRequest?: string,
+}
+
+export type BillInfoUserBooking = {
+    vatFee: number,
+    totalCarFee: number,
+    depositFee: number
 }

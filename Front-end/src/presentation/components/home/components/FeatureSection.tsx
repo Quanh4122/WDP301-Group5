@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import { features } from "../../../../constants";
+import axiosInstance from "../../utils/axios";
 import CarItem from "./CarItem";
+import { CarModel } from "../../checkout/models";
 
 interface props {
   listContent: String
@@ -13,6 +16,18 @@ const FeatureSection = ({ listContent }: props) => {
     // { id: 4 },
     // { id: 5 },
   ]
+
+  const [listFavoritCar, setListFavoritCar] = useState<CarModel[]>()
+
+  useEffect(() => {
+    getListFavoritCar()
+  }, [])
+
+  const getListFavoritCar = async () => {
+    await axiosInstance.get("/request/selectFavoritCar")
+      .then(res => setListFavoritCar(res.data))
+      .catch(err => console.log(err))
+  }
   return (
     <div className="relative my-10 min-h-[500px]">
       <div className="text-center">
@@ -35,8 +50,11 @@ const FeatureSection = ({ listContent }: props) => {
           </div>
         ))} */}
         {
-          listCarItem.map((item) => (
-            <CarItem />
+          listFavoritCar?.map((item, indx) => (
+            <div key={indx}>
+              <CarItem carModel={item} />
+            </div>
+
           ))
         }
       </div>

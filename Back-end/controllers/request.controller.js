@@ -1,6 +1,9 @@
+require("dotenv").config();
 const RequestModel = require("../models/request.model");
+const CarModel = require("../models/car.model");
 const UserModel = require("../models/user.model");
 const NotifyRequest = require("../Templates/Mail/notifyRequest");
+const NotifyBill = require("../Templates/Mail/notifyBill");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
 const BillModel = require("../models/bill.model")
@@ -12,8 +15,6 @@ const createRequest = async (req, res) => {
     user: data.user,
     driver: data.driver || [],
     car: data.car,
-    // startDate: data.startDate,
-    // endDate: data.endDate,
     requestStatus: data.requestStatus,
     isRequestDriver: data.isRequestDriver,
   });
@@ -63,69 +64,74 @@ const getListRequest = async (req, res) => {
 
 const acceptBookingRequest = async (req, res) => {
   const data = req.body;
-
   try {
-    if (data.car) {
-      const requestExisted = await RequestModel.findOne({
-        user: data.user._id,
-        requestStatus: "4",
+    const requestExisted = await RequestModel.findOne({
+      _id: data._id,
+    })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+    if (requestExisted) {
+      const start = dayjs(data.startDate);
+      const end = dayjs(data.endDate);
+      const totalHours = end.diff(start, "hour", true);
+      const startDate = start.format("HH:mm, DD/MM/YYYY");
+      const endDate = end.format("HH:mm, DD/MM/YYYY");
+
+      const carPrices = requestExisted?.car?.map((item) => item.price) ?? [];
+      const totalPrice = carPrices.reduce(
+        (total, current) => total + current,
+        0
+      );
+      const vatFee = totalPrice * totalHours * 0.1;
+      const totalFee = vatFee + totalPrice * totalHours;
+      const displayTotalFee = totalFee.toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
       });
-      if (requestExisted) {
-        await UserModel.updateOne(
-          { _id: data.user._id },
-          {
-            userName: data.user.userName,
-            email: data.user.email,
-            phoneNumber: data.user.phoneNumber,
-            address: data.user.address,
-          }
-        );
-        await RequestModel.updateOne(
-          { _id: requestExisted._id },
-          {
-            startDate: data.startDate,
-            endDate: data.endDate,
-            isRequestDriver: data.isRequestDriver,
-            requestStatus: data.requestStatus,
-            $push: { car: data.car },
-          }
-        );
-        // await RequestModel.updateOne(
-        //   { _id: requestExisted._id },
-        //   {  }
-        // );
-        return res.status(200).json({ message: "Request successfull !!" });
-      } else {
-        return res.status(401).json({ message: "Cannot find your request !!" });
-      }
-    } else {
-      const requestExisted = await RequestModel.findOne({
-        user: data.user._id,
-        requestStatus: "1",
+      const emailContent = await NotifyBill(
+        `${data.user.userName}`,
+        vatFee.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        (totalPrice * totalHours).toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        displayTotalFee,
+        startDate,
+        endDate,
+        data.pickUpLocation
+      );
+
+      await mailService.sendEmail({
+        to: data.emailRequest,
+        subject: "Thông báo yêu cầu đặt xe",
+        html: emailContent,
       });
-      if (requestExisted) {
-        await UserModel.updateOne(
-          { _id: data.user._id },
-          {
-            userName: data.user.userName,
-            email: data.user.email,
-            phoneNumber: data.user.phoneNumber,
-            address: data.user.address,
-          }
-        );
-        await RequestModel.updateOne(
-          { _id: requestExisted._id },
-          {
-            startDate: data.startDate,
-            endDate: data.endDate,
-            isRequestDriver: data.isRequestDriver,
-            requestStatus: data.requestStatus,
-          }
-        );
-        return res.status(200).json({ message: "Request successfull !!" });
-      } else {
-        return res.status(401).json({ message: "Cannot find your request !!" });
-      }
+      await UserModel.updateOne(
+        { _id: data.user._id },
+        {
+          userName: data.user.userName,
+          phoneNumber: data.user.phoneNumber,
+        }
+      );
+      await RequestModel.updateOne(
+        { _id: requestExisted._id },
+        {
+          startDate: data.startDate,
+          endDate: data.endDate,
+          isRequestDriver: data.isRequestDriver,
+          requestStatus: data.requestStatus,
+          $push: { car: data.car },
+          pickUpLocation: data.pickUpLocation,
+          emailRequest: data.emailRequest,
+        }
+      );
+      return res.status(200).json({ message: "Successfull" });
     }
   } catch (error) {
     return res.status(500).json({ message: error });
@@ -262,6 +268,7 @@ const handleAdminAcceptRequest = async (req, res) => {
           message: "Successful !!!",
         });
       }
+      return res.status(200).json({ message: "Successfull !!!" });
     } else {
       return res.status(401).json({ message: "Cannot find this request !!!" });
     }
@@ -274,23 +281,13 @@ const handleCheckRequest = async (req, res) => {
   try {
     const dt = req.body;
     const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
+
     const listReqInRangeTime = await RequestModel.find(
       {
         _id: { $ne: dataRequest._id },
-        requestStatus: "3",
-        $or: [
-          {
-            startDate: { $lte: dataRequest.startDate },
-            endDate: { $gte: dataRequest.startDate },
-          },
-          {
-            startDate: { $lte: dataRequest.endDate },
-            endDate: { $gte: dataRequest.endDate },
-          },
-          {
-            startDate: { $gte: dataRequest.startDate },
-            endDate: { $lte: dataRequest.endDate },
-          },
+        $and: [
+          { startDate: { $lt: dt.endDate } },
+          { endDate: { $gt: dt.startDate } },
         ],
       },
       "car -_id"
@@ -317,6 +314,175 @@ const handleCheckRequest = async (req, res) => {
   }
 };
 
+const getAddress = async (req, res) => {
+  const query = req.query.q; // Từ khóa người dùng nhập
+  if (!query) {
+    return res
+      .status(400)
+      .json({ error: "Vui lòng cung cấp từ khóa tìm kiếm" });
+  }
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        query
+      )}&format=json&addressdetails=1&limit=10&countrycodes=vn`,
+      {
+        headers: {
+          "User-Agent": "MyAddressApp/1.0 (quangmanh279@gmail.com)", // Header của bạn
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Lỗi khi gọi API Nominatim: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return res.status(200).json(data); // Trả về danh sách gợi ý địa chỉ
+  } catch (error) {
+    console.error("Lỗi khi tìm kiếm:", error);
+    return res.status(500).json({ error: "Lỗi khi tìm kiếm địa chỉ" });
+  }
+};
+
+const getRequestById = async (req, res) => {
+  const requestId = req.query.key;
+  try {
+    const requestList = await RequestModel.findOne({ _id: requestId })
+      .populate("user", "userName fullName email phoneNumber address avatar")
+      .populate(
+        "car",
+        "carName color licensePlateNumber price carVersion images numberOfSeat"
+      );
+    return res.status(200).json(requestList);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const selectFavoritCar = async (req, res) => {
+  try {
+    // // Bước 1: Lấy top 3 xe xuất hiện nhiều nhất trong request
+    // const topCarsFromRequests = await RequestModel.aggregate([
+    //   // Tách mảng car thành từng document
+    //   { $unwind: "$car" },
+    //   // Nhóm theo car và đếm số lần xuất hiện
+    //   {
+    //     $group: {
+    //       _id: "$car",
+    //       requestCount: { $sum: 1 },
+    //     },
+    //   },
+    //   // Sắp xếp theo số lần xuất hiện giảm dần
+    //   { $sort: { requestCount: -1 } },
+    //   // Giới hạn lấy 3 xe
+    //   { $limit: 3 },
+    //   // Join với CarModel để lấy tất cả thông tin xe
+    //   {
+    //     $lookup: {
+    //       from: "cars", // Tên collection của CarModel trong MongoDB
+    //       localField: "_id",
+    //       foreignField: "_id",
+    //       as: "carDetails",
+    //     },
+    //   },
+    //   // Tách mảng carDetails
+    //   { $unwind: "$carDetails" },
+    //   // Join với CarTypeModel để lấy thông tin carType
+    //   {
+    //     $lookup: {
+    //       from: "cartypes", // Tên collection của CarTypeModel trong MongoDB
+    //       localField: "carDetails.carType",
+    //       foreignField: "_id",
+    //       as: "carTypeDetails",
+    //     },
+    //   },
+    //   // Tách mảng carTypeDetails (nếu có)
+    //   { $unwind: "$carTypeDetails" },
+    //   // Dựng lại cấu trúc kết quả
+    //   {
+    //     $project: {
+    //       _id: "$carDetails._id",
+    //       carName: "$carDetails.carName",
+    //       color: "$carDetails.color",
+    //       images: "$carDetails.images",
+    //       carStatus: "$carDetails.carStatus",
+    //       licensePlateNumber: "$carDetails.licensePlateNumber",
+    //       price: "$carDetails.price",
+    //       carVersion: "$carDetails.carVersion",
+    //       numberOfSeat: "$carDetails.numberOfSeat",
+    //       carType: {
+    //         bunkBed: "$carTypeDetails.bunkBed",
+    //         flue: "$carTypeDetails.flue",
+    //         transmissionType: "$carTypeDetails.transmissionType",
+    //       },
+    //       requestCount: 1,
+    //     },
+    //   },
+    // ]);
+
+    // // Số lượng xe từ request
+    // const numberOfCars = topCarsFromRequests.length;
+
+    // // Nếu đủ 3 xe, trả về luôn
+    // if (numberOfCars >= 3) {
+    //   return topCarsFromRequests;
+    // }
+
+    // Bước 2: Nếu không đủ 3 xe, lấy thêm từ CarModel theo carVersion
+    const remainingCount = 3;
+    const additionalCars = await CarModel.aggregate([
+      // Join với CarTypeModel
+      {
+        $lookup: {
+          from: "cartypes",
+          localField: "carType",
+          foreignField: "_id",
+          as: "carTypeDetails",
+        },
+      },
+      { $unwind: "$carTypeDetails" },
+      // Sắp xếp theo carVersion giảm dần
+      { $sort: { carVersion: -1 } },
+      // Giới hạn số xe còn thiếu
+      { $limit: remainingCount },
+      // Dựng lại cấu trúc kết quả
+      {
+        $project: {
+          _id: 1,
+          carName: 1,
+          color: 1,
+          images: 1,
+          carStatus: 1,
+          licensePlateNumber: 1,
+          price: 1,
+          carVersion: 1,
+          numberOfSeat: 1,
+          carType: {
+            bunkBed: "$carTypeDetails.bunkBed",
+            flue: "$carTypeDetails.flue",
+            transmissionType: "$carTypeDetails.transmissionType",
+          },
+        },
+      },
+    ]);
+
+    // Kết hợp kết quả
+    const result = [
+      // ...topCarsFromRequests,
+      ...additionalCars.map((car) => ({
+        ...car,
+        // requestCount: 0, // Xe bổ sung không có request
+      })),
+    ];
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports = {
   createRequest,
   getListRequest,
@@ -325,4 +491,7 @@ module.exports = {
   listAdminAcceptRequest,
   handleAdminAcceptRequest,
   handleCheckRequest,
+  getAddress,
+  getRequestById,
+  selectFavoritCar,
 };

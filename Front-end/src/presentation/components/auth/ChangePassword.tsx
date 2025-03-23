@@ -56,7 +56,7 @@ const ChangePassword: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg mb-20">
+    <div className="max-w-lg mx-auto mt-20 mb-20 p-6 bg-white shadow-lg rounded-lg mb-20">
       <h2 className="text-2xl font-bold text-center mb-4">Thay đổi mật khẩu</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -200,7 +200,6 @@ export const fetchApprovedDriverApplications = createAsyncThunk(
   }
 );
 
-
 export const fetchRejectedDriverApplications = createAsyncThunk(
   "auth/fetchRejectedDriverApplications",
   async (_, { getState, rejectWithValue }) => {
@@ -456,7 +455,7 @@ export function FetchApprovedDriverApplications() {
   return async (dispatch) => {
     await dispatch(fetchApprovedDriverApplications());
   };
-};
+}
 
 export function UpdateUserRole(userId, role) {
   return async (dispatch) => {
@@ -476,26 +475,25 @@ export function LoginUser(formValues) {
           withCredentials: true,
         }
       );
+      const token = response.data.data.token;
 
-      console.log("Login response:", response.data);
-
-      const decodedToken = jwtDecode(response.data.token);
+      const decodedToken = jwtDecode(token);
       const expirationTime = decodedToken.exp * 1000;
 
       const standardizedUser = {
-        userId: response.data.userId,
-        userName: response.data.userName,
-        fullName: response.data.fullName || "",
-        phoneNumber: response.data.phoneNumber || "",
-        avatar: response.data.avatar || "",
-        address: response.data.address || "",
-        role: response.data.role,
+        userId: response.data.data.userId,
+        userName: response.data.data.userName,
+        fullName: response.data.data.fullName || "",
+        phoneNumber: response.data.data.phoneNumber || "",
+        avatar: response.data.data.avatar || "",
+        address: response.data.data.address || "",
+        role: response.data.data.role,
         email: formValues.email,
       };
 
       dispatch(
         slice.actions.login({
-          token: response.data.token,
+          token: token,
           user: standardizedUser,
           loginMethod: "email",
         })
@@ -511,12 +509,16 @@ export function LoginUser(formValues) {
           dispatch(LogoutUser());
         }, timeToLogout);
       }
+
+      // Return the result to the caller
+      return { token, user: standardizedUser };
     } catch (error) {
       console.error("Login error:", error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
-      throw error;
+      // Throw a more specific error message
+      throw new Error(error.message || "Đăng nhập thất bại");
     }
   };
 }
@@ -558,19 +560,46 @@ export function VerifyEmail(formValues) {
 
       console.log("Verify response:", response.data);
 
-      dispatch(slice.actions.setRegisterStatus(true));
       dispatch(slice.actions.setVerifyStatus(true));
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
 
-      window.location.href = "/app/sign-in";
+      return response.data;
     } catch (error) {
       console.error("Verify error:", error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
-      throw error;
+      throw error; // Ném lỗi để component có thể xử lý
+    }
+  };
+}
+
+export function ResendOTP(email) {
+  return async (dispatch) => {
+    dispatch(slice.actions.updateIsLoading({ isLoading: true, error: false }));
+    try {
+      const response = await axios.post(
+        "/resend-otp",
+        { email },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("Resend OTP response:", response.data);
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: false })
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error("Resend OTP error:", error);
+      dispatch(
+        slice.actions.updateIsLoading({ isLoading: false, error: true })
+      );
+      throw error; // Ném lỗi để component có thể xử lý
     }
   };
 }

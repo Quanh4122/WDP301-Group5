@@ -3,7 +3,7 @@ const CarTypeModel = require("../models/cartype.model");
 const RequestModel = require("../models/request.model");
 
 const getAllCar = async (req, res) => {
-  const carList = await CarModel.find().populate(
+  const carList = await CarModel.find({ carStatus: false }).populate(
     "carType",
     "bunkBed flue transmissionType"
   );
@@ -21,6 +21,7 @@ const filterCarByNumberOfSeat = async (req, res) => {
   const listReq = req.body;
   const carListFilter = await CarModel.find({
     numberOfSeat: { $in: listReq },
+    carStatus: false,
   }).populate("carType", "bunkBed flue transmissionType");
   if (carListFilter && carListFilter.length > 0) {
     return res.status(200).json(carListFilter);
@@ -46,6 +47,7 @@ const filterCarByTransmissionType = async (req, res) => {
     {
       $match: {
         "carType.transmissionType": { $in: listReq }, // Lọc theo danh sách giá trị bunkBed
+        carStatus: false,
       },
     },
   ]);
@@ -73,6 +75,7 @@ const filterCarByFlue = async (req, res) => {
     {
       $match: {
         "carType.flue": { $in: listReq }, // Lọc theo danh sách giá trị bunkBed
+        carStatus: false,
       },
     },
   ]);
@@ -105,7 +108,6 @@ const createCar = async (req, res) => {
     carStatus,
     carVersion,
     color,
-    images,
     licensePlateNumber,
     numberOfSeat,
     price,
@@ -113,8 +115,6 @@ const createCar = async (req, res) => {
     flue,
     transmissionType,
   } = req.body;
-  console.log(req.body);
-  console.log(req.files);
 
   const carTypeModel = await CarTypeModel.findOne({
     bunkBed: bunkBed,
@@ -157,6 +157,7 @@ const getAllCarFree = async (req, res) => {
   if (data[0] && data[1]) {
     const listCarInAcceptRequest = await RequestModel.find(
       {
+        requestStatus: { $nin: ["1", "5"] },
         $or: [
           {
             startDate: { $lte: data[0] },
@@ -178,12 +179,16 @@ const getAllCarFree = async (req, res) => {
       const arrStr = listCarInAcceptRequest.flatMap((item) =>
         item.car.map((objectId) => objectId.toString())
       );
+
       const newArrStr = arrStr.filter(
         (item, index) => arrStr.indexOf(item) == index
       );
+
       const carList = await CarModel.find({
         _id: { $nin: newArrStr },
+        carStatus: false,
       }).populate("carType", "bunkBed flue transmissionType");
+      console.log(newArrStr);
       if (carList && carList.length > 0) {
         return res.status(200).json(carList);
       } else {
@@ -209,6 +214,74 @@ const getAllCarFree = async (req, res) => {
   }
 };
 
+const updateCar = async (req, res) => {
+  const {
+    carName,
+    carStatus,
+    carVersion,
+    color,
+    images,
+    licensePlateNumber,
+    numberOfSeat,
+    price,
+    bunkBed,
+    flue,
+    transmissionType,
+  } = req.body;
+
+  const { carId } = req.params;
+
+  console.log(carId);
+
+  const carTypeModel = await CarTypeModel.findOne({
+    bunkBed: bunkBed,
+    flue: flue,
+    transmissionType: transmissionType,
+  });
+  if (req.files.length == 0) {
+    const error = new Error("Please choose files");
+    error.httpStatusCode = 400;
+    return next(error);
+  } else {
+    const arrImages = req.files.map((item) => {
+      return `/images/${item.filename}`;
+    });
+    // const carFindByLicensePlateNumber = await CarModel.findOne({
+    //   licensePlateNumber: licensePlateNumber,
+    // });
+    // if (carFindByLicensePlateNumber) {
+    //   return res.status(401).json({ message: "This car is existed !!!" });
+    // } else {
+
+    // }
+    await CarModel.updateOne(
+      { _id: carId },
+      {
+        carName,
+        carStatus,
+        carType: carTypeModel._id,
+        carVersion,
+        color,
+        images: arrImages,
+        licensePlateNumber,
+        numberOfSeat,
+        price,
+      }
+    );
+    return res.status(200).json({ message: "Create Successfull !!!" });
+  }
+};
+
+const onDeleteCar = async (req, res) => {
+  const { carId } = req.params;
+  try {
+    await CarModel.updateOne({ _id: carId }, { carStatus: true });
+    return res.status(200).json({ message: "Delete successfull !!" });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports = {
   getAllCar,
   filterCarByNumberOfSeat,
@@ -217,4 +290,6 @@ module.exports = {
   getCarById,
   createCar,
   getAllCarFree,
+  updateCar,
+  onDeleteCar,
 };

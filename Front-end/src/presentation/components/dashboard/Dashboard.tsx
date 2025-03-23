@@ -1,15 +1,8 @@
-import * as React from 'react';
-import type { } from '@mui/x-date-pickers/themeAugmentation';
-import type { } from '@mui/x-charts/themeAugmentation';
-import type { } from '@mui/x-data-grid-pro/themeAugmentation';
-import type { } from '@mui/x-tree-view/themeAugmentation';
+import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import AppNavbar from './components/AppNavbar';
-import Header from './components/Header';
-import MainGrid from './components/MainGrid';
 import AppTheme from '../shared-theme/AppTheme';
+import Sidebar from './components/Header'; // Đảm bảo import đúng Sidebar
+import MainGrid from './components/MainGrid';
 import {
   chartsCustomizations,
   dataGridCustomizations,
@@ -28,21 +21,19 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
-      <Box sx={{ display: 'flex' }}>
+      <div className="mt-20 mb-20 text-white">
 
-        <Stack
-          spacing={2}
-          sx={{
-            alignItems: 'center',
-            mx: 3,
-            pb: 5,
-            mt: { xs: 8, md: 0 },
-          }}
-        >
-          <Header />
-          <MainGrid />
-        </Stack>
-      </Box>
+        {/* Nội dung chính với Sidebar và MainGrid */}
+        <main className="max-w-7xl mx-auto p-6 flex gap-6">
+          {/* Sidebar */}
+          <Sidebar />
+
+          {/* MainGrid */}
+          <div className="flex-1">
+            <MainGrid />
+          </div>
+        </main>
+      </div>
     </AppTheme>
   );
 }

@@ -7,32 +7,26 @@ import RequestInSelected from "./component/RequestInSelected";
 import { Button } from "antd";
 import { AlertTriangle } from "lucide-react";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
-import RequestInReject from "./component/RequestInReject";
+import { RootState } from "../redux/Store";
+import { useSelector } from "react-redux";
+import dayjs from 'dayjs'; // Thêm import dayjs
 
 const RequestList: React.FC = () => {
-    const [requestList, setRequestList] = useState<RequestModelFull[] | undefined>(undefined);
     const [requestInSelected, setRequestInSelected] = useState<RequestModelFull | undefined>(undefined);
     const [requestInPending, setRequestPending] = useState<RequestModelFull[] | undefined>(undefined);
-    const [requestInReject, setRequestInReject] = useState<RequestModelFull | undefined>(undefined);
     const [display, setDisplay] = useState<boolean>(false);
     const [isDisplayReject, setIsDisplayReject] = useState<boolean>(false);
-    const [currentPage, setCurrentPage] = useState<number>(1); // State cho phân trang
-    const itemsPerPage: number = 5; // Số lượng request trên mỗi trang
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const itemsPerPage: number = 5;
     const location = useLocation();
     const navigate = useNavigate();
+    const userId = useSelector((state: RootState) => (state.auth?.user as { userId: string } | null)?.userId);
 
     useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const uId = queryParams.get("userId");
-        if (uId) {
-            setIsDisplayReject(true);
-            getListCar(uId);
-        } else {
-            getListCar(location.state?.userId);
-        }
+        getListCar(userId);
     }, []);
 
-    // Reset trang về 1 khi danh sách requestInPending thay đổi
     useEffect(() => {
         setCurrentPage(1);
     }, [requestInPending]);
@@ -50,8 +44,24 @@ const RequestList: React.FC = () => {
 
     const onCategoryTypeByRequestList = (list: RequestModelFull[]) => {
         setRequestInSelected(list.filter((item) => item.requestStatus === "1")[0] || undefined);
-        setRequestPending(list.filter((item) => item.requestStatus === "2" || item.requestStatus === "3"));
-        setRequestInReject(list.filter((item) => item.requestStatus === "4")[0] || undefined);
+        setRequestPending(list.filter((item) => item.requestStatus !== '1'));
+    };
+
+    // Hàm sắp xếp danh sách theo timeCreated sử dụng dayjs
+    const handleSortByTime = () => {
+        if (!requestInPending) return;
+
+        const sortedRequests = [...requestInPending].sort((a, b) => {
+            const dateA = dayjs(a.timeCreated);
+            const dateB = dayjs(b.timeCreated);
+            return sortOrder === 'asc'
+                ? dateA.isBefore(dateB) ? -1 : 1
+                : dateB.isBefore(dateA) ? -1 : 1;
+        });
+
+        setRequestPending(sortedRequests);
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        setCurrentPage(1);
     };
 
     // Tính toán phân trang
@@ -61,7 +71,6 @@ const RequestList: React.FC = () => {
     const endIndex: number = startIndex + itemsPerPage;
     const currentItems: RequestModelFull[] = requestInPending?.slice(startIndex, endIndex) || [];
 
-    // Hàm điều hướng phân trang
     const handlePrevious = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
@@ -78,7 +87,6 @@ const RequestList: React.FC = () => {
         setCurrentPage(page);
     };
 
-    // Tạo mảng số trang
     const pageNumbers: number[] = [];
     for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -86,8 +94,7 @@ const RequestList: React.FC = () => {
 
     return (
         <section className="w-full min-h-screen pt-12 bg-gray-50">
-            {/* Header với nút toggle */}
-            <div className="w-full px-6 md:px-20 py-4">
+            <div className="w-full px-6 md:px-20 py-4 flex justify-between items-center">
                 <Button
                     type="primary"
                     onClick={() => setDisplay(!display)}
@@ -95,13 +102,18 @@ const RequestList: React.FC = () => {
                 >
                     <span>{display ? "Xem danh sách" : "Xem chi tiết đang đặt"}</span>
                 </Button>
+                {display && requestInPending && requestInPending.length > 0 && (
+                    <Button
+                        onClick={handleSortByTime}
+                        className="!bg-green-600 !hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+                    >
+                        Sắp xếp theo thời gian {sortOrder === 'asc' ? '↑' : '↓'}
+                    </Button>
+                )}
             </div>
 
-            {/* Nội dung chính */}
             <div className="w-full px-6 md:px-20 py-6">
-                {isDisplayReject && requestInReject ? (
-                    <RequestInReject requestModal={requestInReject} />
-                ) : display === false ? (
+                {display === false ? (
                     requestInSelected ? (
                         <RequestInSelected requestModal={requestInSelected} />
                     ) : (
@@ -135,27 +147,23 @@ const RequestList: React.FC = () => {
                     <div className="w-full h-auto space-y-6">
                         {requestInPending && requestInPending.length > 0 ? (
                             <>
-                                {/* Hiển thị danh sách request của trang hiện tại */}
                                 {currentItems.map((item) => (
                                     <RequestItem key={item._id} requestModel={item} />
                                 ))}
 
-                                {/* Phân trang */}
                                 {totalPages > 1 && (
                                     <div className="flex justify-center items-center gap-2 py-6">
-                                        {/* Nút Previous */}
                                         <button
                                             onClick={handlePrevious}
                                             disabled={currentPage === 1}
                                             className={`px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-200 ${currentPage === 1
-                                                    ? "bg-gray-300 cursor-not-allowed"
-                                                    : "bg-blue-500 text-white"
+                                                ? "bg-gray-300 cursor-not-allowed"
+                                                : "bg-blue-500 text-white"
                                                 }`}
                                         >
                                             Previous
                                         </button>
 
-                                        {/* Số trang */}
                                         {pageNumbers.map((number) => (
                                             <button
                                                 key={number}
@@ -167,13 +175,12 @@ const RequestList: React.FC = () => {
                                             </button>
                                         ))}
 
-                                        {/* Nút Next */}
                                         <button
                                             onClick={handleNext}
                                             disabled={currentPage === totalPages}
                                             className={`px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition duration-200 ${currentPage === totalPages
-                                                    ? "bg-gray-300 cursor-not-allowed"
-                                                    : "bg-blue-500 text-white"
+                                                ? "bg-gray-300 cursor-not-allowed"
+                                                : "bg-blue-500 text-white"
                                                 }`}
                                         >
                                             Next

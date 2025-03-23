@@ -11,7 +11,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { Divider, IconButton, InputAdornment } from '@mui/material';
-import { GoogleIcon, FacebookIcon } from '../auth/CustomIcons';
+import { GoogleIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser, loginWithGoogle } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
@@ -42,114 +42,72 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn() {
-  const [emailError, setEmailError] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState('');
-  const [serverError, setServerError] = React.useState('');
-  const [showPassword, setShowPassword] = React.useState(false);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { isLoading } = useSelector((state: RootState) => state.auth);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleGoogleLogin = async () => {
     try {
       const user = await dispatch(loginWithGoogle()).unwrap();
-      console.log("User object:", user);
       toast.success("Đăng nhập thành công");
       navigate("/");
     } catch (error) {
+      toast.error("Đăng nhập bằng Google thất bại");
       console.error("Google login failed:", error);
-      toast.error("Đăng nhập thất bại");
     }
-  };
-
-  const validateInputs = () => {
-    const email = (document.getElementById('email') as HTMLInputElement).value;
-    const password = (document.getElementById('password') as HTMLInputElement).value;
-
-    let isValid = true;
-
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setEmailError('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError('');
-    }
-
-    if (!password || password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError('');
-    }
-
-    return isValid;
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (!validateInputs()) return;
-
     const formData = new FormData(event.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     try {
-      await dispatch(LoginUser({ email, password }));
-      toast.success('Đăng nhập thành công!');
-      navigate('/');
+      const result = await dispatch(LoginUser({ email, password }));
+      toast.success("Đăng nhập thành công");
+      navigate("/");
     } catch (error: any) {
-      toast.error('errol!');
-      console.log(error);
+      console.error("Login error:", error);
+      const errorMessage = error.message || "Đăng nhập thất bại";
+      toast.error(errorMessage);
     }
   };
 
   return (
     <>
       <CssBaseline />
-      <SignInContainer direction="column" justifyContent="space-between">
+      <SignInContainer direction="column" justifyContent="space-between" style={{ marginTop: '40px', marginBottom: '40px' }}>
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
             Đăng nhập
           </Typography>
-          {serverError && (
-            <Typography color="error" sx={{ textAlign: 'center' }}>
-              {serverError}
-            </Typography>
-          )}
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                error={!!emailError}
-                helperText={emailError}
                 id="email"
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="Nhập email của bạn"
                 autoComplete="email"
                 required
                 fullWidth
                 variant="outlined"
-                color={emailError ? 'error' : 'primary'}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="password">Mật khẩu</FormLabel>
               <TextField
-                error={!!passwordError}
-                helperText={passwordError}
                 name="password"
-                placeholder="Enter your password"
+                placeholder="Nhập mật khẩu của bạn"
                 type={showPassword ? "text" : "password"}
                 id="password"
                 autoComplete="current-password"
                 required
                 fullWidth
                 variant="outlined"
-                color={passwordError ? 'error' : 'primary'}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -163,7 +121,7 @@ export default function SignIn() {
             </FormControl>
 
             <Button type="submit" fullWidth variant="contained" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </Button>
             <Link to={'/app/forgot-password'}>
               <Button component="button" variant="text" sx={{ alignSelf: 'center' }}>
@@ -171,9 +129,6 @@ export default function SignIn() {
               </Button>
             </Link>
           </Box>
-          <Typography textAlign="center" color="error">
-            {serverError}
-          </Typography>
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
@@ -183,7 +138,7 @@ export default function SignIn() {
               variant="outlined"
               startIcon={<GoogleIcon />}
             >
-              {isLoading ? "Đang đăng nhập..." : "Đăng nhập bằng google"}
+              {isLoading ? "Đang đăng nhập..." : "Đăng nhập bằng Google"}
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Bạn chưa có tài khoản?{' '}
@@ -194,6 +149,7 @@ export default function SignIn() {
           </Box>
         </Card>
       </SignInContainer>
+      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }
