@@ -129,6 +129,7 @@ const EditProfile: React.FC = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
                 placeholder="Nhập họ và tên"
+                required
               />
             </div>
             <div>

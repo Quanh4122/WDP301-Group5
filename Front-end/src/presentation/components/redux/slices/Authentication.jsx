@@ -630,6 +630,7 @@ export function ForgotPassword(formValues) {
       })
       .catch((error) => {
         console.log(error);
+        throw error;
       });
   };
 }
@@ -645,16 +646,16 @@ export function NewPassword({ token, password, passwordConfirm }) {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log("Reset Password response:", response.data);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
+
+      return response.data;
     } catch (error) {
-      console.error("Reset Password error:", error.response?.data || error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
-      throw new Error(error.response?.data?.message || "Có lỗi xảy ra");
+      throw error;
     }
   };
 }
@@ -704,17 +705,15 @@ export function EditPassword(userId, formValues) {
           },
         }
       );
-
-      console.log("Change Password response:", response.data);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
-      return response.status;
+      return response.data;
     } catch (error) {
-      console.error("Change Password error:", error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
+      throw error;
     }
   };
 }

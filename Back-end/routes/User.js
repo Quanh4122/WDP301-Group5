@@ -15,7 +15,7 @@ router.get("/logout", verifyToken, userController.logout);
 router.get("/getUserById", userController.getUserById);
 router.post("/forgotPassword", userController.forgotPassword);
 router.post("/resetPassword", userController.resetPassword);
-router.post(
+router.put(
   "/changePassword/:userId",
   verifyToken,
   userController.changePassword
