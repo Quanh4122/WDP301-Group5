@@ -9,6 +9,7 @@ const CLIENT_URL = process.env.CLIENT_PORT;
 const { UserController } = require("./controllers");
 const WebSocket = require("ws");
 const RequestModel = require("./models/request.model");
+const BillModel = require("./models/bill.model");
 const http = require("http");
 const moment = require("moment-timezone");
 const NotifyExtendBill = require("./Templates/Mail/notifyExtentionBill");
@@ -55,51 +56,48 @@ const broadcast = (data) => {
   });
 };
 
-// Hàm cập nhật requestStatus
-const updateRequestStatus = async (request) => {
-  if (request.requestStatus == "2") {
-    request.requestStatus = "3";
-    await request.save();
-
-    broadcast({
-      event: "request-status-updated",
-      data: {
-        requestId: request._id,
-        requestStatus: request.requestStatus,
-        endDate: request.endDate,
-      },
-    });
-    console.log(`Đã cập nhật trạng thái request ${request._id}`);
-  }
-};
-
 const sendEmailRequestStatus3 = async (item) => {
   const now = dayjs();
-  const threeHoursLater = now.add(3, "hour");
+  const hoursLater = now.add(2, "hour");
   const start = dayjs(item.startDate);
   const end = dayjs(item.endDate);
-  if (end.isAfter(now) && end.isBefore(threeHoursLater)) {
-    console.log(item);
+
+  // Kiểm tra nếu end nằm trong khoảng từ now đến 2 tiếng sau (hoursLater)
+  if (now.isAfter(end) && now.isBefore(end.add(2, "hours"))) {
+    console.log("check");
     const startDate = start.format("HH:mm, DD/MM/YYYY");
     const endDate = end.format("HH:mm, DD/MM/YYYY");
-    // Thêm phần update Item lên status 3 ( gần đến lúc trả xe)
-    const detailRequestURL = `http://localhost:3000/app/request-in-expire?requestId=${item._id}`;
-    const emailContent = await NotifyExtendBill(
-      `${item.user.userName}`,
-      startDate,
-      endDate,
-      item.pickUpLocation,
-      detailRequestURL
+
+    await RequestModel.updateOne(
+      {
+        _id: item._id,
+      },
+      {
+        requestStatus: "3",
+      }
     );
-    await mailService.sendEmail({
-      to: item.user.email,
-      subject: "Thông báo yêu cầu đặt xe",
-      html: emailContent,
-    });
+
+    const bill = await BillModel.findOne({ request: item._id });
+    if (bill) {
+      const detailRequestURL = `http://localhost:3000/app/request-in-expire?requestId=${item._id}&billId=${bill._id}`;
+      const emailContent = await NotifyExtendBill(
+        `${item.user.userName}`,
+        startDate,
+        endDate,
+        item.pickUpLocation,
+        item.dropLocation,
+        detailRequestURL
+      );
+      await mailService.sendEmail({
+        to: item.user.email,
+        subject: "Thông báo yêu cầu đặt xe",
+        html: emailContent,
+      });
+    }
   }
 };
 
-const getListRequestStatus2AndSendMai = async () => {
+const getListRequestStatus2AndSendMail = async () => {
   const request = await RequestModel.find({
     requestStatus: "2",
   })
@@ -109,14 +107,13 @@ const getListRequestStatus2AndSendMai = async () => {
       "carName color licensePlateNumber price carVersion images numberOfSeat"
     );
   request.map((item) => sendEmailRequestStatus3(item));
-  //console.log("Check status 2");
 };
 
 setInterval(async () => {
   try {
-    getListRequestStatus2AndSendMai();
+    getListRequestStatus2AndSendMail();
   } catch (error) {}
-}, 6000000);
+}, 10000);
 
 route(server);
 

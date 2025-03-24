@@ -1,5 +1,6 @@
 require("dotenv").config();
 const RequestModel = require("../models/request.model");
+const CarModel = require("../models/car.model");
 const UserModel = require("../models/user.model");
 const NotifyRequest = require("../Templates/Mail/notifyRequest");
 const NotifyBill = require("../Templates/Mail/notifyBill");
@@ -350,6 +351,128 @@ const getRequestById = async (req, res) => {
   }
 };
 
+const selectFavoritCar = async (req, res) => {
+  try {
+    // // Bước 1: Lấy top 3 xe xuất hiện nhiều nhất trong request
+    // const topCarsFromRequests = await RequestModel.aggregate([
+    //   // Tách mảng car thành từng document
+    //   { $unwind: "$car" },
+    //   // Nhóm theo car và đếm số lần xuất hiện
+    //   {
+    //     $group: {
+    //       _id: "$car",
+    //       requestCount: { $sum: 1 },
+    //     },
+    //   },
+    //   // Sắp xếp theo số lần xuất hiện giảm dần
+    //   { $sort: { requestCount: -1 } },
+    //   // Giới hạn lấy 3 xe
+    //   { $limit: 3 },
+    //   // Join với CarModel để lấy tất cả thông tin xe
+    //   {
+    //     $lookup: {
+    //       from: "cars", // Tên collection của CarModel trong MongoDB
+    //       localField: "_id",
+    //       foreignField: "_id",
+    //       as: "carDetails",
+    //     },
+    //   },
+    //   // Tách mảng carDetails
+    //   { $unwind: "$carDetails" },
+    //   // Join với CarTypeModel để lấy thông tin carType
+    //   {
+    //     $lookup: {
+    //       from: "cartypes", // Tên collection của CarTypeModel trong MongoDB
+    //       localField: "carDetails.carType",
+    //       foreignField: "_id",
+    //       as: "carTypeDetails",
+    //     },
+    //   },
+    //   // Tách mảng carTypeDetails (nếu có)
+    //   { $unwind: "$carTypeDetails" },
+    //   // Dựng lại cấu trúc kết quả
+    //   {
+    //     $project: {
+    //       _id: "$carDetails._id",
+    //       carName: "$carDetails.carName",
+    //       color: "$carDetails.color",
+    //       images: "$carDetails.images",
+    //       carStatus: "$carDetails.carStatus",
+    //       licensePlateNumber: "$carDetails.licensePlateNumber",
+    //       price: "$carDetails.price",
+    //       carVersion: "$carDetails.carVersion",
+    //       numberOfSeat: "$carDetails.numberOfSeat",
+    //       carType: {
+    //         bunkBed: "$carTypeDetails.bunkBed",
+    //         flue: "$carTypeDetails.flue",
+    //         transmissionType: "$carTypeDetails.transmissionType",
+    //       },
+    //       requestCount: 1,
+    //     },
+    //   },
+    // ]);
+
+    // // Số lượng xe từ request
+    // const numberOfCars = topCarsFromRequests.length;
+
+    // // Nếu đủ 3 xe, trả về luôn
+    // if (numberOfCars >= 3) {
+    //   return topCarsFromRequests;
+    // }
+
+    // Bước 2: Nếu không đủ 3 xe, lấy thêm từ CarModel theo carVersion
+    const remainingCount = 3;
+    const additionalCars = await CarModel.aggregate([
+      // Join với CarTypeModel
+      {
+        $lookup: {
+          from: "cartypes",
+          localField: "carType",
+          foreignField: "_id",
+          as: "carTypeDetails",
+        },
+      },
+      { $unwind: "$carTypeDetails" },
+      // Sắp xếp theo carVersion giảm dần
+      { $sort: { carVersion: -1 } },
+      // Giới hạn số xe còn thiếu
+      { $limit: remainingCount },
+      // Dựng lại cấu trúc kết quả
+      {
+        $project: {
+          _id: 1,
+          carName: 1,
+          color: 1,
+          images: 1,
+          carStatus: 1,
+          licensePlateNumber: 1,
+          price: 1,
+          carVersion: 1,
+          numberOfSeat: 1,
+          carType: {
+            bunkBed: "$carTypeDetails.bunkBed",
+            flue: "$carTypeDetails.flue",
+            transmissionType: "$carTypeDetails.transmissionType",
+          },
+        },
+      },
+    ]);
+
+    // Kết hợp kết quả
+    const result = [
+      // ...topCarsFromRequests,
+      ...additionalCars.map((car) => ({
+        ...car,
+        // requestCount: 0, // Xe bổ sung không có request
+      })),
+    ];
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports = {
   createRequest,
   getListRequest,
@@ -360,4 +483,5 @@ module.exports = {
   handleCheckRequest,
   getAddress,
   getRequestById,
+  selectFavoritCar,
 };

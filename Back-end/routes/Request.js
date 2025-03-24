@@ -38,4 +38,6 @@ router.get("/search-address", RequestController.getAddress);
 
 router.get("/getRequestById", VerifyToken, RequestController.getRequestById);
 
+router.get("/selectFavoritCar", RequestController.selectFavoritCar);
+
 module.exports = router;

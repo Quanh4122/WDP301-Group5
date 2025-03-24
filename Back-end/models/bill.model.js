@@ -1,14 +1,42 @@
 const mongoose = require("mongoose");
 
 const BillSchema = new mongoose.Schema({
-  requestId: {
+  request: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Request",
-    require: true,
+    required: true,
   },
   billStatus: {
     type: Boolean,
-    require: true,
+    required: true,
+  },
+  vatFee: {
+    type: Number,
+    required: false,
+  },
+  totalCarFee: {
+    type: Number,
+    required: false,
+  },
+  depositFee: {
+    type: Number,
+    required: false,
+  },
+  realTimeDrop: {
+    type: Date,
+    required: false,
+  },
+  realLocationDrop: {
+    type: String,
+    required: false,
+  },
+  realImage: {
+    type: String,
+    required: false,
+  },
+  penaltyFee: {
+    type: Number,
+    required: false,
   },
 });
 

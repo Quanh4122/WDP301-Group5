@@ -4,9 +4,9 @@ const RequestSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    require: true,
+    required: true,
   },
-  emailRequest: { type: String, required: true },
+  emailRequest: { type: String, required: false },
   driver: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Driver",
@@ -14,23 +14,23 @@ const RequestSchema = new mongoose.Schema({
   car: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Car",
-    require: true,
+    required: true,
   },
   startDate: {
     type: Date,
-    require: true,
+    required: false,
   },
   endDate: {
     type: Date,
-    require: true,
+    required: false,
   },
   requestStatus: {
     type: String,
-    require: true,
+    required: true,
   },
   isRequestDriver: {
     type: Boolean,
-    require: true,
+    required: true,
   },
   timeCreated: {
     type: Date,
@@ -38,11 +38,11 @@ const RequestSchema = new mongoose.Schema({
   },
   pickUpLocation: {
     type: String,
-    require: false,
+    required: false,
   },
   dropLocation: {
     type: String,
-    require: false,
+    required: false,
   },
 });
 
