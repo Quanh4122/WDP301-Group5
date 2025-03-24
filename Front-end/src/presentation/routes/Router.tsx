@@ -45,6 +45,10 @@ const Router = () => {
             element: <HomePage />
         },
         {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
+            element: <SignUp />
+        },
+        {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN,
             element: <SignIn />
         },
@@ -83,10 +87,6 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_PASSWORD + "/:userId",
             element: <ProtectedRoute><ChangePassword /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
-            element: <SignUp />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHENTICATION,

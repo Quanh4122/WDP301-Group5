@@ -82,7 +82,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: Props) =>
                         </Descriptions.Item>
                         {
                             billData?.depositFee &&
-                            <Descriptions.Item label="Số tiền phạt">
+                            <Descriptions.Item label="Số tiền cọc">
                                 <span className="font-semibold text-lg">{formattedCurrency(billData?.depositFee)}</span>
                             </Descriptions.Item>
                         }

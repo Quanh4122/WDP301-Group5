@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { applyForDriver } from "../../components/redux/slices/Authentication";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const ApplyDriver = () => {
   const [licenseNumber, setLicenseNumber] = useState("");
@@ -38,7 +38,6 @@ const ApplyDriver = () => {
 
   return (
     <div className="mt-20 mb-20 flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <ToastContainer />
       <div className="max-w-lg w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl">
         {/* Header */}
         <div className="text-center">

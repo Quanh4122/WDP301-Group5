@@ -149,9 +149,8 @@ const Navbar: React.FC = () => {
             {isLoggedIn && user ? (
               <>
                 <div className="relative">
-                  <button
-                    onClick={toggleModal}
-                    className="focus:outline-none"
+                  <div className="flex">
+                  <button onClick={toggleModal} className="flex items-center"
                   >
                     {avatarPreview ? (
                       <img
@@ -160,9 +159,21 @@ const Navbar: React.FC = () => {
                         className="w-10 h-10 rounded-full border object-cover hover:border-sky-500 transition-all duration-200"
                       />
                     ) : (
-                      <PersonIcon className="text-gray-700 hover:text-sky-500 transition-colors duration-200" />
+                      <div className="flex items-center gap-2">
+                        <PersonIcon className="text-gray-700 hover:text-sky-500 transition-colors duration-200" />
+                      </div>
                     )}
                   </button>
+                  {user.role === "User" && (
+                    <button
+                      className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-800 transition-colors duration-200 flex items-center space-x-3"
+                      onClick={onViewListRequest}
+                    >
+                      <ShoppingCartIcon className="text-gray-500" />
+                      <span className="font-medium">Giỏ hàng</span>
+                    </button>
+                  )}
+                  </div>
                   {isModalOpen && (
                     <div className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-xl z-50 border border-gray-200 overflow-hidden">
                       {/* Header */}
@@ -192,17 +203,6 @@ const Navbar: React.FC = () => {
                             <span className="font-medium">Hồ sơ</span>
                           </button>
                         </li>
-                        {user.role === "User" && (
-                          <li>
-                          <button
-                            onClick={onViewListRequest}
-                            className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-600 transition-colors duration-200 flex items-center space-x-3"
-                          >
-                            <ShoppingCartIcon className="text-gray-500" />
-                            <span className="font-medium">Giỏ hàng</span>
-                          </button>
-                        </li>
-                        )}
                         <li>
                           <button
                             onClick={handleLogout}

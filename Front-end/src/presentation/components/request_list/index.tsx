@@ -9,7 +9,7 @@ import { AlertTriangle } from "lucide-react";
 import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
 import { RootState } from "../redux/Store";
 import { useSelector } from "react-redux";
-import dayjs from 'dayjs'; // Thêm import dayjs
+import dayjs from 'dayjs';
 
 const RequestList: React.FC = () => {
     const [requestInSelected, setRequestInSelected] = useState<RequestModelFull | undefined>(undefined);
@@ -18,6 +18,7 @@ const RequestList: React.FC = () => {
     const [isDisplayReject, setIsDisplayReject] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [isLoading, setIsLoading] = useState<boolean>(true); // Thêm state loading
     const itemsPerPage: number = 5;
     const location = useLocation();
     const navigate = useNavigate();
@@ -33,12 +34,15 @@ const RequestList: React.FC = () => {
 
     const getListCar = async (id: any) => {
         try {
+            setIsLoading(true); // Bắt đầu loading
             const res = await axiosInstance.get("/request/getListRequest", {
                 params: { key: id },
             });
             onCategoryTypeByRequestList(res.data);
         } catch (err) {
             console.log(err);
+        } finally {
+            setIsLoading(false); // Kết thúc loading
         }
     };
 
@@ -47,7 +51,6 @@ const RequestList: React.FC = () => {
         setRequestPending(list.filter((item) => item.requestStatus !== '1'));
     };
 
-    // Hàm sắp xếp danh sách theo timeCreated sử dụng dayjs
     const handleSortByTime = () => {
         if (!requestInPending) return;
 
@@ -64,7 +67,6 @@ const RequestList: React.FC = () => {
         setCurrentPage(1);
     };
 
-    // Tính toán phân trang
     const totalItems: number = requestInPending?.length || 0;
     const totalPages: number = Math.ceil(totalItems / itemsPerPage);
     const startIndex: number = (currentPage - 1) * itemsPerPage;
@@ -113,7 +115,14 @@ const RequestList: React.FC = () => {
             </div>
 
             <div className="w-full px-6 md:px-20 py-6">
-                {display === false ? (
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+                        <div className="text-center">
+                            <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
+                            <p className="mt-4 text-lg text-gray-600">Đang tải dữ liệu...</p>
+                        </div>
+                    </div>
+                ) : display === false ? (
                     requestInSelected ? (
                         <RequestInSelected requestModal={requestInSelected} />
                     ) : (
