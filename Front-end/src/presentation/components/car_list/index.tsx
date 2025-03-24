@@ -12,7 +12,6 @@ import CarModal from "../car_detail/component/CarModal";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import dayjs, { Dayjs } from "dayjs";
 import { DateRange } from "@mui/x-date-pickers-pro/models";
-import { ToastContainer } from "react-toastify";
 
 // Định nghĩa kiểu cho bộ lọc
 interface FilterOptions {
@@ -188,7 +187,6 @@ const CarList: React.FC = () => {
 
   return (
     <div className="w-full bg-gray-100 min-h-screen">
-      <ToastContainer />
       <div className="w-full bg-black text-white shadow-lg py-4 px-4 md:px-24">
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-6">
           <div className="flex w-full md:w-auto items-center gap-3 bg-white rounded-lg shadow-md p-2">

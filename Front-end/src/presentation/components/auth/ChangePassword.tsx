@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EditPassword } from "../redux/slices/Authentication";
 import { RootState } from "../redux/Store";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
@@ -122,7 +122,6 @@ const ChangePassword: React.FC = () => {
           {isLoading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
         </button>
       </form>
-      <ToastContainer />
     </div>
   );
 };

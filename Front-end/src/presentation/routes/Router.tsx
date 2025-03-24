@@ -35,7 +35,6 @@ import UserList from "../components/admin/UserList";
 import ChangeRoleAccount from "../components/admin/ChangeRoleAccount";
 import ManagerCar from "../components/manager_car";
 import RequestInExpire from "../components/request_list/component/RequestInExpire";
-import 'react-toastify/dist/ReactToastify.css';
 import BillDetailPage from "../components/request_list/component/BillPayment";
 
 const Router = () => {
@@ -44,6 +43,10 @@ const Router = () => {
         {
             path: ROOT,
             element: <HomePage />
+        },
+        {
+            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
+            element: <SignUp />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN,
@@ -84,10 +87,6 @@ const Router = () => {
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_PASSWORD + "/:userId",
             element: <ProtectedRoute><ChangePassword /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
-            element: <SignUp />
         },
         {
             path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHENTICATION,

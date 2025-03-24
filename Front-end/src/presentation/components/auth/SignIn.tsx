@@ -15,7 +15,7 @@ import { GoogleIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser, loginWithGoogle } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 import { Eye, EyeOff } from 'lucide-react';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -65,14 +65,13 @@ export default function SignIn() {
     const password = formData.get("password") as string;
 
     try {
-      const result = await dispatch(LoginUser({ email, password })) as any;
-      toast.success(result.message);
-      setTimeout(() => {
+      await dispatch(LoginUser({ email, password })) as any;
+      toast.success("Đăng nhập thành công");
+      // setTimeout(() => {
         navigate("/");
-      }, 2000)
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.message || "Đăng nhập thất bại";
-      toast.error(errorMessage);
+      // }, 2000);
+    } catch (error: any) {
+      toast.error(error.message || "Đăng nhập thất bại");
     }
   };
 
@@ -80,7 +79,6 @@ export default function SignIn() {
     <>
       <CssBaseline />
       <SignInContainer direction="column" justifyContent="space-between" style={{ marginTop: '40px', marginBottom: '40px' }}>
-        <ToastContainer/>
         <Card variant="outlined">
           <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
             Đăng nhập
@@ -151,7 +149,6 @@ export default function SignIn() {
           </Box>
         </Card>
       </SignInContainer>
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

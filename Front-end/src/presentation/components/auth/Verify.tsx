@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { ResendOTP, VerifyEmail } from "../redux/slices/Authentication";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, CssBaseline, FormControl, FormLabel, TextField, Typography, Stack, Card } from '@mui/material';
@@ -91,7 +91,6 @@ const Verify: React.FC = () => {
       <CssBaseline />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <VerifyContainer alignItems="center" justifyContent="center">
-        <ToastContainer/>
         <StyledCard variant="outlined">
           <Typography component="h1" variant="h4">
             Xác minh Email

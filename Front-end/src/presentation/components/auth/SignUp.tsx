@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Box, Button, CssBaseline, Divider, FormLabel, FormControl, TextField, Typography, Stack, Card, InputAdornment, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from '../redux/Store';
 import { RegisterUser } from '../redux/slices/Authentication';
@@ -32,7 +32,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
   const { isLoading } = useSelector((state: RootState) => state.auth);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,18 +42,16 @@ export default function SignUp() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    setErrorMessage(null);
-
     try {
       const result = await dispatch(RegisterUser({ userName, phoneNumber, email, password })) as any;
       toast.success(result.message);
       setTimeout(() => {
         navigate('/app/verify');
       }, 2000);
-    } catch (err: any) {
-      const serverMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
-      setErrorMessage(serverMessage);
-      toast.error(serverMessage);
+    } catch (error: any) {
+      toast.error(error.message);
+      console.log(error.message);
+      
     }
   };
 
@@ -62,7 +60,6 @@ export default function SignUp() {
       <CssBaseline />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <SignUpContainer alignItems="center" justifyContent="center">
-        <ToastContainer />
         <StyledCard variant="outlined">
           <Typography component="h1" variant="h4">
             Đăng ký

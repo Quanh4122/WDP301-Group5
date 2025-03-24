@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../redux/Store";
 import { UpdateProfile } from "../redux/slices/Authentication";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const EditProfile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -80,7 +80,6 @@ const EditProfile: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl min-h-screen">
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       <div className="bg-white rounded-xl shadow-lg p-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Chỉnh sửa hồ sơ</h2>
         <form onSubmit={handleSubmit} className="space-y-6">

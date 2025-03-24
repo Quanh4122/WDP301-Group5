@@ -126,12 +126,31 @@ const register = async (req, res) => {
           });
         }
 
+        // Kiểm tra số điện thoại mới có trùng với người dùng khác không
+        const existingPhone = await UserModel.findOne({ phoneNumber, _id: { $ne: existingUser._id } });
+        if (existingPhone) {
+          return res.status(400).json({
+            status: "error",
+            message: "Số điện thoại này đã được sử dụng bởi người dùng khác!",
+          });
+        }
+
+        // Cập nhật thông tin mới
+        existingUser.userName = userName;
+        existingUser.phoneNumber = phoneNumber;
+        await existingUser.save();
+
+        // Hash lại mật khẩu mới (nếu thay đổi)
+        const hashedPassword = await bcrypt.hash(password, 10);
+        auth.password = hashedPassword;
+        await auth.save();
+
         // Gửi lại OTP
         await generateAndSendOTP(auth);
 
         return res.status(200).json({
           status: "success",
-          message: "Tài khoản của bạn từng đăng ký nhưng chưa xác thực. Mã OTP mới đã được gửi đến email của bạn!",
+          message: "Thông tin của bạn đã được cập nhật. Mã OTP mới đã được gửi đến email của bạn!",
           user_id: existingUser._id,
         });
       }

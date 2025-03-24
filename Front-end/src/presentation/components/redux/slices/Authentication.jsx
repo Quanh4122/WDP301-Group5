@@ -512,13 +512,20 @@ export function LoginUser(formValues) {
 
       // Return the result to the caller
       return { token, user: standardizedUser };
+      
     } catch (error) {
-      console.error("Login error:", error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
-      // Throw a more specific error message
-      throw new Error(error.message || "Đăng nhập thất bại");
+
+      let errorMessage = "Đăng nhập thất bại";
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data.message || error.response.data.error || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      throw new Error(errorMessage);
     }
   };
 }
@@ -531,8 +538,6 @@ export function RegisterUser(formValues) {
         headers: { "Content-Type": "application/json" },
       });
 
-      console.log("Register response:", response.data);
-
       dispatch(slice.actions.updateRegisterEmail({ email: formValues.email }));
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
@@ -540,12 +545,18 @@ export function RegisterUser(formValues) {
       return response.data;
 
     } catch (error) {
-      console.error("Register error:", error);
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: true })
       );
-      dispatch(slice.actions.setRegisterStatus(false));
-      throw error;
+
+      let errorMessage = "Đăng nhập thất bại";
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data.message || error.response.data.error || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      throw new Error(errorMessage);
     }
   };
 }
