@@ -21,8 +21,8 @@ export default function ForgotPasswordPage() {
         try {
             await dispatch(ForgotPassword({ email }) as any);
             toast.success(`Gửi về ${email} thành công. Vui lòng kiểm tra.`);
-        } catch (err) {
-            toast.error('Gửi email thất bại. Vui lòng thử lại.');
+        } catch (err: any) {
+            toast.error(err.response.data.message);
         } finally {
             setLoading(false);
         }

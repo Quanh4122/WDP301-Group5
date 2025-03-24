@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Box, Button, CssBaseline, Divider, FormLabel, FormControl, TextField, Typography, Stack, Card, InputAdornment, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from '../redux/Store';
 import { RegisterUser } from '../redux/slices/Authentication';
@@ -32,7 +32,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
   const { isLoading } = useSelector((state: RootState) => state.auth);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,29 +42,19 @@ export default function SignUp() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    setErrorMessage(null);
-
     try {
       const result = await dispatch(RegisterUser({ userName, phoneNumber, email, password })) as any;
-      toast.success('Bạn đăng ký tài khoản thành công');
+      toast.success(result.message);
       navigate('/app/verify');
-    } catch (err: any) {
-      const serverMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
-      if (serverMessage.includes('Tài khoản của bạn từng đăng ký nhưng chưa xác thực')) {
-        toast.error(serverMessage, {
-          autoClose: 2000,
-          onClose: () => navigate('/app/verify'),
-        });
-      } else {
-        setErrorMessage(serverMessage);
-        toast.error(serverMessage);
-      }
+    } catch (error: any) {
+      toast.error(error.message);
+      console.log(error.message);
+
     }
   };
 
   return (
     <div>
-      <ToastContainer />
       <CssBaseline />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <SignUpContainer alignItems="center" justifyContent="center">

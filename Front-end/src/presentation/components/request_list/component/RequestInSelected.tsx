@@ -154,7 +154,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             })
             .then((res) => {
                 setRequestData(res.data);
-                toast.success("Delete Successful");
+                toast.success("Xóa xe thành công");
             })
             .catch((err) => toast.error("Fail to delete !!"));
     };

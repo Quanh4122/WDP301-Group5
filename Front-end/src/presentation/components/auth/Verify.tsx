@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/Store";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { ResendOTP, VerifyEmail } from "../redux/slices/Authentication";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, CssBaseline, FormControl, FormLabel, TextField, Typography, Stack, Card } from '@mui/material';
@@ -62,10 +62,12 @@ const Verify: React.FC = () => {
         email: user?.email || "",
         otp
       }));
-      toast.success("Xác minh thành công");
+      console.log(result);
+      toast.success(result.message);
       navigate("/app/sign-in");
-    } catch (error) {
-      const errorMessage = (error as any)?.response?.data?.message;
+    } catch (err: any) {
+      const errorMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
+      console.log(errorMessage);
       toast.error(errorMessage);
     }
   };
@@ -73,9 +75,9 @@ const Verify: React.FC = () => {
   const handleResend = async () => {
     try {
       const result = await dispatch(ResendOTP(user?.email || ""));
-        toast.success(result?.message);
-        setTimer(120);
-        setCanResend(false);
+      toast.success(result?.message);
+      setTimer(120);
+      setCanResend(false);
     } catch (error) {
       const errorMessage = (error as any)?.response?.data?.message || "Gửi lại OTP thất bại";
       toast.error(errorMessage);
@@ -84,7 +86,6 @@ const Verify: React.FC = () => {
 
   return (
     <div>
-      <ToastContainer />
       <CssBaseline />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <VerifyContainer alignItems="center" justifyContent="center">

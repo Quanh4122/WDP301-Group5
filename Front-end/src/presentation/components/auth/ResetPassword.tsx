@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NewPassword } from "../redux/slices/Authentication";
 import { Eye, EyeOff, Key } from "lucide-react"; 
+import { toast } from "react-toastify";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -13,8 +14,6 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isLoading } = useSelector((state: any) => state.auth);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState({ password: "", confirmPassword: "" });
 
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
@@ -22,35 +21,18 @@ const ResetPassword = () => {
     const tokenFromURL = queryParams.get("token");
     if (tokenFromURL) {
       setToken(tokenFromURL);
-    } else {
-      setMessage("Không tìm thấy token! Vui lòng kiểm tra lại email.");
-    }
+    } 
   }, [location.search]);
 
   const handleReset = async () => {
-    setMessage("");
-    setError({ password: "", confirmPassword: "" });
-
-    if (!token) {
-      setMessage("Không có token hợp lệ.");
-      return;
-    }
-    if (password.length < 6) {
-      setError((prev) => ({ ...prev, password: "Mật khẩu phải có ít nhất 6 ký tự." }));
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError((prev) => ({ ...prev, confirmPassword: "Mật khẩu xác nhận không khớp." }));
-      return;
-    }
 
     dispatch<any>(NewPassword({ token, password, passwordConfirm: confirmPassword }))
       .then(() => {
-        setMessage("Mật khẩu đã được đặt lại thành công!");
-        setTimeout(() => navigate("/app/sign-in"), 2000); 
+        toast.success("Đặt lại mật khẩu thành công!");
+        navigate("/app/sign-in")
       })
       .catch((err: any) => {
-        setMessage(`${err.message}`);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -79,7 +61,6 @@ const ResetPassword = () => {
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
-          {error.password && <p className="text-red-500 text-sm mt-1">{error.password}</p>}
         </div>
 
         {/* Input Xác nhận mật khẩu */}
@@ -98,32 +79,15 @@ const ResetPassword = () => {
           >
             {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
-          {error.confirmPassword && <p className="text-red-500 text-sm mt-1">{error.confirmPassword}</p>}
         </div>
 
         {/* Nút xác nhận */}
         <button
           onClick={handleReset}
-          disabled={isLoading || !password || !confirmPassword}
-          className={`w-full p-3 rounded-lg text-white font-semibold transition-all duration-300 ${
-            password && confirmPassword
-              ? "bg-blue-500 hover:bg-blue-600"
-              : "bg-gray-400 cursor-not-allowed"
-          }`}
+          className={`w-full p-3 rounded-lg text-white font-semibold transition-all duration-300 bg-blue-500 hover:bg-blue-700`}
         >
-          {isLoading ? "⏳ Đang xử lý..." : "Xác nhận"}
+          {isLoading ? "Đang xử lý..." : "Xác nhận"}
         </button>
-
-        {/* Hiển thị thông báo */}
-        {message && (
-          <p
-            className={`mt-3 text-center font-semibold ${
-              message.includes("thành công") ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {message}
-          </p>
-        )}
       </div>
     </div>
   );
