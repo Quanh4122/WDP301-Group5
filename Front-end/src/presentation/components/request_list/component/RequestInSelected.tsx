@@ -53,9 +53,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
     ]);
 
     // Kiểm tra tính hợp lệ của form và các trường bổ sung
-    const validateForm = async () => {
+    const validateForm = () => {
         try {
-            await form.validateFields(); // Kiểm tra tất cả các trường trong form
+            form.validateFields(); // Kiểm tra tất cả các trường trong form
             const allFieldsFilled = pickUpLocation && dropLocation ? true : false; // Kiểm tra pickUpLocation và dropLocation
             setIsFormValid(allFieldsFilled);
         } catch (error) {
@@ -194,8 +194,11 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             .post("/bill/userBookingBill", dataUserBookingToBill)
             .then((res) => {
                 toast.success("Bạn đã thành công đặt xe !!");
+                setTimeout(() => navigate("/"), 2000)
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                toast.error("Đặt xe thất bại !!");
+            });
         setIsModalDepositOpen(false);
     };
 
@@ -308,6 +311,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
                         isOpen={isModalDepositOpen}
                         onCancel={() => setIsModalDepositOpen(false)}
                         onSubmit={handleSubmit}
+                        amoutDefault={totalPrice * 0.1}
                     />
                 </div>
 

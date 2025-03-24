@@ -26,6 +26,9 @@ const RequestList: React.FC = () => {
 
     useEffect(() => {
         getListCar(userId);
+        if (requestInSelected) {
+            setDisplay(false)
+        }
     }, []);
 
     useEffect(() => {
@@ -47,8 +50,10 @@ const RequestList: React.FC = () => {
     };
 
     const onCategoryTypeByRequestList = (list: RequestModelFull[]) => {
+
         setRequestInSelected(list.filter((item) => item.requestStatus === "1")[0] || undefined);
         setRequestPending(list.filter((item) => item.requestStatus !== '1'));
+
     };
 
     const handleSortByTime = () => {

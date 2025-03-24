@@ -4,6 +4,7 @@ const RequestModel = require("../models/request.model");
 const NotifyPayment = require("../Templates/Mail/notifyPayment");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
+const NotifyBill = require("../Templates/Mail/notifyBill");
 
 const getAllBill = async (req, res) => {
   try {
@@ -43,61 +44,69 @@ const toggleBillStatus = async (req, res) => {
 const useBookingBill = async (req, res) => {
   const data = req.body;
   try {
-    await RequestModel.updateOne(
-      {
-        _id: data.request._id,
-      },
-      {
-        requestStatus: data.request.requestStatus,
-        pickUpLocation: data.request.pickUpLocation,
-        isRequestDriver: data.request.isRequestDriver,
-        startDate: data.request.startDate,
-        endDate: data.request.endDate,
-        emailRequest: data.request.emailRequest,
-        dropLocation: data.request.dropLocation,
-      }
-    );
-
-    const bill = new BillModel({
-      billStatus: false,
+    const checkBillExisted = await BillModel.findOne({
       request: data.request._id,
-      depositFee: data.billData.depositFee,
-      vatFee: data.billData.vatFee,
-      totalCarFee: data.billData.totalCarFee,
     });
+    console.log(checkBillExisted);
+    if (!checkBillExisted) {
+      await RequestModel.updateOne(
+        {
+          _id: data.request._id,
+        },
+        {
+          requestStatus: data.request.requestStatus,
+          pickUpLocation: data.request.pickUpLocation,
+          isRequestDriver: data.request.isRequestDriver,
+          startDate: data.request.startDate,
+          endDate: data.request.endDate,
+          emailRequest: data.request.emailRequest,
+          dropLocation: data.request.dropLocation,
+        }
+      );
 
-    await bill.save();
+      const bill = new BillModel({
+        billStatus: false,
+        request: data.request._id,
+        depositFee: data.billData.depositFee,
+        vatFee: data.billData.vatFee,
+        totalCarFee: data.billData.totalCarFee,
+      });
 
-    const emailContent = await NotifyBill(
-      `${data.userName}`,
-      data.billData.vatFee &&
-        data.billData.vatFee.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }),
-      data.billData.totalCarFee &&
-        data.billData.totalCarFee.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }),
-      data.billData.depositFee &&
-        data.billData.depositFee.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }),
-      dayjs(data.request.startDate).format("HH:mm DD/MM/YYYY"),
-      dayjs(data.request.endDate).format("HH:mm DD/MM/YYYY"),
-      data.request.pickUpLocation
-    );
+      await bill.save();
 
-    await mailService.sendEmail({
-      to: data.request.emailRequest,
-      subject: "Thông báo yêu cầu đặt xe",
-      html: emailContent,
-    });
-    return res.status(200).json({ message: "Create bill successfull !!!" });
+      const emailContent = await NotifyBill(
+        `${data.userName}`,
+        data.billData.vatFee &&
+          data.billData.vatFee.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          }),
+        data.billData.totalCarFee &&
+          data.billData.totalCarFee.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          }),
+        data.billData.depositFee &&
+          data.billData.depositFee.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          }),
+        dayjs(data.request.startDate).format("HH:mm DD/MM/YYYY"),
+        dayjs(data.request.endDate).format("HH:mm DD/MM/YYYY"),
+        data.request.pickUpLocation
+      );
+
+      await mailService.sendEmail({
+        to: data.request.emailRequest,
+        subject: "Thông báo yêu cầu đặt xe",
+        html: emailContent,
+      });
+      return res.status(200).json({ message: "Create bill successfull !!!" });
+    } else {
+      return res.status(500).json({ message: "Bill have already booking !!" });
+    }
   } catch (error) {
-    console.log(error);
+    return res.status(300).json(error);
   }
 };
 

@@ -107,8 +107,8 @@ const CarDetail = () => {
                 }
 
                 await axiosInstance.post("/request/createRequest", formBooking)
-                    .then(res => toast.success("Add to request Successfull !!"))
-                    .catch(err => toast.error("This car may be added in your request !!"))
+                    .then(res => toast.success("Thêm xe vào giỏ hàng thành công !!"))
+                    .catch(err => toast.error("Xe đã được thêm vào giỏ hàng trước đây !!"))
             }
         } else {
             navigate(PRIVATE_ROUTES.PATH + '/' + PRIVATE_ROUTES.SUB.SIGN_IN)

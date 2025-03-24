@@ -131,7 +131,7 @@ module.exports = (name, start, end, pickUplocation, dropLocation, link) => {
               <div class="content">
                   <p class="greeting">Chào bạn, ${name},</p>
                   <div class="success-message">
-                      <p>Đơn đặt xe của bạn <span>còn 3 giờ nữa đến thời gian trả xe!</span></p>
+                      <p>Đơn đặt xe của bạn <span>đã đến thời gian trả xe!</span></p>
                   </div>
                   <div class="details-section">
                       <h3>Chi tiết đặt xe</h3>
