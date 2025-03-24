@@ -6,7 +6,6 @@ const route = require("./routes");
 const bodyParser = require("body-parser");
 const PORT = process.env.URL || 3000;
 const CLIENT_URL = process.env.CLIENT_PORT;
-const { UserController } = require("./controllers");
 const WebSocket = require("ws");
 const RequestModel = require("./models/request.model");
 const BillModel = require("./models/bill.model");
@@ -61,9 +60,8 @@ const sendEmailRequestStatus3 = async (item) => {
   const hoursLater = now.add(2, "hour");
   const start = dayjs(item.startDate);
   const end = dayjs(item.endDate);
-
   // Kiểm tra nếu end nằm trong khoảng từ now đến 2 tiếng sau (hoursLater)
-  if (now.isAfter(end) && now.isBefore(end.add(2, "hours"))) {
+  if (now.isAfter(end) && now.isBefore(end.add(1, "hour"))) {
     console.log("check");
     const startDate = start.format("HH:mm, DD/MM/YYYY");
     const endDate = end.format("HH:mm, DD/MM/YYYY");

@@ -23,6 +23,7 @@ const AdminRequest = () => {
 
     useEffect(() => {
         getListRequest();
+        setDataDisplay(requestDataInBooking)
     }, []);
 
     useEffect(() => {
@@ -39,15 +40,11 @@ const AdminRequest = () => {
     };
 
     const setListRequest = (listRequest: RequestModelFull[]) => {
-        setRequestDataPending(listRequest.filter((item) => item.requestStatus === '2'));
-        setRequestDataAccepted(listRequest.filter((item) => item.requestStatus === '4'));
-        setRequestDataDenied(listRequest.filter((item) => item.requestStatus === '5'));
-
         // Sửa
         setRequestInBooking(listRequest.filter((item) => item.requestStatus == '2'))
-        setRequestInAdminFee(listRequest.filter((item) => item.requestStatus == '3'))
-        setRequestInAdminWatiToPay(listRequest.filter((item) => item.requestStatus == '4'))
-        setRequestDoneBill(listRequest.filter((item) => item.requestStatus == '5'))
+        setRequestInAdminFee(listRequest.filter((item) => item.requestStatus == '4'))
+        setRequestInAdminWatiToPay(listRequest.filter((item) => item.requestStatus == '5'))
+        setRequestDoneBill(listRequest.filter((item) => item.requestStatus == '6'))
     };
 
     const onChangeValue = (value: string) => {
@@ -67,11 +64,9 @@ const AdminRequest = () => {
             <div className="mb-4 bg-white shadow-md p-4 rounded-md">
                 <Select
                     options={optionRequest}
-                    defaultValue={'Pending'}
+                    defaultValue={'Đang thực hiện'}
                     onChange={(value) => onChangeValue(value)}
                     className="w-48"
-                // Các style của select
-
                 />
             </div>
             <div className="bg-white shadow-md p-4 rounded-md">

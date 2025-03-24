@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EditPassword } from "../redux/slices/Authentication";
 import { RootState } from "../redux/Store";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const ChangePassword: React.FC = () => {
   const dispatch = useDispatch<any>();
@@ -15,6 +16,7 @@ const ChangePassword: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
 
   // State để kiểm soát hiển thị mật khẩu
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -24,34 +26,14 @@ const ChangePassword: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!userId) {
-      toast.error("Người dùng không hợp lệ, vui lòng đăng nhập lại!");
-      return;
-    }
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      toast.error("Vui lòng điền đầy đủ thông tin!");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error("Mật khẩu mới và xác nhận mật khẩu không khớp!");
-      return;
-    }
-
     try {
-      console.log("Gửi request đổi mật khẩu với userId:", userId);
-      const response = await dispatch(EditPassword(userId, { currentPassword, newPassword, confirmPassword }));
-      console.log(response)
-      if (response == 200) {
-        toast.success("Thay đổi mật khẩu thành công!");
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      }
+      await dispatch(EditPassword(userId, { currentPassword, newPassword, confirmPassword }));
+      toast.success("Thay đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+      navigate("/app/sign-in");
     } catch (err: any) {
-      console.error("Lỗi đổi mật khẩu:", err);
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
+      console.log(err);
+      
+      toast.error(err.response.data.message);
     }
   };
 
@@ -122,7 +104,6 @@ const ChangePassword: React.FC = () => {
           {isLoading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
         </button>
       </form>
-      <ToastContainer />
     </div>
   );
 };

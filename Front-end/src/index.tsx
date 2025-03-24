@@ -6,14 +6,12 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './presentation/components/redux/Store';
 import 'bootstrap/dist/css/bootstrap.css';
-import { ToastContainer } from 'react-toastify';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <BrowserRouter>
-    <ToastContainer />
     <Provider store={store}>
       <App />
     </Provider>

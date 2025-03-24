@@ -15,7 +15,7 @@ import { GoogleIcon } from '../auth/CustomIcons';
 import { useDispatch, useSelector } from '../redux/Store';
 import { LoginUser, loginWithGoogle } from '../redux/slices/Authentication';
 import { RootState } from '../redux/Store';
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 import { Eye, EyeOff } from 'lucide-react';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -65,13 +65,13 @@ export default function SignIn() {
     const password = formData.get("password") as string;
 
     try {
-      const result = await dispatch(LoginUser({ email, password }));
+      await dispatch(LoginUser({ email, password })) as any;
       toast.success("Đăng nhập thành công");
-      navigate("/");
+      // setTimeout(() => {
+        navigate("/");
+      // }, 2000);
     } catch (error: any) {
-      console.error("Login error:", error);
-      const errorMessage = error.message || "Đăng nhập thất bại";
-      toast.error(errorMessage);
+      toast.error(error.message || "Đăng nhập thất bại");
     }
   };
 
@@ -149,7 +149,6 @@ export default function SignIn() {
           </Box>
         </Card>
       </SignInContainer>
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }
