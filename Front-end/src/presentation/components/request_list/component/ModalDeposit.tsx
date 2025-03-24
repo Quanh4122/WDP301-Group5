@@ -40,7 +40,7 @@ const ModalDeposit = ({ isOpen, onCancel, onSubmit }: Props) => {
             ]}
         >
             <div style={{ padding: '16px 0' }}>
-                <label>Số tiền thanh toán (VNĐ):</label>
+                <label>Số tiền đặt cọc (VNĐ):</label>
                 <InputNumber
                     style={{ width: '100%', marginTop: 8 }}
                     min={0} // Giá trị tối thiểu là 0

@@ -17,24 +17,9 @@ interface Props {
 const RequestItem = ({ requestModel }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
-    const [billData, setBillData] = useState<BillModal>()
-
     const startDate = dayjs(requestModel.startDate).format("HH:mm, DD/MM/YYYY");
     const endDate = dayjs(requestModel.endDate).format("HH:mm, DD/MM/YYYY");
 
-    useEffect(() => {
-        getBillByRequestId(requestModel._id)
-    }, [])
-
-    const getBillByRequestId = async (id: string) => {
-        axiosInstance.get("/bill/getBillByReuqestId", {
-            params: {
-                key: id
-            }
-        })
-            .then(res => setBillData(res.data))
-            .catch(err => console.log(err))
-    }
 
     return (
         <div className="w-full rounded-lg shadow-md mb-4 bg-white">

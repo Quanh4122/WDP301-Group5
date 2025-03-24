@@ -63,7 +63,7 @@ const sendEmailRequestStatus3 = async (item) => {
   const end = dayjs(item.endDate);
 
   // Kiểm tra nếu end nằm trong khoảng từ now đến 2 tiếng sau (hoursLater)
-  if (now.isAfter(end) && now.isBefore(end.add(2, "hours"))) {
+  if (now.isAfter(end) && now.isBefore(end.add(1, "hours"))) {
     console.log("check");
     const startDate = start.format("HH:mm, DD/MM/YYYY");
     const endDate = end.format("HH:mm, DD/MM/YYYY");

@@ -275,6 +275,7 @@ const handleCheckRequest = async (req, res) => {
     const listReqInRangeTime = await RequestModel.find(
       {
         _id: { $ne: dataRequest._id },
+        requestStatus: { $in: ["1", "5"] },
         $and: [
           { startDate: { $lt: dt.endDate } },
           { endDate: { $gt: dt.startDate } },
@@ -282,6 +283,19 @@ const handleCheckRequest = async (req, res) => {
       },
       "car -_id"
     );
+
+    const listReqDriverInRangeTime = await RequestModel.find(
+      {
+        _id: { $ne: dataRequest._id },
+        requestStatus: { $in: ["1", "5"] },
+        $and: [
+          { startDate: { $lt: dt.endDate } },
+          { endDate: { $gt: dt.startDate } },
+        ],
+      },
+      "driver -_id"
+    );
+
     if (listReqInRangeTime.length > 0) {
       const listReqInRangeTimeOther = listReqInRangeTime.filter(
         (item) => item._id != dataRequest._id
@@ -295,6 +309,7 @@ const handleCheckRequest = async (req, res) => {
       const set1 = new Set(arrStr);
       const existed = dataRequestCar.filter((ele) => set1.has(ele));
       const val = dataRequestCar.some((element) => arrStr.includes(element));
+
       return res.status(200).json({ isExisted: val, duplicateCar: existed });
     } else {
       return res.status(200).json({ isExisted: false, duplicateCar: [] });
@@ -303,6 +318,8 @@ const handleCheckRequest = async (req, res) => {
     return res.status(400).json({ message: error });
   }
 };
+
+const handleCheckCar = async (req, res) => {};
 
 const getAddress = async (req, res) => {
   const query = req.query.q; // Từ khóa người dùng nhập

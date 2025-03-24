@@ -24,7 +24,6 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
     const [requestData, setRequestData] = useState<RequestModelFull>(requestModal);
     const [dataCheck, setDataCheck] = useState<{ isExisted: boolean; duplicateCar: string[] } | undefined>();
     const navigate = useNavigate();
-    const [driverSelected] = useState<any[]>([]); // Giả định driverSelected không thay đổi
     const [pickUpLocation, setPickUpLocation] = useState<string>("");
     const [dropLocation, setDropLocation] = useState<string>("");
     const [form] = useForm();
@@ -113,7 +112,6 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
 
     const onBooking = async () => {
         const dataCheckRequest = {
-            driver: driverSelected,
             requestId: requestData._id,
             startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
             endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
@@ -134,7 +132,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
         dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour")
     );
     const [totalPrice, setTotalPrice] = useState(arrPrice * totalTime);
-
+    const [dpIsRequestDriver, setDpIsRequestDriver] = useState(false)
     useEffect(() => {
         const val = dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour");
         setTotalTime(val);
@@ -157,22 +155,21 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
     const [isModalDepositOpen, setIsModalDepositOpen] = useState(false);
 
     const handleSubmit = async (amount: number) => {
-        console.log(`Số tiền thanh toán: ${amount}`);
-        setIsModalDepositOpen(false);
-        const requestBookingAccept: RequestAcceptForApi = {
-            user: {
-                ...requestData?.user,
-                userName: form.getFieldValue("userName"),
-                phoneNumber: form.getFieldValue("phoneNumber"),
-            },
-            emailRequest: form.getFieldValue("email") || requestData.user?.email,
-            isRequestDriver: form.getFieldValue("isRequestDriver") || false,
-            startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
-            endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
-            requestStatus: "2",
-            pickUpLocation,
-            _id: requestData._id,
-        };
+
+        // const requestBookingAccept: RequestAcceptForApi = {
+        //     user: {
+        //         ...requestData?.user,
+        //         userName: form.getFieldValue("userName"),
+        //         phoneNumber: form.getFieldValue("phoneNumber"),
+        //     },
+        //     emailRequest: form.getFieldValue("email") || requestData.user?.email,
+        //     isRequestDriver: form.getFieldValue("isRequestDriver") || false,
+        //     startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
+        //     endDate: dayjs(formatDate(dateValue[1]) + " " + timeValue[1]),
+        //     requestStatus: "2",
+        //     pickUpLocation,
+        //     _id: requestData._id,
+        // };
 
         const dataUserBookingToBill: RequestUserBookingToBill = {
             request: {
@@ -199,6 +196,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
                 toast.success("Bạn đã thành công đặt xe !!");
             })
             .catch((err) => console.log(err));
+        setIsModalDepositOpen(false);
     };
 
     return (
