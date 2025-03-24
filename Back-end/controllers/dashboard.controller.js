@@ -126,45 +126,55 @@ const getRequestTrend = async (req, res) => {
 
 const getCarAvailability = async (req, res) => {
   try {
-    // Get today's date and reset the time to midnight for consistency.
+    // Set today's date to midnight.
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const next30Days = 30;
 
-    // Fetch only accepted requests (status "3") that may affect the next 30 days.
+    // Calculate the last day in the 30-day window.
+    const lastDay = new Date(today);
+    lastDay.setDate(lastDay.getDate() + next30Days - 1);
+
+    // Query requests with status 2, 3, or 4 that overlap with the next 30 days.
     const requests = await RequestModel.find({
-      requestStatus: "3",
+      requestStatus: { $in: ["2", "3", "4"] },
+      startDate: { $lte: lastDay },
       endDate: { $gte: today },
     }).lean();
 
-    // Initialize arrays for each day of the next 30 days.
-    const reservedData = Array(next30Days).fill(0);
+    // Get the total number of cars from the Car collection.
+    const totalCars = await CarModel.countDocuments();
+
+    // Prepare arrays for in-use and reserved counts for each day.
     const inUseData = Array(next30Days).fill(0);
+    const reservedData = Array(next30Days).fill(0);
 
     // Loop over each day in the next 30 days.
     for (let i = 0; i < next30Days; i++) {
-      // Calculate the current day by adding i days to today.
       const currentDay = new Date(today);
-      currentDay.setDate(currentDay.getDate() + i);
+      currentDay.setDate(today.getDate() + i);
+      currentDay.setHours(0, 0, 0, 0);
 
-      // For each accepted request, check where the current day falls relative to its rental period.
-      requests.forEach((request) => {
-        const startDate = new Date(request.startDate);
-        const endDate = new Date(request.endDate);
-        // Number of cars booked in this request.
-        const numCars = Array.isArray(request.car) ? request.car.length : 0;
-
-        if (currentDay < startDate) {
-          // The rental has not started yet: count it as reserved.
-          reservedData[i] += numCars;
-        } else if (currentDay >= startDate && currentDay < endDate) {
-          // The rental is currently in use.
-          inUseData[i] += numCars;
+      // Use a Set to collect unique car IDs that are in use on this day.
+      const carSet = new Set();
+      requests.forEach(request => {
+        const reqStart = new Date(request.startDate);
+        const reqEnd = new Date(request.endDate);
+        // Check if currentDay is within the request period (inclusive).
+        if (currentDay >= reqStart && currentDay <= reqEnd) {
+          if (Array.isArray(request.car)) {
+            request.car.forEach(carId => carSet.add(carId.toString()));
+          } else if (request.car) {
+            carSet.add(request.car.toString());
+          }
         }
       });
+      const inUseCount = carSet.size;
+      inUseData[i] = inUseCount;
+      reservedData[i] = totalCars - inUseCount;
     }
-    // Create the output data in the format required for a stacked line graph.
-    // Here, "inuse" will be the lower (bottom) layer and "reserved" will be the upper layer.
+
+    // Build the chart data according to the required JSON format.
     const chartData = [
       {
         id: "inuse",
@@ -190,10 +200,11 @@ const getCarAvailability = async (req, res) => {
 
     return res.json(chartData);
   } catch (error) {
-    console.error("Error generating rental chart data:", error);
+    console.error("Error generating car availability chart:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 const getIncomeData = async (req, res) => {
   try {
@@ -256,12 +267,12 @@ const getIncomeData = async (req, res) => {
     });
 
     // Build the response with the computed income data.
-    const responseData = {
+    const responseData = [{
       id: "completed",
       label: "Completed Payments",
       data: incomeData,
       stack: "A"
-    };
+    }];
 
     return res.status(200).json(responseData);
   } catch (error) {
