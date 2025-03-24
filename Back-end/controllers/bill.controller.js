@@ -4,6 +4,7 @@ const RequestModel = require("../models/request.model");
 const NotifyPayment = require("../Templates/Mail/notifyPayment");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
+const NotifyBill = require("../Templates/Mail/notifyBill")
 
 const getAllBill = async (req, res) => {
   try {
