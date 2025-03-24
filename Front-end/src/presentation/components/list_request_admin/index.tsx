@@ -39,15 +39,11 @@ const AdminRequest = () => {
     };
 
     const setListRequest = (listRequest: RequestModelFull[]) => {
-        setRequestDataPending(listRequest.filter((item) => item.requestStatus === '2'));
-        setRequestDataAccepted(listRequest.filter((item) => item.requestStatus === '4'));
-        setRequestDataDenied(listRequest.filter((item) => item.requestStatus === '5'));
-
         // Sửa
         setRequestInBooking(listRequest.filter((item) => item.requestStatus == '2'))
-        setRequestInAdminFee(listRequest.filter((item) => item.requestStatus == '3'))
-        setRequestInAdminWatiToPay(listRequest.filter((item) => item.requestStatus == '4'))
-        setRequestDoneBill(listRequest.filter((item) => item.requestStatus == '5'))
+        setRequestInAdminFee(listRequest.filter((item) => item.requestStatus == '4'))
+        setRequestInAdminWatiToPay(listRequest.filter((item) => item.requestStatus == '5'))
+        setRequestDoneBill(listRequest.filter((item) => item.requestStatus == '6'))
     };
 
     const onChangeValue = (value: string) => {

@@ -6,8 +6,7 @@ const NotifyRequest = require("../Templates/Mail/notifyRequest");
 const NotifyBill = require("../Templates/Mail/notifyBill");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
-const BillModel = require("../models/bill.model")
-
+const BillModel = require("../models/bill.model");
 
 const createRequest = async (req, res) => {
   const data = req.body;
@@ -281,6 +280,12 @@ const handleCheckRequest = async (req, res) => {
   try {
     const dt = req.body;
     const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
+
+    if (dataRequest.car.length < 0) {
+      return res
+        .status(300)
+        .json({ message: "Không bạn phải chọn thêm xe bất kì để tiếp tục !!" });
+    }
 
     const listReqInRangeTime = await RequestModel.find(
       {

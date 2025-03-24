@@ -107,7 +107,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             .then((res) => {
                 toast.success("Bạn đã thành công đặt xe !!");
             })
-            .catch((err) => console.log(err));
+            .catch((err) => toast.error("Số lượng tài xế không đủ bạn có thể bớt xe hoặc thuê không tài xế !!"));
     };
 
     const onBooking = async () => {
