@@ -1,5 +1,7 @@
 const UserModel = require("../models/user.model");
 const RequestModel = require("../models/request.model");
+const BillModel = require("../models/bill.model")
+const dayjs = require("dayjs");
 const CarModel = require("../models/car.model");
 
 const getUserTrend = async (req, res) => {
@@ -124,46 +126,55 @@ const getRequestTrend = async (req, res) => {
 
 const getCarAvailability = async (req, res) => {
   try {
-    // Get today's date and reset the time to midnight for consistency.
+    // Set today's date to midnight.
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const next30Days = 30;
 
-    // Fetch only accepted requests (status "3") that may affect the next 30 days.
+    // Calculate the last day in the 30-day window.
+    const lastDay = new Date(today);
+    lastDay.setDate(lastDay.getDate() + next30Days - 1);
+
+    // Query requests with status 2, 3, or 4 that overlap with the next 30 days.
     const requests = await RequestModel.find({
-      requestStatus: "3",
+      requestStatus: { $in: ["2", "3", "4"] },
+      startDate: { $lte: lastDay },
       endDate: { $gte: today },
     }).lean();
 
-    // Initialize arrays for each day of the next 30 days.
-    const reservedData = Array(next30Days).fill(0);
+    // Get the total number of cars from the Car collection.
+    const totalCars = await CarModel.countDocuments();
+
+    // Prepare arrays for in-use and reserved counts for each day.
     const inUseData = Array(next30Days).fill(0);
+    const reservedData = Array(next30Days).fill(0);
 
     // Loop over each day in the next 30 days.
     for (let i = 0; i < next30Days; i++) {
-      // Calculate the current day by adding i days to today.
       const currentDay = new Date(today);
-      currentDay.setDate(currentDay.getDate() + i);
+      currentDay.setDate(today.getDate() + i);
+      currentDay.setHours(0, 0, 0, 0);
 
-      // For each accepted request, check where the current day falls relative to its rental period.
-      requests.forEach((request) => {
-        const startDate = new Date(request.startDate);
-        const endDate = new Date(request.endDate);
-        // Number of cars booked in this request.
-        const numCars = Array.isArray(request.car) ? request.car.length : 0;
-
-        if (currentDay < startDate) {
-          // The rental has not started yet: count it as reserved.
-          reservedData[i] += numCars;
-        } else if (currentDay >= startDate && currentDay < endDate) {
-          // The rental is currently in use.
-          inUseData[i] += numCars;
+      // Use a Set to collect unique car IDs that are in use on this day.
+      const carSet = new Set();
+      requests.forEach(request => {
+        const reqStart = new Date(request.startDate);
+        const reqEnd = new Date(request.endDate);
+        // Check if currentDay is within the request period (inclusive).
+        if (currentDay >= reqStart && currentDay <= reqEnd) {
+          if (Array.isArray(request.car)) {
+            request.car.forEach(carId => carSet.add(carId.toString()));
+          } else if (request.car) {
+            carSet.add(request.car.toString());
+          }
         }
       });
+      const inUseCount = carSet.size;
+      inUseData[i] = inUseCount;
+      reservedData[i] = totalCars - inUseCount;
     }
 
-    // Create the output data in the format required for a stacked line graph.
-    // Here, "inuse" will be the lower (bottom) layer and "reserved" will be the upper layer.
+    // Build the chart data according to the required JSON format.
     const chartData = [
       {
         id: "inuse",
@@ -189,13 +200,92 @@ const getCarAvailability = async (req, res) => {
 
     return res.json(chartData);
   } catch (error) {
-    console.error("Error generating rental chart data:", error);
+    console.error("Error generating car availability chart:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+const getIncomeData = async (req, res) => {
+  try {
+    // Define the 7-month window: past 3 months, current month, next 3 months.
+    const current = dayjs();
+    const months = [];
+    // Start 3 months ago (beginning of that month)
+    const startMonth = current.subtract(3, "month").startOf("month");
+
+    // Build an array of 7 dayjs objects, one for each month in the window
+    for (let i = 0; i < 7; i++) {
+      months.push(startMonth.add(i, "month"));
+    }
+
+    // Initialize an array for the income data for each month
+    const incomeData = Array(7).fill(0);
+
+    // Determine the overall date range
+    const startRange = months[0].startOf("month").toDate();
+    const endRange = months[6].endOf("month").toDate();
+
+    // Query all bills and populate the request field to get endDate and requestStatus.
+    const bills = await BillModel.find().populate({
+      path: "request",
+      select: "endDate requestStatus"
+    });
+
+    // Process each bill to sum income by month based on the Request's endDate.
+    bills.forEach(bill => {
+      // Ensure the bill has an associated Request with endDate and requestStatus.
+      if (bill.request && bill.request.endDate && bill.request.requestStatus) {
+        const billEndDate = dayjs(bill.request.endDate);
+
+        // Only include bills whose Request endDate is within the 7-month window.
+        if (
+          billEndDate.isBefore(dayjs(startRange)) ||
+          billEndDate.isAfter(dayjs(endRange))
+        ) {
+          return; // skip bills outside our window
+        }
+
+        // Find the corresponding index in the months array.
+        const index = months.findIndex(month => {
+          return (
+            billEndDate.year() === month.year() &&
+            billEndDate.month() === month.month()
+          );
+        });
+
+        if (index >= 0) {
+          // Depending on requestStatus, add depositFee or totalCarFee.
+          const requestStatus = bill.request.requestStatus;
+          if (["2", "3", "4"].includes(requestStatus)) {
+            incomeData[index] += bill.depositFee || 0;
+          } else if (requestStatus === "5") {
+            incomeData[index] += bill.totalCarFee || 0;
+          }
+        }
+      }
+    });
+
+    // Build the response with the computed income data.
+    const responseData = [{
+      id: "completed",
+      label: "Completed Payments",
+      data: incomeData,
+      stack: "A"
+    }];
+
+    return res.status(200).json(responseData);
+  } catch (error) {
+    console.error("Error computing income data:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+
 
 module.exports = {
   getUserTrend,
   getRequestTrend,
   getCarAvailability,
+  getIncomeData
 };

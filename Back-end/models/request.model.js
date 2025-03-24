@@ -7,10 +7,6 @@ const RequestSchema = new mongoose.Schema({
     required: true,
   },
   emailRequest: { type: String, required: false },
-  driver: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Driver",
-  },
   car: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Car",

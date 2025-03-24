@@ -36,6 +36,18 @@ export const getCarAvailability = async () => {
   }
 };
 
+export const getIncomeData = async () => {
+  try {
+    const response = await axios.get("http://localhost:3030/getIncomeData");
+    console.log("Request IncomeData:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching IncomeData:", error);
+    alert(error || "Failed to fetch IncomeData");
+    return [];
+  }
+};
+
 
 
 

@@ -6,6 +6,8 @@ const NotifyRequest = require("../Templates/Mail/notifyRequest");
 const NotifyBill = require("../Templates/Mail/notifyBill");
 const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
+const BillModel = require("../models/bill.model")
+
 
 const createRequest = async (req, res) => {
   const data = req.body;
@@ -174,9 +176,7 @@ const listAdminAcceptRequest = async (req, res) => {
 const handleAdminAcceptRequest = async (req, res) => {
   try {
     const dt = req.body;
-    const dataRequest = await RequestModel.findOne({
-      _id: dt.requestId,
-    })
+    const dataRequest = await RequestModel.findOne({ _id: dt.requestId })
       .populate("user", "userName fullName email phoneNumber address avatar")
       .populate(
         "car",
@@ -224,7 +224,9 @@ const handleAdminAcceptRequest = async (req, res) => {
         endDate,
         lstduplicateN
       );
+
       if (dt.isAccept) {
+        // Update the request with assigned driver and new status
         await RequestModel.updateOne(
           { _id: dt.requestId },
           {
@@ -232,6 +234,13 @@ const handleAdminAcceptRequest = async (req, res) => {
             requestStatus: "3",
           }
         );
+
+        // Create a new Bill document. The Bill model's pre-save hook
+        // will compute the 'total' based on the Request's car prices.
+        const newBill = await BillModel.create({
+          requestId: dt.requestId,
+        });
+
         await mailService.sendEmail({
           to: dataRequest.user.email,
           subject: "Thông báo yêu cầu đặt xe",
@@ -239,7 +248,8 @@ const handleAdminAcceptRequest = async (req, res) => {
         });
         return res.status(200).json({
           status: "success",
-          message: "Successfull !!",
+          message: "Successful !!",
+          bill: newBill, // optionally return bill details
         });
       } else {
         await RequestModel.updateOne(
@@ -255,7 +265,7 @@ const handleAdminAcceptRequest = async (req, res) => {
         });
         return res.status(200).json({
           status: "success",
-          message: "Successfull !!!",
+          message: "Successful !!!",
         });
       }
       return res.status(200).json({ message: "Successfull !!!" });
