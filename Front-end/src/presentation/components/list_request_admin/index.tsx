@@ -42,7 +42,7 @@ const AdminRequest = () => {
     const setListRequest = (listRequest: RequestModelFull[]) => {
         // Sửa
         setRequestInBooking(listRequest.filter((item) => item.requestStatus == '2'))
-        setRequestInAdminFee(listRequest.filter((item) => item.requestStatus == '4'))
+        setRequestInAdminFee(listRequest.filter((item) => item.requestStatus == '4' || item.requestStatus == '3'))
         setRequestInAdminWatiToPay(listRequest.filter((item) => item.requestStatus == '5'))
         setRequestDoneBill(listRequest.filter((item) => item.requestStatus == '6'))
     };
