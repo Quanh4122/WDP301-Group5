@@ -64,9 +64,7 @@ const Verify: React.FC = () => {
       }));
       console.log(result);
       toast.success(result.message);
-      setTimeout(() => {
-        navigate("/app/sign-in");
-      }, 2000);      
+      navigate("/app/sign-in");
     } catch (err: any) {
       const errorMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
       console.log(errorMessage);
@@ -77,9 +75,9 @@ const Verify: React.FC = () => {
   const handleResend = async () => {
     try {
       const result = await dispatch(ResendOTP(user?.email || ""));
-        toast.success(result?.message);
-        setTimer(120);
-        setCanResend(false);
+      toast.success(result?.message);
+      setTimer(120);
+      setCanResend(false);
     } catch (error) {
       const errorMessage = (error as any)?.response?.data?.message || "Gửi lại OTP thất bại";
       toast.error(errorMessage);

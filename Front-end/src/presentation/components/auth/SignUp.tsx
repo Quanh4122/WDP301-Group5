@@ -32,7 +32,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
   const { isLoading } = useSelector((state: RootState) => state.auth);
-  
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,13 +45,11 @@ export default function SignUp() {
     try {
       const result = await dispatch(RegisterUser({ userName, phoneNumber, email, password })) as any;
       toast.success(result.message);
-      setTimeout(() => {
-        navigate('/app/verify');
-      }, 2000);
+      navigate('/app/verify');
     } catch (error: any) {
       toast.error(error.message);
       console.log(error.message);
-      
+
     }
   };
 
