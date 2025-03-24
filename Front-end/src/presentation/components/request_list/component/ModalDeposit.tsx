@@ -19,7 +19,6 @@ const ModalDeposit = ({ isOpen, onCancel, onSubmit, amoutDefault }: Props) => {
     const handleSubmit = () => {
         if (amount !== null && amount > 0) { // Kiểm tra amount hợp lệ
             onSubmit(amount);
-            setAmount(0); // Reset giá trị sau khi submit
         }
     };
 

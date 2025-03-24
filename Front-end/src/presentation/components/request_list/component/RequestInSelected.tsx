@@ -147,9 +147,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             })
             .then((res) => {
                 setRequestData(res.data);
-                toast.success("Delete Successful");
+                toast.success("Xóa thành công !!");
             })
-            .catch((err) => toast.error("Fail to delete !!"));
+            .catch((err) => toast.error("Xóa thất bại!!"));
     };
 
     const [isModalDepositOpen, setIsModalDepositOpen] = useState(false);
@@ -197,7 +197,8 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
                 setTimeout(() => navigate("/"), 2000)
             })
             .catch((err) => {
-                toast.error("Đặt xe thất bại !!");
+                console.log(err.response.data.message)
+                toast.error(err.response.data.message + " !!!");
             });
         setIsModalDepositOpen(false);
     };

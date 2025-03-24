@@ -40,6 +40,11 @@ const RequestSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  driver: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "User",
+    required: false,
+  },
 });
 
 RequestSchema.index({ nextCheckTime: 1 });
