@@ -197,39 +197,37 @@ const getCarAvailability = async (req, res) => {
 
 const getIncomeData = async (req, res) => {
   try {
-    // Define the 7-month window:
-    // - Past 3 months, current month, next 3 months.
+    // Define the 7-month window: past 3 months, current month, next 3 months.
     const current = dayjs();
     const months = [];
     // Start 3 months ago (beginning of that month)
     const startMonth = current.subtract(3, "month").startOf("month");
 
-    // Build an array of 7 dayjs objects for each month in the window
+    // Build an array of 7 dayjs objects, one for each month in the window
     for (let i = 0; i < 7; i++) {
       months.push(startMonth.add(i, "month"));
     }
 
-    // Initialize two arrays (one for each series) with 7 zeros
-    const completedData = Array(7).fill(0);
-    const pendingData = Array(7).fill(0);
+    // Initialize an array for the income data for each month
+    const incomeData = Array(7).fill(0);
 
     // Determine the overall date range
     const startRange = months[0].startOf("month").toDate();
     const endRange = months[6].endOf("month").toDate();
 
-    // Query all bills and populate the requestId field to get its endDate.
+    // Query all bills and populate the request field to get endDate and requestStatus.
     const bills = await BillModel.find().populate({
-      path: "requestId",
-      select: "endDate"
+      path: "request",
+      select: "endDate requestStatus"
     });
 
-    // Process each bill to sum totals by month based on the Request's endDate.
+    // Process each bill to sum income by month based on the Request's endDate.
     bills.forEach(bill => {
-      // Ensure the bill has an associated Request with an endDate.
-      if (bill.requestId && bill.requestId.endDate) {
-        const billEndDate = dayjs(bill.requestId.endDate);
+      // Ensure the bill has an associated Request with endDate and requestStatus.
+      if (bill.request && bill.request.endDate && bill.request.requestStatus) {
+        const billEndDate = dayjs(bill.request.endDate);
 
-        // Only include bills whose Request endDate is in the 7-month window.
+        // Only include bills whose Request endDate is within the 7-month window.
         if (
           billEndDate.isBefore(dayjs(startRange)) ||
           billEndDate.isAfter(dayjs(endRange))
@@ -246,32 +244,24 @@ const getIncomeData = async (req, res) => {
         });
 
         if (index >= 0) {
-          // Add the bill total to the correct series based on billStatus.
-          if (bill.billStatus === true) {
-            completedData[index] += bill.total;
-          } else {
-            pendingData[index] += bill.total;
+          // Depending on requestStatus, add depositFee or totalCarFee.
+          const requestStatus = bill.request.requestStatus;
+          if (["2", "3", "4"].includes(requestStatus)) {
+            incomeData[index] += bill.depositFee || 0;
+          } else if (requestStatus === "5") {
+            incomeData[index] += bill.totalCarFee || 0;
           }
         }
       }
     });
 
-    // Build the response in the required format.
-    // "stack: 'A'" indicates that the two series should stack.
-    const responseData = [
-      {
-        id: "completed",
-        label: "Completed Payments",
-        data: completedData,
-        stack: "A"
-      },
-      {
-        id: "pending",
-        label: "Pending Payments",
-        data: pendingData,
-        stack: "A"
-      }
-    ];
+    // Build the response with the computed income data.
+    const responseData = {
+      id: "completed",
+      label: "Completed Payments",
+      data: incomeData,
+      stack: "A"
+    };
 
     return res.status(200).json(responseData);
   } catch (error) {
