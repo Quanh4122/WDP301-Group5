@@ -62,10 +62,14 @@ const Verify: React.FC = () => {
         email: user?.email || "",
         otp
       }));
-      toast.success("Xác minh thành công");
-      navigate("/app/sign-in");
-    } catch (error) {
-      const errorMessage = (error as any)?.response?.data?.message;
+      console.log(result);
+      toast.success(result.message);
+      setTimeout(() => {
+        navigate("/app/sign-in");
+      }, 2000);      
+    } catch (err: any) {
+      const errorMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
+      console.log(errorMessage);
       toast.error(errorMessage);
     }
   };
@@ -84,10 +88,10 @@ const Verify: React.FC = () => {
 
   return (
     <div>
-      <ToastContainer />
       <CssBaseline />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <VerifyContainer alignItems="center" justifyContent="center">
+        <ToastContainer/>
         <StyledCard variant="outlined">
           <Typography component="h1" variant="h4">
             Xác minh Email

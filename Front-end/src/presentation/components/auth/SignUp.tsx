@@ -46,28 +46,23 @@ export default function SignUp() {
 
     try {
       const result = await dispatch(RegisterUser({ userName, phoneNumber, email, password })) as any;
-      toast.success('Bạn đăng ký tài khoản thành công');
-      navigate('/app/verify');
+      toast.success(result.message);
+      setTimeout(() => {
+        navigate('/app/verify');
+      }, 2000);
     } catch (err: any) {
       const serverMessage = err?.response.data?.message || err?.message || 'Đã xảy ra lỗi không xác định từ server';
-      if (serverMessage.includes('Tài khoản của bạn từng đăng ký nhưng chưa xác thực')) {
-        toast.error(serverMessage, {
-          autoClose: 2000,
-          onClose: () => navigate('/app/verify'),
-        });
-      } else {
-        setErrorMessage(serverMessage);
-        toast.error(serverMessage);
-      }
+      setErrorMessage(serverMessage);
+      toast.error(serverMessage);
     }
   };
 
   return (
     <div>
-      <ToastContainer />
       <CssBaseline />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <SignUpContainer alignItems="center" justifyContent="center">
+        <ToastContainer />
         <StyledCard variant="outlined">
           <Typography component="h1" variant="h4">
             Đăng ký

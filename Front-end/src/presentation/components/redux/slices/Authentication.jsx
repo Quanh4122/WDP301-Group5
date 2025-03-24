@@ -537,8 +537,8 @@ export function RegisterUser(formValues) {
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
+      return response.data;
 
-      window.location.href = "/app/verify";
     } catch (error) {
       console.error("Register error:", error);
       dispatch(
