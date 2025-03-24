@@ -23,6 +23,7 @@ const AdminRequest = () => {
 
     useEffect(() => {
         getListRequest();
+        setDataDisplay(requestDataInBooking)
     }, []);
 
     useEffect(() => {
@@ -63,11 +64,9 @@ const AdminRequest = () => {
             <div className="mb-4 bg-white shadow-md p-4 rounded-md">
                 <Select
                     options={optionRequest}
-                    defaultValue={'Pending'}
+                    defaultValue={'Đang thực hiện'}
                     onChange={(value) => onChangeValue(value)}
                     className="w-48"
-                // Các style của select
-
                 />
             </div>
             <div className="bg-white shadow-md p-4 rounded-md">

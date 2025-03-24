@@ -61,106 +61,109 @@ const useBookingBill = async (req, res) => {
       return res.status(404).json({ message: "Request does not exist!" });
     }
 
-    // Bước 3: Kiểm tra vai trò tài xế (Driver Role)
-    const driverRole = await RoleModel.findOne({ roleName: "Driver" });
-    if (!driverRole) {
-      return res.status(404).json({ message: "Driver role not found!" });
-    }
+    if (data.request.isRequestDriver) {
+      // Bước 3: Kiểm tra vai trò tài xế (Driver Role)
+      const driverRole = await RoleModel.findOne({ roleName: "Driver" });
+      if (!driverRole) {
+        return res.status(404).json({ message: "Driver role not found!" });
+      }
 
-    // Bước 4: Lấy danh sách tài xế theo vai trò
-    const availableDrivers = await UserModel.find({
-      role: driverRole._id,
-    }).exec();
-    if (availableDrivers.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "No drivers available for hire!" });
-    }
-
-    // Bước 5: Xác định số lượng xe và kiểm tra tài xế đủ hay không
-    const requiredCars = request.car.length; // Số lượng xe trong request
-    if (availableDrivers.length < requiredCars) {
-      return res.status(400).json({
-        message:
-          "Not enough drivers available! You can reduce the number of cars or opt for driverless rental.",
-      });
-    }
-
-    // Bước 6: Logic chọn số lượng tài xế bằng số lượng xe nếu cần tài xế
-    let selectedDriverIds = [];
-    if (data.request.isRequestDriver === true) {
-      // Chọn ngẫu nhiên số lượng tài xế bằng số lượng xe
-      const numberOfDriversToSelect = requiredCars;
-      if (availableDrivers.length < numberOfDriversToSelect) {
+      // Bước 4: Lấy danh sách tài xế theo vai trò
+      const availableDrivers = await UserModel.find({
+        role: driverRole._id,
+      }).exec();
+      if (availableDrivers.length === 0) {
         return res
           .status(400)
-          .json({ message: "Not enough drivers to match the number of cars!" });
+          .json({ message: "No drivers available for hire!" });
       }
 
-      // Xáo trộn mảng và lấy số lượng tài xế cần thiết
-      const shuffledDrivers = availableDrivers.sort(() => 0.5 - Math.random());
-      selectedDriverIds = shuffledDrivers
-        .slice(0, numberOfDriversToSelect)
-        .map((driver) => driver._id);
+      // Bước 5: Xác định số lượng xe và kiểm tra tài xế đủ hay không
+      const requiredCars = request.car.length; // Số lượng xe trong request
+      if (availableDrivers.length < requiredCars) {
+        return res.status(400).json({
+          message:
+            "Not enough drivers available! You can reduce the number of cars or opt for driverless rental.",
+        });
+      }
+
+      // Bước 6: Logic chọn số lượng tài xế bằng số lượng xe nếu cần tài xế
+      let selectedDriverIds = [];
+      if (data.request.isRequestDriver === true) {
+        // Chọn ngẫu nhiên số lượng tài xế bằng số lượng xe
+        const numberOfDriversToSelect = requiredCars;
+        if (availableDrivers.length < numberOfDriversToSelect) {
+          return res.status(400).json({
+            message: "Not enough drivers to match the number of cars!",
+          });
+        }
+
+        // Xáo trộn mảng và lấy số lượng tài xế cần thiết
+        const shuffledDrivers = availableDrivers.sort(
+          () => 0.5 - Math.random()
+        );
+        selectedDriverIds = shuffledDrivers
+          .slice(0, numberOfDriversToSelect)
+          .map((driver) => driver._id);
+      }
+    } else {
+      // Bước 7: Cập nhật thông tin request (bao gồm danh sách driver nếu có)
+      await RequestModel.updateOne(
+        { _id: request._id },
+        {
+          requestStatus: data.request.requestStatus,
+          pickUpLocation: data.request.pickUpLocation,
+          isRequestDriver: data.request.isRequestDriver,
+          startDate: data.request.startDate,
+          endDate: data.request.endDate,
+          emailRequest: data.request.emailRequest,
+          dropLocation: data.request.dropLocation,
+          driver: [], // Thêm danh sách _id của tài xế
+        }
+      );
+
+      // Bước 8: Tạo hóa đơn mới
+      const newBill = new BillModel({
+        billStatus: false,
+        request: request._id,
+        depositFee: data.billData.depositFee,
+        vatFee: data.billData.vatFee,
+        totalCarFee: data.billData.totalCarFee,
+      });
+      await newBill.save();
+
+      // Bước 9: Chuẩn bị nội dung email thông báo
+      const emailContent = await NotifyBill(
+        data.userName,
+        data.billData.vatFee?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        data.billData.totalCarFee?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        data.billData.depositFee?.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        dayjs(data.request.startDate).format("HH:mm DD/MM/YYYY"),
+        dayjs(data.request.endDate).format("HH:mm DD/MM/YYYY"),
+        data.request.pickUpLocation
+      );
+
+      // Bước 10: Gửi email thông báo
+      await mailService.sendEmail({
+        to: data.request.emailRequest,
+        subject: "Vehicle Booking Request Notification",
+        html: emailContent,
+      });
+
+      // Bước 11: Trả về phản hồi thành công
+      return res.status(200).json({
+        message: "Bill created successfully!",
+      });
     }
-
-    // Bước 7: Cập nhật thông tin request (bao gồm danh sách driver nếu có)
-    await RequestModel.updateOne(
-      { _id: request._id },
-      {
-        requestStatus: data.request.requestStatus,
-        pickUpLocation: data.request.pickUpLocation,
-        isRequestDriver: data.request.isRequestDriver,
-        startDate: data.request.startDate,
-        endDate: data.request.endDate,
-        emailRequest: data.request.emailRequest,
-        dropLocation: data.request.dropLocation,
-        driver: selectedDriverIds, // Thêm danh sách _id của tài xế
-      }
-    );
-
-    // Bước 8: Tạo hóa đơn mới
-    const newBill = new BillModel({
-      billStatus: false,
-      request: request._id,
-      depositFee: data.billData.depositFee,
-      vatFee: data.billData.vatFee,
-      totalCarFee: data.billData.totalCarFee,
-    });
-    await newBill.save();
-
-    // Bước 9: Chuẩn bị nội dung email thông báo
-    const emailContent = await NotifyBill(
-      data.userName,
-      data.billData.vatFee?.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      }),
-      data.billData.totalCarFee?.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      }),
-      data.billData.depositFee?.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      }),
-      dayjs(data.request.startDate).format("HH:mm DD/MM/YYYY"),
-      dayjs(data.request.endDate).format("HH:mm DD/MM/YYYY"),
-      data.request.pickUpLocation
-    );
-
-    // Bước 10: Gửi email thông báo
-    await mailService.sendEmail({
-      to: data.request.emailRequest,
-      subject: "Vehicle Booking Request Notification",
-      html: emailContent,
-    });
-
-    // Bước 11: Trả về phản hồi thành công
-    return res.status(200).json({
-      message: "Bill created successfully!",
-      assignedDrivers: selectedDriverIds, // (Tùy chọn) Trả về danh sách tài xế được gán
-    });
   } catch (error) {
     console.error("Error in useBookingBill:", error);
     return res
