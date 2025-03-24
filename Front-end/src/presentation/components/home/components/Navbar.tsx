@@ -166,7 +166,7 @@ const Navbar: React.FC = () => {
             {isLoggedIn && user ? (
               <>
                 <div className="relative">
-                  <button onClick={toggleModal} className="focus:outline-none">
+                  <button onClick={toggleModal} className="focus:outline-none"></button>
                   <div className="flex">
                   <button onClick={toggleModal} className="flex items-center"
                   >

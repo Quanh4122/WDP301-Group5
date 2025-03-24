@@ -36,7 +36,7 @@ import ChangeRoleAccount from "../components/admin/ChangeRoleAccount";
 import ManagerCar from "../components/manager_car";
 import RequestInExpire from "../components/request_list/component/RequestInExpire";
 import BillDetailPage from "../components/request_list/component/BillPayment";
-import DriverBill from "../components/driver/DriverBillList";
+import DriverBill from "../components/driver/DriverBill";
 
 const Router = () => {
 
