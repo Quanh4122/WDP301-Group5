@@ -145,11 +145,19 @@ const Navbar: React.FC = () => {
             )}
             {/* Thêm nút Xem Bill cho Driver */}
             {isLoggedIn && user?.role === "Driver" && (
+              <>
               <li>
-                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`}>
-                  <button className="text-lg hover:text-sky-500 transition-colors duration-200">Xem Chuyến Xe</button>
-                </Link>
-              </li>
+                  <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.CAR_LIST}`}>
+                    <button className="text-lg hover:text-sky-500 transition-colors duration-200">Danh sách xe</button>
+                  </Link>
+                </li>
+              <li>
+              <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`}>
+                <button className="text-lg hover:text-sky-500 transition-colors duration-200">Xem Chuyến Xe</button>
+              </Link>
+            </li>
+            </>
+              
             )}
           </ul>
 
