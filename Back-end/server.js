@@ -6,7 +6,6 @@ const route = require("./routes");
 const bodyParser = require("body-parser");
 const PORT = process.env.URL || 3000;
 const CLIENT_URL = process.env.CLIENT_PORT;
-const { UserController } = require("./controllers");
 const WebSocket = require("ws");
 const RequestModel = require("./models/request.model");
 const BillModel = require("./models/bill.model");
