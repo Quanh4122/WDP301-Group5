@@ -250,7 +250,7 @@ const adminUpdatePenaltyFee = async (req, res) => {
           style: "currency",
           currency: "VND",
         }),
-        bill.depositFee.toLocaleString("vi-VN", {
+        bill.penaltyFee.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
         }),
