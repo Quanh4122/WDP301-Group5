@@ -42,7 +42,7 @@ export default function PageViewsBarChart() {
     <Card variant="outlined" sx={{ width: '100%' }}>
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
-          Income Data
+          Dữ liệu thu nhập
         </Typography>
         <Stack sx={{ justifyContent: 'space-between' }}>
           <Stack
@@ -54,12 +54,12 @@ export default function PageViewsBarChart() {
             }}
           >
             <Typography variant="h4" component="p">
-              Income Overview
+              Tổng quan về thu nhập
             </Typography>
             <Chip size="small" color="error" label="-8%" />
           </Stack>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Income for the past 3 months, current month, and next 3 months
+            Thu nhập trong 3 tháng qua, tháng hiện tại và 3 tháng tiếp theo
           </Typography>
         </Stack>
         <BarChart
