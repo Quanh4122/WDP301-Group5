@@ -18,7 +18,7 @@ const DriverBill = () => {
   const getRequestStatusLabel = (status) => {
     switch (Number(status)) {
       case 2:
-        return <span className="text-green-600">Đang được thi triển</span>;
+        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đang chạy</span>;
       case 3:
         return <span className="text-green-600">Đến hạn trả xe</span>;
       case 4:
@@ -90,6 +90,10 @@ const DriverBill = () => {
     setUserError(null);
   };
 
+  // Separate active (status 2) and other requests
+  const activeRequests = driverRequests.filter((req) => Number(req.requestStatus) === 2);
+  const otherRequests = driverRequests.filter((req) => Number(req.requestStatus) !== 2);
+
   if (!isLoggedIn || !driverId) {
     return (
       <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -147,51 +151,110 @@ const DriverBill = () => {
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h1 className="text-4xl font-extrabold text-gray-900">Yêu Cầu Của Tôi</h1>
         </header>
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <th className="py-4 px-6">ID</th>
-                  <th className="py-4 px-6">Người Dùng</th>
-                  <th className="py-4 px-6">Ngày Bắt Đầu</th>
-                  <th className="py-4 px-6">Ngày Kết Thúc</th>
-                  <th className="py-4 px-6">Trạng Thái</th>
-                  <th className="py-4 px-6">Hành Động</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {driverRequests.map((request, index) => (
-                  <tr key={request._id} className="hover:bg-gray-50 transition-colors duration-200">
-                    <td className="py-4 px-6 text-gray-900 font-medium">{index + 1}</td>
-                    <td className="py-4 px-6 text-gray-700">{request.user?.userName || "N/A"}</td>
-                    <td className="py-4 px-6 text-gray-700">
-                      {request.startDate
-                        ? new Date(request.startDate).toLocaleDateString("vi-VN")
-                        : "N/A"}
-                    </td>
-                    <td className="py-4 px-6 text-gray-700">
-                      {request.endDate
-                        ? new Date(request.endDate).toLocaleDateString("vi-VN")
-                        : "N/A"}
-                    </td>
-                    <td className="py-4 px-6 text-gray-700">
-                      {getRequestStatusLabel(request.requestStatus)}
-                    </td>
-                    <td className="py-4 px-6">
-                      <button
-                        onClick={() => showRequestDetails(request)}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Xem chi tiết
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+        {/* Active Requests Section */}
+        {activeRequests.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Đang Chạy</h2>
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      <th className="py-4 px-6">ID</th>
+                      <th className="py-4 px-6">Người Dùng</th>
+                      <th className="py-4 px-6">Ngày Bắt Đầu</th>
+                      <th className="py-4 px-6">Ngày Kết Thúc</th>
+                      <th className="py-4 px-6">Trạng Thái</th>
+                      <th className="py-4 px-6">Hành Động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {activeRequests.map((request, index) => (
+                      <tr key={request._id} className="hover:bg-gray-50 transition-colors duration-200">
+                        <td className="py-4 px-6 text-gray-900 font-medium">{index + 1}</td>
+                        <td className="py-4 px-6 text-gray-700">{request.user?.userName || "N/A"}</td>
+                        <td className="py-4 px-6 text-gray-700">
+                          {request.startDate
+                            ? new Date(request.startDate).toLocaleDateString("vi-VN")
+                            : "N/A"}
+                        </td>
+                        <td className="py-4 px-6 text-gray-700">
+                          {request.endDate
+                            ? new Date(request.endDate).toLocaleDateString("vi-VN")
+                            : "N/A"}
+                        </td>
+                        <td className="py-4 px-6 text-gray-700">
+                          {getRequestStatusLabel(request.requestStatus)}
+                        </td>
+                        <td className="py-4 px-6">
+                          <button
+                            onClick={() => showRequestDetails(request)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            Xem chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Other Requests Section */}
+        {otherRequests.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Yêu Cầu Cũ</h2>
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      <th className="py-4 px-6">ID</th>
+                      <th className="py-4 px-6">Người Dùng</th>
+                      <th className="py-4 px-6">Ngày Bắt Đầu</th>
+                      <th className="py-4 px-6">Ngày Kết Thúc</th>
+                      <th className="py-4 px-6">Trạng Thái</th>
+                      <th className="py-4 px-6">Hành Động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {otherRequests.map((request, index) => (
+                      <tr key={request._id} className="hover:bg-gray-50 transition-colors duration-200">
+                        <td className="py-4 px-6 text-gray-900 font-medium">{index + 1}</td>
+                        <td className="py-4 px-6 text-gray-700">{request.user?.userName || "N/A"}</td>
+                        <td className="py-4 px-6 text-gray-700">
+                          {request.startDate
+                            ? new Date(request.startDate).toLocaleDateString("vi-VN")
+                            : "N/A"}
+                        </td>
+                        <td className="py-4 px-6 text-gray-700">
+                          {request.endDate
+                            ? new Date(request.endDate).toLocaleDateString("vi-VN")
+                            : "N/A"}
+                        </td>
+                        <td className="py-4 px-6 text-gray-700">
+                          {getRequestStatusLabel(request.requestStatus)}
+                        </td>
+                        <td className="py-4 px-6">
+                          <button
+                            onClick={() => showRequestDetails(request)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            Xem chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
 
         {selectedRequest && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
