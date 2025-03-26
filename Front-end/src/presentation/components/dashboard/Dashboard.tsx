@@ -36,7 +36,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
     return (
       <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' }, marginTop: '50px', marginBottom: '50px' }}>
         {/* cards */}
-        <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+        <Typography component="h2" variant="h6" sx={{ mb: 2 }} style={{ fontWeight: 'bold', fontSize: '34px' }}>
           Tổng quát thống kê
         </Typography>
         <Grid

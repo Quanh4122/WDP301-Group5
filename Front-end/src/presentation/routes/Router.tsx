@@ -37,6 +37,9 @@ import ManagerCar from "../components/manager_car";
 import RequestInExpire from "../components/request_list/component/RequestInExpire";
 import BillDetailPage from "../components/request_list/component/BillPayment";
 import DriverBill from "../components/driver/DriverBill";
+import AccountDetail from "../components/admin/AccountDetail";
+import DriverDetail from "../components/admin/DriverDetail";
+import CarDetails from "../components/manager_car/component/CarDetails";
 
 const Router = () => {
   const privateRoutes: any[] = [
@@ -157,8 +160,16 @@ const Router = () => {
       element: <ProtectedRoute requiredRole="Admin"><ManageAccount /></ProtectedRoute>,
     },
     {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_DRIVER_ACCEPT + "/:id",
+      element: <ProtectedRoute requiredRole="Admin"><DriverDetail /></ProtectedRoute>,
+    },
+    {
       path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT,
       element: <ProtectedRoute requiredRole="Admin"><UserList /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT + "/:id",
+      element: <ProtectedRoute requiredRole="Admin"><AccountDetail /></ProtectedRoute>,
     },
     {
       path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.CHANGE_ROLE_ACCOUNT + "/:userId",
@@ -171,6 +182,10 @@ const Router = () => {
     {
       path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGER_CAR,
       element: <ProtectedRoute requiredRole="Admin"><ManagerCar /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGER_CAR + "/:id",
+      element: <ProtectedRoute requiredRole="Admin"><CarDetails /></ProtectedRoute>,
     },
     {
       path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REQUEST_IN_EXPIRE,

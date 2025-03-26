@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaEdit } from "react-icons/fa"; // Thay FaUserShield/FaUserTimes bằng FaEdit
+import { FaEdit } from "react-icons/fa";
 import Pagination from "../../components/home/components/Pagination";
 import { fetchUsersAndDrivers } from "../redux/slices/Authentication";
-import { Link, useNavigate } from "react-router-dom"; // Thêm useNavigate để điều hướng
+import { Link, useNavigate } from "react-router-dom";
 
 const UserList = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Hook để điều hướng
+  const navigate = useNavigate();
   const {
     usersAndDrivers = [],
     isLoading = false,
@@ -37,9 +37,6 @@ const UserList = () => {
     currentPage * itemsPerPage
   );
 
-  const handleEditClick = (userId) => {
-    navigate(`/app/change-role/${userId}`); // Điều hướng đến trang ChangeRoleAccount với userId
-  };
 
   if (isLoading) {
     return (
@@ -57,7 +54,7 @@ const UserList = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-4xl font-extrabold text-gray-900">Danh Sách Người Dùng</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Danh Sách Người Dùng</h1>
           <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
             Cập nhật: {new Date().toLocaleString("vi-VN")}
           </div>
@@ -108,12 +105,13 @@ const UserList = () => {
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
-                  <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <tr className="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="py-4 px-6">Ảnh đại diện</th>
                     <th className="py-4 px-6">Tên người dùng</th>
                     <th className="py-4 px-6">Email</th>
                     <th className="py-4 px-6">Vai trò</th>
                     <th className="py-4 px-6">Ngày đăng ký</th>
-                    <th className="py-4 px-6 text-center">Hành động</th>
+                    <th className="py-4 px-6">Hành động</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -122,35 +120,46 @@ const UserList = () => {
                       key={user._id}
                       className="hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="py-4 px-6 text-gray-900 font-medium">
-                        {user.userName ?? "N/A"}
+                      <td className="py-4 px-6 text-center">
+                        <img
+                          src={user.avatar ?? "/images/avatar.png"}
+                          alt={user.userName ?? "N/A"}
+                          className="w-12 h-12 rounded-full object-cover mx-auto"
+                        />
                       </td>
-                      <td className="py-4 px-6 text-gray-700">{user.email ?? "N/A"}</td>
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 text-gray-900 font-medium text-center">
+                        <Link
+                          to={`/app/dashboard/manage-account/${user._id}`}
+                          className="hover:text-sky-400"
+                        >
+                          <button>{user.userName ?? "N/A"}</button>
+                        </Link>
+                      </td>
+                      <td className="py-4 px-6 text-gray-700 text-center">{user.email ?? "N/A"}</td>
+                      <td className="py-4 px-6 text-center">
                         <span
-                          className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
-                            user.role?.roleName === "Admin"
+                          className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${user.role?.roleName === "Admin"
                               ? "bg-blue-100 text-blue-700"
                               : user.role?.roleName === "Driver"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
+                                ? "bg-green-100 text-green-700"
+                                : "bg-gray-100 text-gray-700"
+                            }`}
                         >
                           {user.role?.roleName ?? "N/A"}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-gray-700">
+                      <td className="py-4 px-6 text-gray-700 text-center">
                         {new Date(user.createdAt).toLocaleDateString("vi-VN")}
                       </td>
                       <td className="py-4 px-6 text-center">
                         <div className="flex justify-center gap-3">
                           <Link
                             to={`/app/dashboard/change-role/${user._id}`}
-                            className="bg-yellow-600 text-white p-2 rounded-full hover:bg-yellow-700 transition-all duration-200 disabled:opacity-50 shadow-md"
+                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-3 rounded-full hover:from-yellow-600 hover:to-yellow-700 active:from-yellow-700 active:to-yellow-800 transition-all duration-200 disabled:opacity-50 shadow-lg flex items-center justify-center w-12 h-12"
                             disabled={isLoading}
                             title="Chỉnh sửa vai trò"
                           >
-                            <FaEdit className="w-4 h-4" />
+                            <FaEdit />
                           </Link>
                         </div>
                       </td>

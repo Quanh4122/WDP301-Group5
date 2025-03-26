@@ -2,8 +2,10 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Table, Button, Space, Input, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { SearchOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom"; // Thêm import Link
 import Pagination from "../../home/components/Pagination";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
+
 interface CarType {
   _id: string;
   bunkBed: boolean;
@@ -27,7 +29,7 @@ interface Car {
 interface CarTableProps {
   cars: Car[];
   onEdit: (car: Car) => void;
-  onDelete?: (carId: string) => Promise<any>; // Cập nhật onDelete để trả về Promise
+  onDelete?: (carId: string) => Promise<any>;
   onCreate?: () => void;
 }
 
@@ -37,7 +39,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
   const [seatFilter, setSeatFilter] = useState<number>(0);
   const [filteredCars, setFilteredCars] = useState<Car[]>(cars);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false); // Thêm state loading
+  const [loading, setLoading] = useState<boolean>(false);
   const itemsPerPage = 5;
 
   const flueOptions = [
@@ -65,6 +67,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
 
   useEffect(() => {
     let filtered = [...cars];
+    localStorage.setItem("carsData", JSON.stringify(cars));
     if (searchText) {
       const lowerSearchText = searchText.toLowerCase();
       filtered = filtered.filter(
@@ -100,7 +103,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
     if (!onDelete) return;
     setLoading(true);
     try {
-      await onDelete(carId); // Giả sử onDelete trả về Promise
+      await onDelete(carId);
       toast.success("Xóa xe thành công!", {
         position: "top-right",
         autoClose: 3000,
@@ -109,7 +112,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
         pauseOnHover: true,
         draggable: true,
       });
-      setFilteredCars((prev) => prev.filter((car) => car._id !== carId)); // Cập nhật danh sách sau khi xóa
+      setFilteredCars((prev) => prev.filter((car) => car._id !== carId));
     } catch (error) {
       toast.error("Xóa xe thất bại. Vui lòng thử lại!", {
         position: "top-right",
@@ -132,10 +135,28 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
       width: 60,
       align: "center",
     },
-    { title: "Tên xe", dataIndex: "carName", key: "carName", ellipsis: true },
+    {
+      title: "Tên xe",
+      dataIndex: "carName",
+      key: "carName",
+      ellipsis: true,
+      render: (text: string, record: Car) => (
+        <Link
+          to={`/app/dashboard/manager-car/${record._id}`}
+          className="text-sky-600 hover:text-sky-800 font-medium transition duration-200"
+        >
+          <button>{text}</button>
+        </Link>
+      ),
+    },
     { title: "Phiên bản", dataIndex: "carVersion", key: "carVersion", ellipsis: true, width: 80 },
     { title: "Màu sắc", dataIndex: "color", key: "color", ellipsis: true, width: 100 },
-    { title: "Biển số", dataIndex: "licensePlateNumber", key: "licensePlateNumber", ellipsis: true },
+    {
+      title: "Biển số",
+      dataIndex: "licensePlateNumber",
+      key: "licensePlateNumber",
+      ellipsis: true,
+    },
     { title: "Số chỗ", dataIndex: "numberOfSeat", key: "numberOfSeat", width: 80 },
     {
       title: "Loại truyền động",
@@ -207,7 +228,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-4xl font-extrabold text-gray-900">Danh Sách Xe</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Danh Sách Xe</h1>
           <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
             Cập nhật: {new Date().toLocaleString("vi-VN")}
           </div>
