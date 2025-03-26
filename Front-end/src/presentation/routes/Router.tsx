@@ -40,6 +40,8 @@ import DriverBill from "../components/driver/DriverBill";
 import AccountDetail from "../components/admin/AccountDetail";
 import DriverDetail from "../components/admin/DriverDetail";
 import CarDetails from "../components/manager_car/component/CarDetails";
+import ManageBlogDetail from "../components/blog/ManageBlogDetail";
+import UpdateBlog from "../components/blog/UpdateBlog";
 
 const Router = () => {
   const privateRoutes: any[] = [
@@ -114,6 +116,14 @@ const Router = () => {
     {
       path: PRIVATE_ROUTES.PATH + "/dashboard/blogManager",
       element: <ProtectedRoute requiredRole="Admin"><BlogManager /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/blogManager/:id",
+      element: <ProtectedRoute requiredRole="Admin"><ManageBlogDetail /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/blogManager/edit/:id",
+      element: <ProtectedRoute requiredRole="Admin"><UpdateBlog /></ProtectedRoute>,
     },
     {
       path: PRIVATE_ROUTES.PATH + "/blog/:postId",

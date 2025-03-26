@@ -6,7 +6,7 @@ const NotAuthentication: React.FC = () => {
         <p className="text-2xl mt-4 font-semibold">Không có quyền truy cập</p>
         <p className="mt-2 text-gray-600 text-lg">Bạn không có quyền truy cập vào trang này.</p>
         <a href="/app/sign-in" className="mt-6 inline-block px-6 py-3 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-700 transition text-lg font-medium">
-          Hãy đăng nhập
+          <button>Hãy đăng nhập</button>
         </a>
       </div>
     </div>
