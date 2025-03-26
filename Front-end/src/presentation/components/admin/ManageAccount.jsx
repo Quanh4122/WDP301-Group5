@@ -8,6 +8,7 @@ import {
 } from "../redux/slices/Authentication";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import Pagination from "../../components/home/components/Pagination";
+import { Link } from "react-router-dom";
 
 const ManageAccount = () => {
   const dispatch = useDispatch();
@@ -69,7 +70,7 @@ const ManageAccount = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-4xl font-extrabold text-gray-900">Quản Lý Tài Khoản</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Quản Lý Tài Khoản</h1>
           <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
             Cập nhật: {new Date().toLocaleString("vi-VN")}
           </div>
@@ -153,7 +154,9 @@ const ManageAccount = () => {
                         )}
                       </td>
                       <td className="py-4 px-6 text-gray-900 font-medium">
-                        {application.user?.userName ?? "N/A"}
+                        <Link to={`/app/dashboard/manage-driver-accept/${application.user?._id}`}>
+                          <button>{application.user?.userName ?? "N/A"}</button>
+                        </Link>
                       </td>
                       <td className="py-4 px-6 text-gray-700">
                         {application.user?.email ?? "N/A"}
