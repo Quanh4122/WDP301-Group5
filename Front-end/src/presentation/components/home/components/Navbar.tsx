@@ -125,7 +125,7 @@ const Navbar: React.FC = () => {
             {isLoggedIn && user?.role === "Admin" && (
               <li>
                 <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DASH_BOARD}`}>
-                  <button className="text-lg hover:text-sky-500 transition-colors duration-200">Thống kê</button>
+                  <button className="text-lg hover:text-sky-500 transition-colors duration-200">Bảng điều khiển</button>
                 </Link>
               </li>
             )}
@@ -168,7 +168,7 @@ const Navbar: React.FC = () => {
                 <div className="relative">
                   <button onClick={toggleModal} className="focus:outline-none"></button>
                   <div className="flex">
-                  <button onClick={toggleModal} className="flex items-center"
+                  <button onClick={toggleModal} className="flex items-center w-full"
                   >
                     {avatarPreview ? (
                       <img
@@ -184,11 +184,10 @@ const Navbar: React.FC = () => {
                   </button>
                   {user.role === "User" && (
                     <button
-                      className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-800 transition-colors duration-200 flex items-center space-x-3"
+                      className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-800 transition-colors duration-200 flex items-center"
                       onClick={onViewListRequest}
                     >
                       <ShoppingCartIcon className="text-gray-500" />
-                      <span className="font-medium">Giỏ hàng</span>
                     </button>
                   )}
                   </div>
@@ -296,7 +295,7 @@ const Navbar: React.FC = () => {
             {isLoggedIn && user?.role === "Admin" && (
               <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DASH_BOARD}`} onClick={() => setMobileDrawerOpen(false)}>
                 <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
-                  Thống kê
+                  Bảng điều khiển
                 </button>
               </Link>
             )}

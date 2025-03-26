@@ -25,11 +25,16 @@ const ManageAccount = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
+  // Hàm làm mới danh sách
+  const refreshApplications = () => {
+    dispatch(FetchPendingDriverApplications());
+    dispatch(FetchApprovedDriverApplications());
+    dispatch(fetchRejectedDriverApplications());
+  };
+
   useEffect(() => {
     if (user?.role === "Admin") {
-      dispatch(FetchPendingDriverApplications());
-      dispatch(FetchApprovedDriverApplications());
-      dispatch(fetchRejectedDriverApplications());
+      refreshApplications();
     }
   }, [dispatch, user?.role]);
 
@@ -37,7 +42,7 @@ const ManageAccount = () => {
     ...pendingDriverApplications,
     ...approvedDriverApplications,
     ...rejectedDriverApplications,
-  ];
+  ].filter((app) => app.user); // Lọc bỏ các ứng dụng không có user (đã xóa)
 
   const filteredApplications = allApplications.filter((application) => {
     const matchesFilter = filter === "all" || application.status === filter;
@@ -54,6 +59,13 @@ const ManageAccount = () => {
     currentPage * itemsPerPage
   );
 
+  // Xử lý phê duyệt/từ chối và làm mới danh sách
+  const handleApplicationAction = (userId, status) => {
+    dispatch(ApproveDriverApplication({ userId, status })).then(() => {
+      refreshApplications(); // Làm mới danh sách sau khi hành động hoàn tất
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -68,7 +80,6 @@ const ManageAccount = () => {
   return (
     <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h1 className="text-4xl font-bold text-gray-900">Quản Lý Tài Khoản</h1>
           <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
@@ -76,7 +87,6 @@ const ManageAccount = () => {
           </div>
         </header>
 
-        {/* Filters */}
         <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <input
@@ -112,7 +122,6 @@ const ManageAccount = () => {
           </select>
         </div>
 
-        {/* Table */}
         {paginatedApplications.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow-lg text-center">
             <p className="text-gray-600 text-lg">Không tìm thấy dữ liệu phù hợp.</p>
@@ -192,12 +201,7 @@ const ManageAccount = () => {
                           <div className="flex justify-center gap-3">
                             <button
                               onClick={() =>
-                                dispatch(
-                                  ApproveDriverApplication({
-                                    userId: application.user?._id,
-                                    status: "approved",
-                                  })
-                                )
+                                handleApplicationAction(application.user?._id, "approved")
                               }
                               className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-all duration-200 disabled:opacity-50 shadow-md"
                               disabled={isLoading}
@@ -207,12 +211,7 @@ const ManageAccount = () => {
                             </button>
                             <button
                               onClick={() =>
-                                dispatch(
-                                  ApproveDriverApplication({
-                                    userId: application.user?._id,
-                                    status: "rejected",
-                                  })
-                                )
+                                handleApplicationAction(application.user?._id, "rejected")
                               }
                               className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-all duration-200 disabled:opacity-50 shadow-md"
                               disabled={isLoading}
@@ -231,7 +230,6 @@ const ManageAccount = () => {
           </div>
         )}
 
-        {/* Pagination */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
