@@ -65,7 +65,7 @@ const ManageAccount = () => {
   }
 
   return (
-    <div className=" mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -122,13 +122,13 @@ const ManageAccount = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="py-4 px-6 text-center">Ảnh bằng lái</th>
                     <th className="py-4 px-6">Tên người dùng</th>
                     <th className="py-4 px-6">Email</th>
                     <th className="py-4 px-6">Vai trò</th>
                     <th className="py-4 px-6">Trạng thái</th>
                     <th className="py-4 px-6">Số bằng lái</th>
                     <th className="py-4 px-6">Kinh nghiệm</th>
-                    <th className="py-4 px-6 text-center">Ảnh bằng lái</th>
                     <th className="py-4 px-6 text-center">Hành động</th>
                   </tr>
                 </thead>
@@ -138,6 +138,20 @@ const ManageAccount = () => {
                       key={application._id}
                       className="hover:bg-gray-50 transition-colors duration-200"
                     >
+                      <td className="py-4 px-6 text-center">
+                        {application.driversLicensePhoto ? (
+                          <img
+                            src={`http://localhost:3030${application.driversLicensePhoto}`}
+                            alt="Ảnh bằng lái"
+                            className="h-16 w-24 object-cover rounded-lg border border-gray-200 shadow-sm"
+                            onError={(e) =>
+                              (e.currentTarget.src = "/fallback-image.png")
+                            }
+                          />
+                        ) : (
+                          <span className="text-gray-500 text-sm">N/A</span>
+                        )}
+                      </td>
                       <td className="py-4 px-6 text-gray-900 font-medium">
                         {application.user?.userName ?? "N/A"}
                       </td>
@@ -169,20 +183,6 @@ const ManageAccount = () => {
                       </td>
                       <td className="py-4 px-6 text-gray-700">
                         {application.experience ?? "N/A"}
-                      </td>
-                      <td className="py-4 px-6 text-center">
-                        {application.driversLicensePhoto ? (
-                          <img
-                            src={`http://localhost:3030${application.driversLicensePhoto}`}
-                            alt="Ảnh bằng lái"
-                            className="h-10 w-10 object-cover rounded-full border border-gray-200 shadow-sm"
-                            onError={(e) =>
-                              (e.currentTarget.src = "/fallback-image.png")
-                            }
-                          />
-                        ) : (
-                          <span className="text-gray-500 text-sm">N/A</span>
-                        )}
                       </td>
                       <td className="py-4 px-6 text-center">
                         {application.status === "pending" && (

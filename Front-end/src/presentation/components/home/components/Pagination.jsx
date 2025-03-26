@@ -46,7 +46,7 @@ const Pagination = ({
         <button
           onClick={handlePrevious}
           disabled={currentPage === 1}
-          className="bg-blue-600 text-white px-6 py-3 rounded-md disabled:bg-gray-300 hover:bg-blue-700 transition-all duration-200 shadow-md"
+          className="bg-sky-600 text-white px-6 py-3 rounded-md disabled:bg-gray-300 hover:bg-sky-700 transition-all duration-200 shadow-md"
         >
           Trước
         </button>
@@ -56,7 +56,7 @@ const Pagination = ({
             onClick={() => onPageChange(page)}
             className={`px-4 py-2 rounded-md ${
               currentPage === page
-                ? "bg-blue-600 text-white shadow-md"
+                ? "bg-sky-600 text-white shadow-md"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             } transition-all duration-200`}
           >
@@ -69,7 +69,7 @@ const Pagination = ({
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages}
-          className="bg-blue-600 text-white px-6 py-3 rounded-md disabled:bg-gray-300 hover:bg-blue-700 transition-all duration-200 shadow-md"
+          className="bg-sky-600 text-white px-6 py-3 rounded-md disabled:bg-gray-300 hover:bg-sky-700 transition-all duration-200 shadow-md"
         >
           Tiếp
         </button>
