@@ -145,7 +145,7 @@ const UserList = () => {
                       <td className="py-4 px-6 text-center">
                         <div className="flex justify-center gap-3">
                           <Link
-                            to={`/app/change-role/${user._id}`}
+                            to={`/app/dashboard/change-role/${user._id}`}
                             className="bg-yellow-600 text-white p-2 rounded-full hover:bg-yellow-700 transition-all duration-200 disabled:opacity-50 shadow-md"
                             disabled={isLoading}
                             title="Chỉnh sửa vai trò"

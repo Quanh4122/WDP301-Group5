@@ -39,176 +39,166 @@ import BillDetailPage from "../components/request_list/component/BillPayment";
 import DriverBill from "../components/driver/DriverBill";
 
 const Router = () => {
+  const privateRoutes: any[] = [
+    {
+      path: ROOT,
+      element: <HomePage />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
+      element: <SignUp />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN,
+      element: <SignIn />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.VERIFY,
+      element: <Verify />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_FOUND,
+      element: <NotFound />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHENTICATION,
+      element: <NotAuthentication />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHORIZATION,
+      element: <NotAuthorization />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.FORGOT_PASSWORD,
+      element: <ForgotPassword />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.RESET_PASSWORD,
+      element: <ResetPassword />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PROFILE + "/:userId",
+      element: <ProtectedRoute><UserProfile /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.EDIT_PROFILE + "/:userId",
+      element: <ProtectedRoute><EditProfile /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_PASSWORD + "/:userId",
+      element: <ProtectedRoute><ChangePassword /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHENTICATION,
+      element: <NotAuthenticated />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.AUTHORIZATION,
+      element: <Authorization />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DASH_BOARD,
+      element: <ProtectedRoute requiredRole="Admin"><Dashboard /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING,
+      element: <Checkout />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/createBlog",
+      element: <ProtectedRoute requiredRole="Admin"><CreateBlog /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/blogManager",
+      element: <ProtectedRoute requiredRole="Admin"><BlogManager /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/blog/:postId",
+      element: <BlogDetail />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/blog",
+      element: <BlogList />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST,
+      element: <CarList />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_DETAIL,
+      element: <CarDetail />,
+    },
+    {
+      path: "*",
+      element: <NotFound />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING_LIST,
+      element: <ProtectedRoute requiredRole="User"><RequestList /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_CREATE,
+      element: <CreateDriver />,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST,
+      element: <ProtectedRoute requiredRole="Admin"><AdminRequest /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST,
+      element: <ProtectedRoute requiredRole="Admin"><AdminDetailRequest /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.TRANSACTION,
+      element: <ProtectedRoute requiredRole="Admin"><TransactionList /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_DRIVER_ACCEPT,
+      element: <ProtectedRoute requiredRole="Admin"><ManageAccount /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT,
+      element: <ProtectedRoute requiredRole="Admin"><UserList /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.CHANGE_ROLE_ACCOUNT + "/:userId",
+      element: <ProtectedRoute requiredRole="Admin"><ChangeRoleAccount /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.APPLY_DRIVER + "/:userId",
+      element: <ProtectedRoute requiredRole="User"><ApplyDriver /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGER_CAR,
+      element: <ProtectedRoute requiredRole="Admin"><ManagerCar /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REQUEST_IN_EXPIRE,
+      element: <ProtectedRoute requiredRole="User"><RequestInExpire /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BILL_PAYMENT,
+      element: <ProtectedRoute requiredRole="User"><BillDetailPage /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_BILL,
+      element: <ProtectedRoute requiredRole="Driver"><DriverBill /></ProtectedRoute>,
+    },
+  ];
 
-    const privateRoutes: any[] = [
-        {
-            path: ROOT,
-            element: <HomePage />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REGISTER,
-            element: <SignUp />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.SIGN_IN,
-            element: <SignIn />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.VERIFY,
-            element: <Verify />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_FOUND,
-            element: <NotFound />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHENTICATION,
-            element: <NotAuthentication />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHORIZATION,
-            element: <NotAuthorization />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.FORGOT_PASSWORD,
-            element: <ForgotPassword />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.RESET_PASSWORD,
-            element: <ResetPassword />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.PROFILE + "/:userId",
-            element: <ProtectedRoute><UserProfile /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.EDIT_PROFILE + "/:userId",
-            element: <ProtectedRoute><EditProfile /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_PASSWORD + "/:userId",
-            element: <ProtectedRoute><ChangePassword /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.NOT_AUTHENTICATION,
-            element: <NotAuthenticated />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.AUTHORIZATION,
-            element: <Authorization />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DASH_BOARD,
-            element: <ProtectedRoute requiredRole="Admin"><Dashboard /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING,
-            element: <Checkout />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/createBlog",
-            element: <ProtectedRoute requiredRole="Admin"><CreateBlog /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/blogManager",
-            element: <ProtectedRoute requiredRole="Admin"><BlogManager /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/blog/:postId",
-            element: <BlogDetail />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/blog",
-            element: <BlogList />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST,
-            element: <CarList />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_DETAIL,
-            element: <CarDetail />
-        },
-        {
-            path: "*",
-            element: <NotFound />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BOOKING_LIST,
-            element: <ProtectedRoute requiredRole="User"><RequestList /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_CREATE,
-            element: <CreateDriver />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_REQUEST,
-            element: <ProtectedRoute requiredRole="Admin"><AdminRequest /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.ADMIN_DETAIL_REQUEST,
-            element: <AdminDetailRequest />
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.TRANSACTION,
-            element: <TransactionList />
-        },
+  return (
+    <Routes>
+      <Route path={ROOT} element={<PrivateRoute />}>
+        {privateRoutes.map((element: any, index) => (
+          <Route
+            key={index}
+            path={element.path}
+            element={element.element}
+          />
+        ))}
+      </Route>
+    </Routes>
+  );
+};
 
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGE_DRIVER_ACCEPT,
-            element: <ProtectedRoute requiredRole="Admin"><ManageAccount /></ProtectedRoute>
-        },
-
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT,
-            element: <ProtectedRoute requiredRole="Admin"><UserList /></ProtectedRoute>
-        },
-
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CHANGE_ROLE_ACCOUNT + "/:userId",
-            element: <ProtectedRoute requiredRole="Admin"><ChangeRoleAccount /></ProtectedRoute>
-        },
-
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.APPLY_DRIVER + "/:userId",
-            element: <ProtectedRoute requiredRole="User"><ApplyDriver /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.MANAGER_CAR,
-            element: <ProtectedRoute requiredRole="Admin"><ManagerCar /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REQUEST_IN_EXPIRE,
-            element: <ProtectedRoute requiredRole="User"><RequestInExpire /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.BILL_PAYMENT,
-            element: <ProtectedRoute requiredRole="User"><BillDetailPage /></ProtectedRoute>
-        },
-        {
-            path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.DRIVER_BILL,
-            element: <ProtectedRoute requiredRole="Driver"><DriverBill /></ProtectedRoute>
-        },
-    ]
-
-    return (
-        <Routes>
-            <Route
-                path={ROOT}
-                element={<PrivateRoute />}
-            >
-                {
-                    privateRoutes.map((element: any, index) => (
-                        <Route
-                            key={index}
-                            path={element.path}
-                            element={element.element}
-                        />
-                    ))
-                }
-            </Route>
-        </Routes>
-    )
-}
-
-export default Router
+export default Router;
