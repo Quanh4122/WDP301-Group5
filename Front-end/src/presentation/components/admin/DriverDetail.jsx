@@ -119,10 +119,10 @@ const DriverDetail = () => {
               </h2>
               <span
                 className={`inline-flex mt-1 px-3 py-1 text-sm font-medium rounded-full text-white ${driverApplication.status === "approved"
-                    ? "bg-green-800"
-                    : driverApplication.status === "rejected"
-                      ? "bg-red-800"
-                      : "bg-yellow-800"
+                  ? "bg-green-800"
+                  : driverApplication.status === "rejected"
+                    ? "bg-red-800"
+                    : "bg-yellow-800"
                   }`}
               >
                 {driverApplication.status === "approved"
@@ -184,7 +184,9 @@ const DriverDetail = () => {
                   to="/app/dashboard/manage-account"
                   className="block w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white py-2 px-4 rounded-lg text-center font-medium shadow-md hover:from-gray-700 hover:to-gray-800 transition-all duration-300"
                 >
-                  Quay lại danh sách
+                  <button>
+                    Quay lại danh sách
+                  </button>
                 </Link>
               </div>
             </div>

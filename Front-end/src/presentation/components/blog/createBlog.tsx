@@ -47,6 +47,7 @@ import {
 } from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 import { postBlog } from "../blog/blogAPI";
+import { toast } from "react-toastify";
 
 // Định nghĩa giao diện BlogFormData
 interface BlogFormData {
@@ -57,18 +58,10 @@ interface BlogFormData {
 }
 
 // Thành phần thông báo lỗi
-const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
-    {message}
-  </div>
-);
+
 
 // Thành phần thông báo thành công
-const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative" role="alert">
-    {message}
-  </div>
-);
+
 
 // Thành phần tải dữ liệu
 const LoadingSpinner: React.FC = () => (
@@ -87,8 +80,7 @@ const CreateBlog: React.FC = () => {
     content: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -103,7 +95,7 @@ const CreateBlog: React.FC = () => {
       e.preventDefault();
 
       if (!formData.title.trim() || !formData.description.trim()) {
-        setError("Tiêu đề và mô tả là các trường bắt buộc");
+        toast.error("Tiêu đề và mô tả là các trường bắt buộc");
         return;
       }
 
@@ -118,11 +110,8 @@ const CreateBlog: React.FC = () => {
 
       try {
         setLoading(true);
-        setError(null);
-        setSuccess(null);
 
         await postBlog(blogData);
-        setSuccess("Đã tạo bài viết thành công!");
 
         setFormData({
           title: "",
@@ -131,7 +120,7 @@ const CreateBlog: React.FC = () => {
           content: "",
         });
       } catch (err) {
-        setError("Không thể tạo bài viết. Vui lòng thử lại.");
+        toast.error("Không thể tạo bài viết. Vui lòng thử lại.");
         console.error("Lỗi khi tạo bài viết:", err);
       } finally {
         setLoading(false);
@@ -146,9 +135,6 @@ const CreateBlog: React.FC = () => {
         <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
           Tạo Bài Viết Mới
         </h1>
-
-        {error && <ErrorMessage message={error} />}
-        {success && <SuccessMessage message={success} />}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

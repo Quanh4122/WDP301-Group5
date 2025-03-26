@@ -2,9 +2,61 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Table, Button, Space, Input, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { SearchOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom"; // Thêm import Link
+import { Link } from "react-router-dom";
 import Pagination from "../../home/components/Pagination";
 import { toast } from "react-toastify";
+
+// Component con để hiển thị carousel ảnh
+const CarImageCarousel: React.FC<{ images: string[] }> = ({ images }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Tự động chuyển ảnh mỗi 3 giây
+  useEffect(() => {
+    if (images.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prevIndex) =>
+          prevIndex === images.length - 1 ? 0 : prevIndex + 1
+        );
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [images]);
+
+  // Xử lý nhấp vào chấm để chuyển ảnh
+  const handleDotClick = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
+  return (
+    <div className="relative w-full h-24">
+      {images.length > 0 && currentImageIndex < images.length ? (
+        <>
+          <img
+            src={images[currentImageIndex]}
+            alt={`Car Image ${currentImageIndex}`}
+            className="w-full h-24 object-cover rounded-lg shadow-sm"
+            onError={() => console.log("Error loading image:", images[currentImageIndex])}
+          />
+          {images.length > 1 && (
+            <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleDotClick(index)}
+                  className={`w-2 h-2 rounded-full ${
+                    currentImageIndex === index ? "bg-sky-600" : "bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="text-gray-600 text-center">Không có ảnh</p>
+      )}
+    </div>
+  );
+};
 
 interface CarType {
   _id: string;
@@ -136,10 +188,17 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
       align: "center",
     },
     {
+      title: "Ảnh",
+      key: "images",
+      render: (record: Car) => <CarImageCarousel images={record.images.map(image => `http://localhost:3030${image}`)} />,
+      width: 130,
+    },
+    {
       title: "Tên xe",
       dataIndex: "carName",
       key: "carName",
       ellipsis: true,
+      width: 170, // Thêm chiều rộng cố định để cột rộng hơn
       render: (text: string, record: Car) => (
         <Link
           to={`/app/dashboard/manager-car/${record._id}`}
@@ -163,6 +222,7 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
       key: "transmissionType",
       render: (record: Car) => getTransmissionLabel(record.carType.transmissionType),
       ellipsis: true,
+      width: 2,
     },
     {
       title: "Nhiên liệu",

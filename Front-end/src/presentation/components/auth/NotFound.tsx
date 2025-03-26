@@ -6,7 +6,7 @@ const NotFound: React.FC = () => {
         <p className="text-2xl mt-4 font-semibold">Có vấn đề! Trang khöng tìm thấy</p>
         <p className="mt-2 text-gray-600 text-lg">Có vẻ như bạn đang truy cập trang không tồn tại, vui lóng quay về trang chủ.</p>
         <a href="/" className="mt-6 inline-block px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-700 transition text-lg font-medium">
-          Quay về trang chủ
+          <button>Quay về trang chủ</button>
         </a>
       </div>
     </div>
