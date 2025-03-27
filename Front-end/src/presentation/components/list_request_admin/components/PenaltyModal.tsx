@@ -145,13 +145,18 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
         {billData?.realImage && (
           <div>
             <Text strong>Ảnh xác nhận:</Text>
-            <Image
-              src={`http://localhost:3030${billData?.realImage}`}
-              alt={`Real Image`}
-              className="w-10 h-10 object-cover rounded-md shadow-sm"
-              width={40}
-              height={40}
-            />
+            {
+              billData.realImage.map((item, idx) => (
+                <Image
+                  src={`http://localhost:3030${item}`}
+                  alt={`Real Image`}
+                  className="w-10 h-10 object-cover rounded-md shadow-sm"
+                  width={40}
+                  height={40}
+                />
+              ))
+            }
+
           </div>
         )}
 
