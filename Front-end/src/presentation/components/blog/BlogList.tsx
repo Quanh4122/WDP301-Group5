@@ -7,7 +7,7 @@ interface Post {
   _id: string;
   title: string; // tiêu đề
   description: string; // mô tả
-  image: string; // hình ảnh
+  images: string[]; // mảng hình ảnh
   createdAt?: string; // ngày tạo (tuỳ chọn)
 }
 
@@ -116,8 +116,13 @@ const BlogList: React.FC = () => {
       setLoading(true);
       setError(null);
       const data = await getAllPosts(); // lấy tất cả bài viết
-      setPosts(data);
-      setFilteredPosts(data);
+      // Đảm bảo dữ liệu trả về có images là mảng, nếu không thì chuyển đổi
+      const normalizedData = data.map((post: any) => ({
+        ...post,
+        images: Array.isArray(post.images) ? post.images : post.image ? [post.image] : [],
+      }));
+      setPosts(normalizedData);
+      setFilteredPosts(normalizedData);
     } catch (err) {
       setError("Không thể tải bài viết. Vui lòng thử lại sau.");
       console.error("Lỗi khi tải bài viết:", err);
@@ -223,7 +228,11 @@ const BlogList: React.FC = () => {
               >
                 <div className="relative h-56 overflow-hidden rounded-t-xl bg-gray-100">
                   <img
-                    src={`http://localhost:3030${post.image}`}
+                    src={
+                      post.images && post.images.length > 0
+                        ? `http://localhost:3030${post.images[0]}`
+                        : "/placeholder-image.jpg"
+                    }
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                     alt={post.title}
                     loading="lazy"
