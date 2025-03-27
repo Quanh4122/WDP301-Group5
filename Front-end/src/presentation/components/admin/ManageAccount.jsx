@@ -25,7 +25,6 @@ const ManageAccount = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  // Hàm làm mới danh sách
   const refreshApplications = () => {
     dispatch(FetchPendingDriverApplications());
     dispatch(FetchApprovedDriverApplications());
@@ -43,15 +42,17 @@ const ManageAccount = () => {
     ...pendingDriverApplications,
     ...approvedDriverApplications,
     ...rejectedDriverApplications,
-  ]; // Loại bỏ các tài khoản đã giáng cấp thành User
+  ];
 
   const filteredApplications = allApplications.filter((application) => {
+    // Chỉ giữ lại các ứng dụng có thông tin người dùng hợp lệ (không null/undefined)
+    const hasValidUser = application.user && application.user._id;
     const matchesFilter = filter === "all" || application.status === filter;
     const matchesSearch =
       searchTerm === "" ||
-      application.user?.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      application.user?.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
+      (application.user?.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+      (application.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+    return hasValidUser && matchesFilter && matchesSearch;
   });
 
   const totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
@@ -60,10 +61,9 @@ const ManageAccount = () => {
     currentPage * itemsPerPage
   );
 
-  // Xử lý phê duyệt/từ chối và làm mới danh sách
   const handleApplicationAction = (userId, status) => {
     dispatch(ApproveDriverApplication({ userId, status })).then(() => {
-      refreshApplications(); // Làm mới danh sách sau khi hành động hoàn tất
+      refreshApplications();
     });
   };
 
@@ -165,15 +165,11 @@ const ManageAccount = () => {
                       </td>
                       <td className="py-4 px-6 text-gray-900 font-medium">
                         <Link to={`/app/dashboard/manage-driver-accept/${application.user?._id}`} className="hover:text-sky-400">
-                          <button>{application.user?.userName ?? "N/A"}</button>
+                          <button>{application.user.userName}</button>
                         </Link>
                       </td>
-                      <td className="py-4 px-6 text-gray-700">
-                        {application.user?.email ?? "N/A"}
-                      </td>
-                      <td className="py-4 px-6 text-gray-700">
-                        {application.user?.role?.roleName ?? "N/A"}
-                      </td>
+                      <td className="py-4 px-6 text-gray-700">{application.user.email}</td>
+                      <td className="py-4 px-6 text-gray-700">{application.user.role.roleName}</td>
                       <td className="py-4 px-6">
                         <span
                           className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
@@ -202,7 +198,7 @@ const ManageAccount = () => {
                           <div className="flex justify-center gap-3">
                             <button
                               onClick={() =>
-                                handleApplicationAction(application.user?._id, "approved")
+                                handleApplicationAction(application.user._id, "approved")
                               }
                               className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-all duration-200 disabled:opacity-50 shadow-md"
                               disabled={isLoading}
@@ -212,7 +208,7 @@ const ManageAccount = () => {
                             </button>
                             <button
                               onClick={() =>
-                                handleApplicationAction(application.user?._id, "rejected")
+                                handleApplicationAction(application.user._id, "rejected")
                               }
                               className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-all duration-200 disabled:opacity-50 shadow-md"
                               disabled={isLoading}
