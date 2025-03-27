@@ -34,7 +34,6 @@ interface CarFormDrawerProps {
     setCarList: (cars: Car[] | undefined) => void;
 }
 
-// Hàm chuyển URL thành File
 const urlToFile = async (url: string, fileName: string): Promise<File> => {
     const response = await fetch(url);
     const blob = await response.blob();
@@ -83,6 +82,7 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                 flue: carDetail.carType.flue,
                 transmissionType: carDetail.carType.transmissionType,
                 bunkBed: carDetail.carType.bunkBed,
+                images: carDetail.images,
             });
             setIsDisplayBunkbed(carDetail.numberOfSeat > 7);
 
@@ -91,6 +91,7 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                 name: `image-${index}`,
                 status: "done",
                 url: `http://localhost:3030${url}`,
+                path: url, // Lưu path gốc để so sánh sau
             }));
             setFileList(defaultFileList);
             setArrFile([]);
@@ -117,7 +118,7 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                 flue: form.getFieldValue("flue"),
                 transmissionType: form.getFieldValue("transmissionType"),
             },
-            images: arrFile.length > 0 ? arrFile : carDetail?.images, // Dùng arrFile nếu có tệp mới, nếu không giữ images cũ
+            images: fileList.map((file) => file.path || file), // Kết hợp ảnh cũ và mới
         };
         if (carDetail) {
             updateCar(data, carDetail._id);
@@ -163,20 +164,25 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
         formData.append("flue", String(value.carType.flue));
         formData.append("transmissionType", String(value.carType.transmissionType));
 
-        if (value.images && value.images.length > 0) {
+        if (fileList && fileList.length > 0) {
             const imageFiles = await Promise.all(
-                value.images.map(async (element, index) => {
-                    if (typeof element === "string") {
-                        const fullUrl = `http://localhost:3030${element}`;
+                fileList.map(async (file, index) => {
+                    if (file.url && file.path) {
+                        // Ảnh cũ (URL)
+                        const fullUrl = `http://localhost:3030${file.path}`;
                         return await urlToFile(fullUrl, `image-${index}.jpg`);
-                    } else {
-                        return element;
+                    } else if (file.originFileObj) {
+                        // Ảnh mới (File)
+                        return file.originFileObj;
                     }
+                    return null;
                 })
             );
-            imageFiles.forEach((file) => {
-                formData.append("images", file);
-            });
+            imageFiles
+                .filter((file): file is File => file !== null) // Loại bỏ null
+                .forEach((file) => {
+                    formData.append("images", file);
+                });
         }
 
         await axiosInstance
@@ -191,17 +197,27 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
     };
 
     const onChangeGetFile = (info: any) => {
-        const newFileList = info.fileList;
+        const newFileList = info.fileList.slice(0, 4);
         setFileList(newFileList);
 
         const newFiles: File[] = newFileList
             .filter((file: any) => file.originFileObj)
             .map((file: any) => file.originFileObj);
         setArrFile(newFiles);
+
+        form.setFieldsValue({ images: newFileList });
     };
 
     const handleCancel = () => {
         setIsDrawerVisible(false);
+    };
+
+    const validateImages = (_: any, value: any) => {
+        const currentFiles = fileList.length;
+        if (currentFiles < 4) {
+            return Promise.reject(new Error("Vui lòng tải lên ít nhất 4 ảnh!"));
+        }
+        return Promise.resolve();
     };
 
     return (
@@ -285,7 +301,7 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                                 />
                             </Form.Item>
                             <Form.Item
-                                label="Giá thuê 1h"
+                                label="Giá thuê 4h"
                                 rules={[{ required: true, message: "Vui lòng nhập giá thuê 4h!" }]}
                                 name="price"
                             >
@@ -324,8 +340,11 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                         </div>
                         <Form.Item
                             label="Thêm ảnh"
-                            rules={[{ required: !carDetail, message: "Vui lòng tải lên hình ảnh!" }]}
                             name="images"
+                            rules={[
+                                { required: true, message: "Vui lòng tải lên ảnh!" },
+                                { validator: validateImages },
+                            ]}
                             className="mt-4"
                         >
                             <Upload.Dragger
@@ -333,13 +352,14 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                                 fileList={fileList}
                                 onChange={onChangeGetFile}
                                 beforeUpload={() => false}
+                                maxCount={4}
                                 className="border-2 border-dashed border-gray-300 bg-white rounded-lg p-4 text-center hover:border-blue-500 transition duration-200 max-h-40 overflow-y-auto"
                             >
                                 <p className="ant-upload-drag-icon">
                                     <InboxOutlined className="text-blue-500 text-3xl" />
                                 </p>
                                 <p className="ant-upload-text text-gray-600 text-sm">
-                                    Click or drag file to this area to upload
+                                    Click or drag file to this area to upload (Tối đa 4 ảnh)
                                 </p>
                                 <p className="text-xs text-gray-400">Support multiple files</p>
                             </Upload.Dragger>
