@@ -317,8 +317,8 @@ export const TranmissionType = [
 
 export const statusRequestAdminView = [
   { lable: "Trong thời gian thực hiện", value: "2" },
-  { lable: "Đợi đánh giá tình trạng và thông báo tiền", value: "3" },
-  { lable: "Đợi khách thanh toán", value: "4" },
-  { lable: "Đã thanh toán thành công", value: "5" },
-  { lable: "Đã bị hủy", value: "6" },
+  { lable: "Đợi người dùng trả xe", value: "3" },
+  { lable: "Đợi admin đánh giá", value: "4" },
+  { lable: "Chờ người dùng thanh toán", value: "5" },
+  { lable: "Đã thanh toán thành công", value: "6" },
 ]

@@ -40,7 +40,6 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       const requestResponse = await axiosInstance.get("/bill/getBillByReuqestId", {
         params: { key: requestId },
       });
-      console.log("check data : ", requestResponse.data.bill)
       setBillData(requestResponse.data.bill);
 
       // Tính toán phí phạt mặc định nếu realTimeDrop muộn hơn endDate
@@ -50,7 +49,8 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       const endDate = dayjs(requestResponse.data.bill.request.endDate);
       if (realTimeDrop && realTimeDrop.isAfter(endDate)) {
         const timeLate = realTimeDrop.diff(endDate, "hour");
-        const defaultPenalty = timeLate * 50000; // Ví dụ: 50,000 VNĐ/ngày
+
+        const defaultPenalty = timeLate * 500000; // Ví dụ: 50,000 VNĐ/ngày
         setPenaltyFee(defaultPenalty);
         form.setFieldsValue({ penaltyFee: defaultPenalty });
       } else {
@@ -74,15 +74,18 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
           penaltyFee: values.penaltyFee
         }
         // Gửi dữ liệu lên server
-        const response = await axiosInstance.put("/bill/adminUpdatePenaltyFee", dataSubmit);
-        toast.success("Cập nhật phí phạt thành công!");
-        form.resetFields();
-        onClose(); // Đóng modal
-        if (onSuccess) onSuccess(); // Gọi callback nếu có
+        await axiosInstance.put("/bill/adminUpdatePenaltyFee", dataSubmit)
+          .then(res => {
+            toast.success("Cập nhật phí phạt thành công!");
+            form.resetFields();
+            onClose(); // Đóng modal
+            if (onSuccess) onSuccess(); // Gọi callback nếu có
+          }).catch(err => {
+            toast.error(err.response.data.message);
+          })
       } else {
         console.log("Have no bill")
       }
-
     } catch (error) {
       console.error(error);
       toast.error("Đã có lỗi xảy ra, vui lòng thử lại.");

@@ -160,25 +160,33 @@ const adminUpdatePenaltyFee = async (req, res) => {
 
   try {
     if (data) {
-      const bill = await BillModel.findOneAndUpdate(
-        {
-          _id: data.billId,
-        },
-        {
-          penaltyFee: data.penaltyFee,
-        }
-      );
-      const requestModal = await RequestModel.findOneAndUpdate(
-        {
-          _id: bill.request._id,
-        },
-        {
-          requestStatus: "4",
-        }
-      ).populate("user", "userName fullName email phoneNumber address avatar");
+      // const bill = await BillModel.findOneAndUpdate(
+      //   {
+      //     _id: data.billId,
+      //   },
+      //   {
+      //     penaltyFee: data.penaltyFee || 0,
+      //   }
+      // );
+      const bill = await BillModel.findOne({
+        _id: data.billId,
+      });
+      // const requestModal = await RequestModel.findOneAndUpdate(
+      //   {
+      //     _id: bill.request._id,
+      //   },
+      //   {
+      //     requestStatus: "5",
+      //   }
+      const requestModal = await RequestModel.findOne({
+        _id: bill.request._id,
+      }).populate("user", "userName fullName email phoneNumber address avatar");
       const bookingAgainURL = `http://localhost:3000/app/bill-payment?billId=${bill._id}`;
-      const total = bill.vatFee + bill.totalCarFee - bill.depositFee;
-      const emailContent = await NotifyPayment(
+      let total = bill.vatFee + bill.totalCarFee;
+      if (bill.depositFee) total = total - bill.depositFee;
+
+      if (bill.penaltyFee) total = total + bill.penaltyFee;
+      const emailContent = NotifyPayment(
         `${requestModal.user.userName}`,
         bookingAgainURL,
         bill.vatFee.toLocaleString("vi-VN", {
@@ -189,10 +197,18 @@ const adminUpdatePenaltyFee = async (req, res) => {
           style: "currency",
           currency: "VND",
         }),
-        bill.depositFee.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }),
+        bill.depositFee
+          ? bill.depositFee.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })
+          : 0,
+        bill.penaltyFee
+          ? bill.penaltyFee.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })
+          : 0,
         total.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
@@ -208,10 +224,9 @@ const adminUpdatePenaltyFee = async (req, res) => {
         message: "Successfull !!!",
       });
     }
-
     return res.status(401).json({ message: "Have no data to update !!" });
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(400).json({ message: "check" + error });
   }
 };
 

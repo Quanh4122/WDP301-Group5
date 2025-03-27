@@ -1,4 +1,12 @@
-module.exports = (name, link, VATFee, totalcarFee, depositFee, totalMoney) => {
+module.exports = (
+  name,
+  link,
+  VATFee,
+  totalcarFee,
+  depositFee,
+  penaltyFee,
+  totalMoney
+) => {
   return `<!DOCTYPE html>
       <html>
       <head>
@@ -108,9 +116,10 @@ module.exports = (name, link, VATFee, totalcarFee, depositFee, totalMoney) => {
                   <h3>Chi tiết đặt xe</h3>
                   <p><strong>Thuế VAT:</strong> ${VATFee}</p>
                   <p><strong>Tổng tiền thuê xe:</strong> ${totalcarFee}</p>
+                  <p><strong>Số tiền bạn đã cọc:</strong> ${depositFee}</p>
                   ${
-                    depositFee
-                      ? `<p><strong>Số tiền phạt:</strong> ${depositFee}</p>`
+                    penaltyFee
+                      ? `<p><strong>Số tiền phạt:</strong> ${penaltyFee}</p>`
                       : ""
                   }
                   <p><strong>Số tiền cần thanh toán:</strong> ${totalMoney}</p>
