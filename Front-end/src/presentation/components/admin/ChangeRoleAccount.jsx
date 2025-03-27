@@ -5,7 +5,6 @@ import {
   fetchUsersAndDrivers,
   UpdateUserRole,
 } from "../redux/slices/Authentication";
-import { FaArrowLeft } from "react-icons/fa"; // Thêm icon Back
 
 const ChangeRoleAccount = () => {
   const { userId } = useParams();
@@ -36,7 +35,7 @@ const ChangeRoleAccount = () => {
     if (selectedRole && selectedRole !== user?.role?.roleName) {
       dispatch(UpdateUserRole(userId, selectedRole))
         .then(() => {
-          navigate("/app/manage-account");
+          navigate("/app/dashboard/manage-account");
         })
         .catch((err) => {
           console.error("Failed to update role:", err);
@@ -45,7 +44,7 @@ const ChangeRoleAccount = () => {
   };
 
   const handleBack = () => {
-    navigate("/app/manage-account");
+    navigate("/app/dashboard/manage-account");
   };
 
   if (isLoading) {
@@ -74,15 +73,8 @@ const ChangeRoleAccount = () => {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <header className="mb-8 flex items-center gap-4">
-          <Link
-            to="/app/manage-account"
-            className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors duration-200"
-          >
-            <FaArrowLeft className="w-5 h-5" />
-            <span className="text-lg font-medium">Quay lại</span>
-          </Link>
           <h1 className="text-3xl font-bold text-gray-900 flex-1 text-center">
-            Phân Quyền Tài Khoản
+            Chi tiết tài khoản
           </h1>
         </header>
 

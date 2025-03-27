@@ -107,7 +107,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             .then((res) => {
                 toast.success("Bạn đã thành công đặt xe !!");
             })
-            .catch((err) => console.log(err));
+            .catch((err) => toast.error("Số lượng tài xế không đủ bạn có thể bớt xe hoặc thuê không tài xế !!"));
     };
 
     const onBooking = async (amount: number) => {
@@ -149,9 +149,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             })
             .then((res) => {
                 setRequestData(res.data);
-                toast.success("Delete Successful");
+                toast.success("Xóa thành công !!");
             })
-            .catch((err) => toast.error("Fail to delete !!"));
+            .catch((err) => toast.error("Xóa thất bại!!"));
     };
 
     const [isModalDepositOpen, setIsModalDepositOpen] = useState(false);
@@ -199,7 +199,8 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
                 setTimeout(() => navigate("/"), 2000)
             })
             .catch((err) => {
-                toast.error("Đặt xe thất bại !!");
+                console.log(err.response.data.message)
+                toast.error(err.response.data.message + " !!!");
             });
         setIsModalDepositOpen(false);
     };

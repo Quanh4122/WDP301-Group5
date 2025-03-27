@@ -13,14 +13,11 @@ const BlogSchema = new mongoose.Schema({
     type: Date, 
     require: true 
   },
+  dateUpdated: { type: Date },
   image: { 
     type: String, 
     require: true 
   },
-  content: { 
-    type: String, 
-    require: true 
-  }
 });
 
 const BlogModel = mongoose.model("Blog", BlogSchema);

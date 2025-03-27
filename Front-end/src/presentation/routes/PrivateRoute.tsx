@@ -12,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
   const { isLoggedIn, user } = useSelector((state: RootState) => state.auth) as {
     isLoggedIn: boolean;
     user: {
-      role: string;
+      role: string | { roleName: string };
     } | null;
   };
 
@@ -20,7 +20,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     return <Navigate to="/app/not-authetication" replace />;
   }
 
-  if (requiredRole && (!user || user.role !== requiredRole)) {
+  const userRole = typeof user?.role === "object" ? user.role.roleName : user?.role;
+  if (requiredRole && (!user || userRole !== requiredRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

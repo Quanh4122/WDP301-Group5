@@ -406,7 +406,7 @@ const login = async (req, res) => {
         phoneNumber: user.phoneNumber,
       },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "4h" }
     );
 
     res.cookie("token", token, {
@@ -487,7 +487,7 @@ const googleLogin = async (req, res) => {
         role: user.role.roleName, // Lấy roleName thay vì toàn bộ object role
       },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "4h" }
     );
 
     res.cookie("token", token, {
@@ -722,7 +722,7 @@ const editProfile = async (req, res) => {
 
     const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
       new: true,
-    });
+    }).populate("role");
 
     if (!updatedUser) {
       return res.status(404).json({ message: "Không tìm thấy user!" });
@@ -828,15 +828,20 @@ const changePassword = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const userId = req.query.key;
-    const user = await UserModel.findById(userId).populate("role");
+    console.log("Fetching user with ID:", userId);
+    const user = await UserModel.findById(userId)
+      .select("userName fullName email phoneNumber address avatar role")
+      .populate("role");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    console.log("User Data:", user);
     return res.status(200).json(user);
   } catch (error) {
+    console.error("Error in getUserById:", error.message, error.stack);
     return res
       .status(500)
-      .json({ message: "Lỗi máy chủ, vui lòng thử lại sau !!" });
+      .json({ message: "Lỗi máy chủ, vui lòng thử lại sau !!", error: error.message });
   }
 };
 

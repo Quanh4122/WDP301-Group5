@@ -17,15 +17,15 @@ const FeatureSection = ({ listContent }: props) => {
     // { id: 5 },
   ]
 
-  const [listFavoritCar, setListFavoritCar] = useState<CarModel[]>()
+  const [listFavoriteCar, setListFavoriteCar] = useState<CarModel[]>()
 
   useEffect(() => {
     getListFavoritCar()
   }, [])
 
   const getListFavoritCar = async () => {
-    await axiosInstance.get("/request/selectFavoritCar")
-      .then(res => setListFavoritCar(res.data))
+    await axiosInstance.get("/request/selectFavoriteCar")
+      .then(res => setListFavoriteCar(res.data))
       .catch(err => console.log(err))
   }
   return (
@@ -50,7 +50,7 @@ const FeatureSection = ({ listContent }: props) => {
           </div>
         ))} */}
         {
-          listFavoritCar?.map((item, indx) => (
+          listFavoriteCar?.map((item, indx) => (
             <div key={indx}>
               <CarItem carModel={item} />
             </div>

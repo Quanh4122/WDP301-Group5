@@ -33,11 +33,13 @@ router.post(
   VerifyToken,
   RequestController.handleCheckRequest
 );
+router.get("/getRequestsByDriverId", RequestController.getRequestsByDriverId);
+router.get("/getAllRequest", RequestController.getAllRequests);
 
 router.get("/search-address", RequestController.getAddress);
 
 router.get("/getRequestById", VerifyToken, RequestController.getRequestById);
 
-router.get("/selectFavoritCar", RequestController.selectFavoritCar);
+router.get("/selectFavoriteCar", RequestController.selectFavoriteCar);
 
 module.exports = router;

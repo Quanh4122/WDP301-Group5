@@ -24,6 +24,9 @@ const UserProfile: React.FC = () => {
   const [userIdPreview, setUserIdPreview] = useState("");
   const [userNamePreview, setUserNamePreview] = useState("");
 
+  console.log(user);
+  
+
   useEffect(() => {
     if (isLoggedIn && user) {
       if (user.avatar) {

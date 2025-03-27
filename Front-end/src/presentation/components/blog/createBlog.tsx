@@ -1,74 +1,13 @@
 import React, { useState, useCallback } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import {
-  ClassicEditor,
-  Autoformat,
-  AutoImage,
-  Autosave,
-  BlockQuote,
-  Bold,
-  CKBox,
-  CKBoxImageEdit,
-  CloudServices,
-  Emoji,
-  Essentials,
-  Heading,
-  ImageBlock,
-  ImageCaption,
-  ImageInline,
-  ImageInsert,
-  ImageInsertViaUrl,
-  ImageResize,
-  ImageStyle,
-  ImageTextAlternative,
-  ImageToolbar,
-  ImageUpload,
-  Indent,
-  IndentBlock,
-  Italic,
-  Link,
-  LinkImage,
-  List,
-  ListProperties,
-  MediaEmbed,
-  Mention,
-  Paragraph,
-  PasteFromOffice,
-  PictureEditing,
-  Table,
-  TableCaption,
-  TableCellProperties,
-  TableColumnResize,
-  TableProperties,
-  TableToolbar,
-  TextTransformation,
-  TodoList,
-  Underline,
-} from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 import { postBlog } from "../blog/blogAPI";
+import { toast } from "react-toastify";
 
 // Định nghĩa giao diện BlogFormData
 interface BlogFormData {
   title: string;
   description: string;
-  image: string;
-  content: string;
 }
-
-// Thành phần thông báo lỗi
-const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
-    {message}
-  </div>
-);
-
-// Thành phần thông báo thành công
-const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative" role="alert">
-    {message}
-  </div>
-);
 
 // Thành phần tải dữ liệu
 const LoadingSpinner: React.FC = () => (
@@ -83,12 +22,10 @@ const CreateBlog: React.FC = () => {
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
     description: "",
-    image: "",
-    content: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null); // Lưu file ảnh
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // Xem trước ảnh
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -98,12 +35,22 @@ const CreateBlog: React.FC = () => {
     }));
   };
 
+  // Xử lý khi chọn file ảnh
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file); // Tạo URL tạm để xem trước
+      setImagePreview(previewUrl);
+    }
+  };
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       if (!formData.title.trim() || !formData.description.trim()) {
-        setError("Tiêu đề và mô tả là các trường bắt buộc");
+        toast.error("Tiêu đề và mô tả là các trường bắt buộc");
         return;
       }
 
@@ -111,33 +58,27 @@ const CreateBlog: React.FC = () => {
         title: formData.title.trim(),
         description: formData.description.trim(),
         dateCreate: new Date().toISOString(),
-        author: "67bb8e06a5fe4f4fe85dc19f", // Nên làm động trong thực tế
-        image: formData.image.trim(),
-        content: formData.content,
+        image: imageFile || "", // Gửi File hoặc chuỗi rỗng nếu không có ảnh
       };
 
       try {
         setLoading(true);
-        setError(null);
-        setSuccess(null);
 
         await postBlog(blogData);
-        setSuccess("Đã tạo bài viết thành công!");
 
+        // Reset form sau khi thành công
         setFormData({
           title: "",
           description: "",
-          image: "",
-          content: "",
         });
+        setImageFile(null);
+        setImagePreview(null);
       } catch (err) {
-        setError("Không thể tạo bài viết. Vui lòng thử lại.");
-        console.error("Lỗi khi tạo bài viết:", err);
       } finally {
         setLoading(false);
       }
     },
-    [formData]
+    [formData, imageFile]
   );
 
   return (
@@ -146,9 +87,6 @@ const CreateBlog: React.FC = () => {
         <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
           Tạo Bài Viết Mới
         </h1>
-
-        {error && <ErrorMessage message={error} />}
-        {success && <SuccessMessage message={success} />}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -191,105 +129,47 @@ const CreateBlog: React.FC = () => {
 
           <div>
             <label
-              htmlFor="image"
+              htmlFor="imageUpload"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              URL Hình ảnh
+              Tải lên hình ảnh
             </label>
-            <input
-              type="text"
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
-              placeholder="Nhập URL hình ảnh"
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nội dung
-            </label>
-            <div className="rounded-lg border border-gray-300 shadow-sm">
-              <CKEditor
-                editor={ClassicEditor}
-                config={{
-                  licenseKey: "GPL",
-                  plugins: [
-                    Autoformat,
-                    AutoImage,
-                    Autosave,
-                    BlockQuote,
-                    Bold,
-                    CKBox,
-                    CKBoxImageEdit,
-                    CloudServices,
-                    Emoji,
-                    Essentials,
-                    Heading,
-                    ImageBlock,
-                    ImageCaption,
-                    ImageInline,
-                    ImageInsert,
-                    ImageInsertViaUrl,
-                    ImageResize,
-                    ImageStyle,
-                    ImageTextAlternative,
-                    ImageToolbar,
-                    ImageUpload,
-                    Indent,
-                    IndentBlock,
-                    Italic,
-                    Link,
-                    LinkImage,
-                    List,
-                    ListProperties,
-                    MediaEmbed,
-                    Mention,
-                    Paragraph,
-                    PasteFromOffice,
-                    PictureEditing,
-                    Table,
-                    TableCaption,
-                    TableCellProperties,
-                    TableColumnResize,
-                    TableProperties,
-                    TableToolbar,
-                    TextTransformation,
-                    TodoList,
-                    Underline,
-                  ],
-                  toolbar: [
-                    "heading",
-                    "|",
-                    "bold",
-                    "italic",
-                    "underline",
-                    "|",
-                    "emoji",
-                    "link",
-                    "insertImage",
-                    "ckbox",
-                    "insertTable",
-                    "blockQuote",
-                    "|",
-                    "bulletedList",
-                    "numberedList",
-                    "todoList",
-                    "outdent",
-                    "indent",
-                  ],
-                }}
-                data={formData.content}
-                onChange={(event, editor) => {
-                  const data = editor.getData();
-                  setFormData((prev) => ({ ...prev, content: data }));
-                }}
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                id="imageUpload"
+                name="imageUpload"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 disabled:opacity-50"
                 disabled={loading}
               />
+              {imagePreview && (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Xem trước"
+                    className="w-24 h-24 object-cover rounded-lg shadow-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                    disabled={loading}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
             </div>
+            {imageFile && (
+              <p className="text-sm text-gray-500 mt-2">
+                Đã chọn: {imageFile.name}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-center pt-6">

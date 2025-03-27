@@ -11,6 +11,12 @@ interface Post {
   createdAt?: string; // ngày tạo (tuỳ chọn)
 }
 
+// Hàm cắt ngắn văn bản
+const truncateText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + "...";
+};
+
 // Thành phần thông báo lỗi
 const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
   <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
@@ -217,7 +223,7 @@ const BlogList: React.FC = () => {
               >
                 <div className="relative h-56 overflow-hidden rounded-t-xl bg-gray-100">
                   <img
-                    src={post.image}
+                    src={`http://localhost:3030${post.image}`}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                     alt={post.title}
                     loading="lazy"
@@ -231,7 +237,7 @@ const BlogList: React.FC = () => {
                     {post.title}
                   </h5>
                   <p className="text-gray-600 text-sm flex-grow line-clamp-3 mb-4">
-                    {post.description}
+                    {truncateText(post.description, 100)} {/* Áp dụng cắt ngắn */}
                   </p>
                   <Link
                     to={`/app/blog/${post._id}`}

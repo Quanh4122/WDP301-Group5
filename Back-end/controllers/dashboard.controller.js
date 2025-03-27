@@ -47,7 +47,7 @@ const getUserTrend = async (req, res) => {
     res.json({
       title: "Số lượng người dùng trong hệ thống",
       value: totalUsers.toString(),
-      interval: "Last 30 days",
+      interval: "30 ngày qua",
       trend,
       data: dailyCounts,
     });
@@ -114,7 +114,7 @@ const getRequestTrend = async (req, res) => {
     res.json({
       title: "Tổng số lương request",
       value: valueStr,
-      interval: "Last 30 days",
+      interval: "30 ngày qua",
       trend,
       data: dailyCounts,
     });

@@ -49,7 +49,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       const endDate = dayjs(requestResponse.data.bill.request.endDate);
       if (realTimeDrop && realTimeDrop.isAfter(endDate)) {
         const timeLate = realTimeDrop.diff(endDate, "hour");
-
+        console.log(timeLate)
         const defaultPenalty = timeLate * 500000; // Ví dụ: 50,000 VNĐ/ngày
         setPenaltyFee(defaultPenalty);
         form.setFieldsValue({ penaltyFee: defaultPenalty });
@@ -157,7 +157,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
 
         {/* Form nhập phí phạt */}
         {
-          billData?.request.requestStatus == "3" &&
+          billData?.request.requestStatus == "4" &&
           <Form form={form} onFinish={onSubmit} layout="vertical">
             <Form.Item
               name="penaltyFee"
@@ -174,6 +174,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
                 parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
                 className="w-full"
                 placeholder="Nhập số tiền phạt"
+                readOnly
               />
             </Form.Item>
           </Form>
@@ -188,7 +189,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       title={<span className="text-xl font-bold">Thông Tin Hóa Đơn và Phí Phạt</span>}
       open={visible}
       onCancel={onClose}
-      footer={billData?.request.requestStatus == "3" && [
+      footer={billData?.request.requestStatus == "4" && [
         <Button key="cancel" onClick={onClose} disabled={loading}>
           Hủy
         </Button>,
