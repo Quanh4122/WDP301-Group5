@@ -33,7 +33,7 @@ const BillSchema = new mongoose.Schema({
     required: false,
   },
   realImage: {
-    type: String,
+    type: [String],
     required: false,
   },
   penaltyFee: {
@@ -43,7 +43,7 @@ const BillSchema = new mongoose.Schema({
   total: {
     type: Number,
     // no static default here; we'll compute it in a pre-save hook
-  }
+  },
 });
 
 // Pre-save hook to compute total from the related Request document
@@ -52,7 +52,10 @@ BillSchema.pre("save", async function (next) {
   if (this.isNew && (this.total === undefined || this.total === null)) {
     try {
       // Find the related Request and populate its car field
-      const request = await mongoose.model("Request").findById(this.requestId).populate("car");
+      const request = await mongoose
+        .model("Request")
+        .findById(this.requestId)
+        .populate("car");
 
       if (request && request.car) {
         let totalPrice = 0;

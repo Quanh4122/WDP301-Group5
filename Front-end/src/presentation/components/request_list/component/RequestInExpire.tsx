@@ -51,7 +51,7 @@ const RequestInExpire: React.FC = () => {
         setArrFile(files);
     };
 
-    const onBooking = async () => {
+    const onBooking = async (value: any) => {
         setLoading(true);
         try {
             const formData = new FormData();
@@ -61,7 +61,6 @@ const RequestInExpire: React.FC = () => {
             const dateNow = dayjs().format("YYYY/MM/DD HH:mm");
             formData.append('realTimeDrop', dateNow);
             arrFile.forEach((file) => formData.append('images', file));
-
             await axiosInstance.post('/bill/userConfirmDoneBill', formData)
                 .then(res => {
                     toast.success('Xác nhận trả xe thành công!');
