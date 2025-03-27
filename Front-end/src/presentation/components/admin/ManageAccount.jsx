@@ -38,11 +38,12 @@ const ManageAccount = () => {
     }
   }, [dispatch, user?.role]);
 
+  // Kết hợp và lọc các ứng dụng tài xế
   const allApplications = [
     ...pendingDriverApplications,
     ...approvedDriverApplications,
     ...rejectedDriverApplications,
-  ].filter((app) => app.user); // Lọc bỏ các ứng dụng không có user (đã xóa)
+  ].filter((app) => app.user && app.user.role?.roleName !== "User"); // Loại bỏ các tài khoản đã giáng cấp thành User
 
   const filteredApplications = allApplications.filter((application) => {
     const matchesFilter = filter === "all" || application.status === filter;
@@ -81,7 +82,7 @@ const ManageAccount = () => {
     <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-4xl font-bold text-gray-900">Quản Lý Tài Khoản</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Quản Lý Danh Sách Tài Xế Ứng Tuyển</h1>
           <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
             Cập nhật: {new Date().toLocaleString("vi-VN")}
           </div>
@@ -163,7 +164,7 @@ const ManageAccount = () => {
                         )}
                       </td>
                       <td className="py-4 px-6 text-gray-900 font-medium">
-                        <Link to={`/app/dashboard/manage-driver-accept/${application.user?._id}`}>
+                        <Link to={`/app/dashboard/manage-driver-accept/${application.user?._id}`} className="hover:text-sky-400">
                           <button>{application.user?.userName ?? "N/A"}</button>
                         </Link>
                       </td>

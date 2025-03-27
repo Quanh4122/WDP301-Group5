@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaUser } from "react-icons/fa"; // Thêm FaUser
 import Pagination from "../../components/home/components/Pagination";
 import { fetchUsersAndDrivers } from "../redux/slices/Authentication";
 import { Link, useNavigate } from "react-router-dom";
@@ -37,6 +37,16 @@ const UserList = () => {
     currentPage * itemsPerPage
   );
 
+  // Hàm xử lý đường dẫn ảnh
+  const getAvatarUrl = (avatar) => {
+    if (!avatar || avatar.trim() === "") {
+      return null; // Không có ảnh, sẽ dùng icon
+    }
+    if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
+      return avatar; // URL tuyệt đối từ Google hoặc bên ngoài
+    }
+    return `http://localhost:3030${avatar.startsWith("/") ? "" : "/"}${avatar}`; // Ảnh từ backend
+  };
 
   if (isLoading) {
     return (
@@ -115,56 +125,66 @@ const UserList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {paginatedUsers.map((user) => (
-                    <tr
-                      key={user._id}
-                      className="hover:bg-gray-50 transition-colors duration-200"
-                    >
-                      <td className="py-4 px-6 text-center">
-                        <img
-                          src={user.avatar ?? "/images/avatar.png"}
-                          alt={user.userName ?? "N/A"}
-                          className="w-12 h-12 rounded-full object-cover mx-auto"
-                        />
-                      </td>
-                      <td className="py-4 px-6 text-gray-900 font-medium text-center">
-                        <Link
-                          to={`/app/dashboard/manage-account/${user._id}`}
-                          className="hover:text-sky-400"
-                        >
-                          <button>{user.userName ?? "N/A"}</button>
-                        </Link>
-                      </td>
-                      <td className="py-4 px-6 text-gray-700 text-center">{user.email ?? "N/A"}</td>
-                      <td className="py-4 px-6 text-center">
-                        <span
-                          className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${user.role?.roleName === "Admin"
-                              ? "bg-blue-100 text-blue-700"
-                              : user.role?.roleName === "Driver"
+                  {paginatedUsers.map((user) => {
+                    const avatarUrl = getAvatarUrl(user.avatar);
+                    return (
+                      <tr
+                        key={user._id}
+                        className="hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <td className="py-4 px-6 text-center">
+                          {avatarUrl ? (
+                            <img
+                              src={avatarUrl}
+                              alt={user.userName ?? "Người dùng"}
+                              className="w-12 h-12 rounded-full object-cover mx-auto"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
+                              <FaUser className="text-gray-500 text-2xl" />
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-gray-900 font-medium text-center">
+                          <Link
+                            to={`/app/dashboard/manage-account/${user._id}`}
+                            className="hover:text-sky-400"
+                          >
+                            <button>{user.userName ?? "N/A"}</button>
+                          </Link>
+                        </td>
+                        <td className="py-4 px-6 text-gray-700 text-center">{user.email ?? "N/A"}</td>
+                        <td className="py-4 px-6 text-center">
+                          <span
+                            className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
+                              user.role?.roleName === "Admin"
+                                ? "bg-blue-100 text-blue-700"
+                                : user.role?.roleName === "Driver"
                                 ? "bg-green-100 text-green-700"
                                 : "bg-gray-100 text-gray-700"
                             }`}
-                        >
-                          {user.role?.roleName ?? "N/A"}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-gray-700 text-center">
-                        {new Date(user.createdAt).toLocaleDateString("vi-VN")}
-                      </td>
-                      <td className="py-4 px-6 text-center">
-                        <div className="flex justify-center gap-3">
-                          <Link
-                            to={`/app/dashboard/change-role/${user._id}`}
-                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-3 rounded-full hover:from-yellow-600 hover:to-yellow-700 active:from-yellow-700 active:to-yellow-800 transition-all duration-200 disabled:opacity-50 shadow-lg flex items-center justify-center w-12 h-12"
-                            disabled={isLoading}
-                            title="Chỉnh sửa vai trò"
                           >
-                            <FaEdit />
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            {user.role?.roleName ?? "N/A"}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-gray-700 text-center">
+                          {new Date(user.createdAt).toLocaleDateString("vi-VN")}
+                        </td>
+                        <td className="py-4 px-6 text-center">
+                          <div className="flex justify-center gap-3">
+                            <Link
+                              to={`/app/dashboard/change-role/${user._id}`}
+                              className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-3 rounded-full hover:from-yellow-600 hover:to-yellow-700 active:from-yellow-700 active:to-yellow-800 transition-all duration-200 disabled:opacity-50 shadow-lg flex items-center justify-center w-12 h-12"
+                              disabled={isLoading}
+                              title="Chỉnh sửa vai trò"
+                            >
+                              <FaEdit />
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

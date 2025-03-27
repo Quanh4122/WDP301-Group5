@@ -722,7 +722,7 @@ const editProfile = async (req, res) => {
 
     const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
       new: true,
-    });
+    }).populate("role");
 
     if (!updatedUser) {
       return res.status(404).json({ message: "Không tìm thấy user!" });

@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
-// Danh sách bài viết mẫu (giả định lấy từ localStorage hoặc state toàn cục)
 const samplePosts = JSON.parse(localStorage.getItem("posts")) || [];
 
 const ManageBlogDetail = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   // Tìm bài viết dựa trên ID
   useEffect(() => {
     const fetchPost = () => {
       try {
         setLoading(true);
-        setError(null);
 
         // Tìm bài viết trong danh sách
         const foundPost = samplePosts.find((post) => post._id === id);
@@ -23,11 +21,10 @@ const ManageBlogDetail = () => {
         if (foundPost) {
           setPost(foundPost);
         } else {
-          setError("Không tìm thấy bài viết với ID này.");
+          toast.error("Không tìm thấy bài viết với ID này.");
         }
       } catch (err) {
-        setError("Lỗi khi tải chi tiết bài viết. Vui lòng thử lại sau.");
-        console.error("Lỗi khi tìm bài viết:", err);
+        toast.error("Lỗi khi tải chi tiết bài viết. Vui lòng thử lại sau.");
       } finally {
         setLoading(false);
       }
@@ -42,18 +39,6 @@ const ManageBlogDetail = () => {
         <div className="flex items-center gap-3 p-5 bg-white rounded-lg shadow-lg">
           <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-600"></div>
           <span className="text-lg text-gray-700 font-semibold">Đang tải...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
-            {error}
-          </div>
         </div>
       </div>
     );

@@ -36,9 +36,11 @@ const DriverDetail = () => {
     ...approvedDriverApplications,
     ...rejectedDriverApplications,
   ];
+   console.log(allApplications);
+   
 
   // Tìm ứng dụng tài xế dựa trên ID
-  const driverApplication = allApplications.find((app) => app.user._id === id);
+  const driverApplication = allApplications.find((app) => app.user?._id === id);
 
   if (isLoading) {
     return (
@@ -60,7 +62,7 @@ const DriverDetail = () => {
             to="/app/dashboard/manage-account"
             className="mt-6 inline-block bg-gradient-to-r from-sky-500 to-blue-600 text-white py-2 px-6 rounded-lg shadow-md hover:from-sky-600 hover:to-blue-700 transition-all duration-300"
           >
-            Quay lại danh sách
+            <button>Quay lại danh sách</button>
           </Link>
         </div>
       </div>
