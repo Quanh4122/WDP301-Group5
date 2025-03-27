@@ -1,59 +1,91 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getBlogDetail, putBlog } from "./blogAPI"; // Import API functions
+import { getBlogDetail, putBlog } from "./blogAPI";
 import { toast } from "react-toastify";
 
 const UpdateBlog = () => {
-  const { id } = useParams(); // Lấy postId từ URL
-  const navigate = useNavigate(); // Để điều hướng sau khi cập nhật
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     dateCreate: "",
-    image: "",
     content: "",
+    dateUpdated: "",
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Tải dữ liệu bài viết hiện tại
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const post = await getBlogDetail(id);
-        if (post) {
+        console.log("Dữ liệu từ getBlogDetail:", post);
+
+        if (post && typeof post === "object" && post !== null) {
           setFormData({
             title: post.title || "",
             description: post.description || "",
-            dateCreate: post.dateCreate ? post.dateCreate.split("T")[0] : "", // Format date cho input
-            image: post.image || "",
+            dateCreate: post.dateCreate ? post.dateCreate.split("T")[0] : "",
             content: post.content || "",
+            dateUpdated: post.dateUpdated ? new Date(post.dateUpdated).toLocaleString("vi-VN") : "",
           });
+          if (post.image && typeof post.image === "string") {
+            setImagePreview(post.image.startsWith("http") ? post.image : `http://localhost:3030${post.image}`);
+          }
+        } else {
+          throw new Error("Dữ liệu bài viết không hợp lệ hoặc không tìm thấy");
         }
       } catch (error) {
         toast.error("Không tải được bài viết!");
+        console.error("Lỗi khi tải bài viết:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPost();
+    if (id) fetchPost();
   }, [id]);
 
-  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Thay đổi ${name}: ${value}`);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Xử lý submit form
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      await putBlog(id, formData);
-      navigate("/app/dashboard/blogManager"); // Điều hướng về danh sách sau khi cập nhật
+      const blogData = {
+        title: formData.title,
+        description: formData.description,
+        content: formData.content,
+        image: imageFile || undefined,
+      };
+
+      console.log("Dữ liệu gửi lên:", blogData);
+
+      const updatedPost = await putBlog(id, blogData);
+      setFormData((prev) => ({
+        ...prev,
+        dateUpdated: new Date(updatedPost.dateUpdated).toLocaleString("vi-VN"),
+      }));
+      navigate("/app/dashboard/blogManager");
     } catch (error) {
-      // Lỗi đã được xử lý bằng toast trong putBlog
+      toast.error("Không thể cập nhật bài viết. Vui lòng thử lại!");
+      console.error("Lỗi khi cập nhật bài viết:", error);
     } finally {
       setLoading(false);
     }
@@ -73,15 +105,13 @@ const UpdateBlog = () => {
   return (
     <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h1 className="text-4xl font-bold text-gray-900">Chỉnh Sửa Bài Viết</h1>
           <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
-            Cập nhật: {new Date().toLocaleString("vi-VN")}
+            Cập nhật: {formData.dateUpdated || new Date().toLocaleString("vi-VN")}
           </div>
         </header>
 
-        {/* Form */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -110,15 +140,40 @@ const UpdateBlog = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">URL hình ảnh</label>
-              <input
-                type="text"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Nhập URL hình ảnh"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tải lên hình ảnh</label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  name="imageUpload"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer"
+                  disabled={loading}
+                />
+                {imagePreview && (
+                  <div className="relative">
+                    <img
+                      src={imagePreview}
+                      alt="Xem trước"
+                      className="w-24 h-24 object-cover rounded-lg shadow-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      disabled={loading}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+              {imageFile && (
+                <p className="text-sm text-gray-500 mt-2">Đã chọn: {imageFile.name}</p>
+              )}
             </div>
 
             <div>

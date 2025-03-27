@@ -7,9 +7,9 @@ interface Post {
   title: string;
   description: string;
   dateCreate: string;
-  author: string;
-  image: string;
+  image?: string | File; // Có thể là URL (string) hoặc File khi upload
   content: string;
+  dateUpdated?: string; // Thêm trường dateUpdated (tùy chọn)
 }
 
 // Hàm tạo bài viết
@@ -17,57 +17,67 @@ export const postBlog = async ({
   title,
   description,
   dateCreate,
-  author,
   image,
   content,
 }: Post): Promise<any> => {
   try {
-    const response = await axios.post('http://localhost:3030/postBlog', {
-      title,
-      description,
-      dateCreate,
-      author,
-      image,
-      content,
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('dateCreate', dateCreate);
+    formData.append('content', content);
+
+    // Nếu image là File (từ input file), thêm vào FormData
+    if (image instanceof File) {
+      formData.append('image', image);
+    } else if (typeof image === 'string' && image) {
+      formData.append('image', image); // Nếu là URL (ít xảy ra trong create)
+    }
+
+    const response = await axios.post('http://localhost:3030/postBlog', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
-    console.log("Post Created:", response.data);
+    console.log("Bài viết đã được tạo:", response.data);
     toast.success("Tạo bài viết thành công!");
     return response.data;
   } catch (error: any) {
-    console.error("Error creating post:", error);
+    console.error("Lỗi khi tạo bài viết:", error);
     toast.error(error.response?.data?.message || "Tạo bài viết thất bại!");
     throw error;
   }
 };
 
-// Hàm cập nhật bài viết
+// Hàm putBlog với type cụ thể hơn
 export const putBlog = async (
   postId: string,
-  {
-    title,
-    description,
-    dateCreate,
-    author,
-    image,
-    content,
-  }: Partial<Post> // Partial để các trường là tùy chọn
-): Promise<any> => {
+  { title, description, dateCreate, image, content }: Partial<Post>
+): Promise<Post> => {
   try {
-    const response = await axios.put(`http://localhost:3030/putBlog/${postId}`, {
-      title,
-      description,
-      dateCreate,
-      author,
-      image,
-      content,
+    const formData = new FormData();
+    if (title) formData.append('title', title);
+    if (description) formData.append('description', description);
+    if (dateCreate) formData.append('dateCreate', dateCreate);
+    if (content) formData.append('content', content);
+    if (image instanceof File) {
+      formData.append('image', image);
+    } else if (typeof image === 'string' && image) {
+      formData.append('image', image);
+    }
+
+    const response = await axios.put(`http://localhost:3030/putBlog/${postId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
-    console.log("Post Updated:", response.data);
+    const updatedPost = response.data;
     toast.success("Cập nhật bài viết thành công!");
-    return response.data;
+    return updatedPost;
   } catch (error: any) {
-    console.error("Error updating post:", error);
+    console.error("Lỗi khi cập nhật bài viết:", error);
     toast.error(error.response?.data?.message || "Cập nhật bài viết thất bại!");
     throw error;
   }

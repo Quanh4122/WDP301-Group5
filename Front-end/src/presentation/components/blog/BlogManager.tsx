@@ -11,29 +11,26 @@ interface Post {
   description: string;
   image: string;
   dateCreate: string;
-  author: string;
+  dateUpdated: string;
 }
 
 const BlogManager: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const itemsPerPage = 5;
+  const itemsPerPage = 5;  
 
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
       const data = await getAllPosts();
       setPosts(data);
       setFilteredPosts(data);
       localStorage.setItem("posts", JSON.stringify(data));
     } catch (err) {
-      setError("Lỗi khi tải bài viết. Vui lòng thử lại sau.");
-      console.error("Lỗi khi tải bài viết:", err);
+      toast.error("Lỗi khi tải bài viết. Vui lòng thử lại sau.");
     } finally {
       setLoading(false);
     }
@@ -47,8 +44,7 @@ const BlogManager: React.FC = () => {
     const filtered = posts.filter(
       (post) =>
         post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.author.toLowerCase().includes(searchTerm.toLowerCase())
+        post.description.toLowerCase().includes(searchTerm.toLowerCase()) 
     );
     setFilteredPosts(filtered);
     setCurrentPage(1);
@@ -67,8 +63,6 @@ const BlogManager: React.FC = () => {
           setPosts(posts.filter((post) => post._id !== id));
           setFilteredPosts(filteredPosts.filter((post) => post._id !== id));
         } catch (err) {
-          setError("Lỗi khi xóa bài viết. Vui lòng thử lại.");
-          console.error("Lỗi khi xóa bài viết:", err);
           toast.error("Đã xảy ra lỗi khi xóa bài viết!");
         }
       },
@@ -114,7 +108,7 @@ const BlogManager: React.FC = () => {
           <div className="relative flex-1">
             <input
               type="text"
-              placeholder="Tìm kiếm tiêu đề, mô tả hoặc tác giả..."
+              placeholder="Tìm kiếm tiêu đề, mô tả..."
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800 placeholder-gray-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -148,8 +142,9 @@ const BlogManager: React.FC = () => {
                   <tr className="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     <th className="py-4 px-6 w-[120px]">Hình ảnh</th>
                     <th className="py-4 px-6 w-[300px]">Tiêu đề</th>
-                    <th className="py-4 px-6 w-[400px]">Mô tả</th>
+                    <th className="py-4 px-6 w-[300px]">Mô tả</th>
                     <th className="py-4 px-6 w-[150px]">Ngày tạo</th>
+                    <th className="py-4 px-6 w-[200px]">Ngày cập nhật</th>
                     <th className="py-4 px-6 w-[200px]">Hành động</th>
                   </tr>
                 </thead>
@@ -161,7 +156,7 @@ const BlogManager: React.FC = () => {
                     >
                       <td className="py-4 px-6 text-center">
                         <img
-                          src={post.image}
+                          src={`http://localhost:3030${post.image}`}
                           alt={post.title}
                           className="w-20 h-20 object-cover rounded-lg mx-auto"
                           onError={(e) => {
@@ -182,6 +177,11 @@ const BlogManager: React.FC = () => {
                       </td>
                       <td className="py-4 px-6 text-gray-700 text-center">
                         {new Date(post.dateCreate).toLocaleDateString("vi-VN")}
+                      </td>
+                      <td className="py-4 px-6 text-gray-700 text-center">
+                        {
+                          (post.dateUpdated ? new Date(post.dateUpdated).toLocaleDateString("vi-VN") : "Chưa cập nhật")
+                        }
                       </td>
                       <td className="py-4 px-6 text-center">
                         <div className="flex justify-center gap-3">

@@ -53,15 +53,8 @@ import { toast } from "react-toastify";
 interface BlogFormData {
   title: string;
   description: string;
-  image: string;
-  content: string;
+  content: string; // Không cần trường image trong formData nữa vì dùng File riêng
 }
-
-// Thành phần thông báo lỗi
-
-
-// Thành phần thông báo thành công
-
 
 // Thành phần tải dữ liệu
 const LoadingSpinner: React.FC = () => (
@@ -76,11 +69,11 @@ const CreateBlog: React.FC = () => {
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
     description: "",
-    image: "",
     content: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [imageFile, setImageFile] = useState<File | null>(null); // Lưu file ảnh
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // Xem trước ảnh
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,6 +81,16 @@ const CreateBlog: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Xử lý khi chọn file ảnh
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file); // Tạo URL tạm để xem trước
+      setImagePreview(previewUrl);
+    }
   };
 
   const handleSubmit = useCallback(
@@ -103,8 +106,7 @@ const CreateBlog: React.FC = () => {
         title: formData.title.trim(),
         description: formData.description.trim(),
         dateCreate: new Date().toISOString(),
-        author: "67bb8e06a5fe4f4fe85dc19f", // Nên làm động trong thực tế
-        image: formData.image.trim(),
+        image: imageFile || "", // Gửi File hoặc chuỗi rỗng nếu không có ảnh
         content: formData.content,
       };
 
@@ -113,12 +115,14 @@ const CreateBlog: React.FC = () => {
 
         await postBlog(blogData);
 
+        // Reset form sau khi thành công
         setFormData({
           title: "",
           description: "",
-          image: "",
           content: "",
         });
+        setImageFile(null);
+        setImagePreview(null);
       } catch (err) {
         toast.error("Không thể tạo bài viết. Vui lòng thử lại.");
         console.error("Lỗi khi tạo bài viết:", err);
@@ -126,7 +130,7 @@ const CreateBlog: React.FC = () => {
         setLoading(false);
       }
     },
-    [formData]
+    [formData, imageFile]
   );
 
   return (
@@ -177,21 +181,47 @@ const CreateBlog: React.FC = () => {
 
           <div>
             <label
-              htmlFor="image"
+              htmlFor="imageUpload"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              URL Hình ảnh
+              Tải lên hình ảnh
             </label>
-            <input
-              type="text"
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
-              placeholder="Nhập URL hình ảnh"
-              disabled={loading}
-            />
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                id="imageUpload"
+                name="imageUpload"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 disabled:opacity-50"
+                disabled={loading}
+              />
+              {imagePreview && (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Xem trước"
+                    className="w-24 h-24 object-cover rounded-lg shadow-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                    disabled={loading}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+            {imageFile && (
+              <p className="text-sm text-gray-500 mt-2">
+                Đã chọn: {imageFile.name}
+              </p>
+            )}
           </div>
 
           <div>
