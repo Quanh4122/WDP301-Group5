@@ -133,7 +133,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
     const [totalTime, setTotalTime] = useState(
         dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour")
     );
-    const [totalPrice, setTotalPrice] = useState(arrPrice * totalTime);
+    const [totalPrice, setTotalPrice] = useState<number>(arrPrice * totalTime);
     const [dpIsRequestDriver, setDpIsRequestDriver] = useState(false)
     useEffect(() => {
         const val = dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour");
@@ -314,7 +314,8 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
                         isOpen={isModalDepositOpen}
                         onCancel={() => setIsModalDepositOpen(false)}
                         onSubmit={onBooking}
-                        amoutDefault={totalPrice * 0.1}
+                        amountDefault={totalPrice * 0.1}
+                        maxAmonut={totalPrice}
                     />
                 </div>
 

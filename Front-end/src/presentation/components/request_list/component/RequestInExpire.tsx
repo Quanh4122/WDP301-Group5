@@ -58,11 +58,10 @@ const RequestInExpire: React.FC = () => {
             formData.append('request', requestId || '');
             formData.append('bill', billId || '');
             formData.append('realDropLocation', addressBooking);
-            const dateNow = dayjs().format("YYYY/MM/DD HH:mm")
+            const dateNow = dayjs().format("YYYY/MM/DD HH:mm");
             formData.append('realTimeDrop', dateNow);
             arrFile.forEach((file) => formData.append('images', file));
 
-            // Gửi request lên server (thêm logic API nếu cần)
             await axiosInstance.post('/bill/userConfirmDoneBill', formData)
                 .then(res => {
                     toast.success('Xác nhận trả xe thành công!');
@@ -70,12 +69,8 @@ const RequestInExpire: React.FC = () => {
                     setAddressBooking('');
                     setArrFile([]);
                     setTimeout(() => navigate("/"), 2000);
-
                 })
-                .catch(err => console.log(err))
-
-
-
+                .catch(err => console.log(err));
         } catch (error) {
             console.log(error);
             toast.error('Đã có lỗi xảy ra, vui lòng thử lại.');
@@ -103,7 +98,6 @@ const RequestInExpire: React.FC = () => {
                     layout="vertical"
                     className="space-y-6"
                 >
-                    {/* Input địa chỉ */}
                     <Form.Item
                         name="addressSearch"
                         label={<span className="font-medium text-gray-700">Vị trí nhận xe</span>}
@@ -116,7 +110,6 @@ const RequestInExpire: React.FC = () => {
                         />
                     </Form.Item>
 
-                    {/* Upload hình ảnh */}
                     <Form.Item
                         name="images"
                         label={<span className="font-medium text-gray-700">Ảnh xác nhận</span>}
@@ -124,6 +117,7 @@ const RequestInExpire: React.FC = () => {
                     >
                         <Upload.Dragger
                             multiple
+                            maxCount={requestData?.car.length ? requestData?.car.length : 0}  // Giới hạn tối đa 3 ảnh
                             onChange={onChangeGetFile}
                             beforeUpload={() => false} // Ngăn upload tự động
                             className="border-gray-300 rounded-md hover:border-blue-500 transition"
@@ -135,12 +129,11 @@ const RequestInExpire: React.FC = () => {
                                 Kéo thả hoặc nhấn để tải ảnh xe lên
                             </p>
                             <p className="ant-upload-hint text-gray-400">
-                                Hỗ trợ nhiều file ảnh
+                                Bạn cần thêm {requestData?.car.length ? requestData?.car.length : 0} ảnh
                             </p>
                         </Upload.Dragger>
                     </Form.Item>
 
-                    {/* Nút hành động */}
                     <div className="flex justify-end space-x-4">
                         <Button
                             onClick={() => navigate(-1)}

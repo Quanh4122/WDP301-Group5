@@ -75,7 +75,7 @@ const BillDetail: React.FC<{ bill?: BillModal }> = ({ bill }) => {
                     <p className="text-lg font-semibold">
                         Tổng tiền cần thanh toán:{" "}
                         <span className="text-blue-600">
-                            {((bill?.vatFee || 0) + (bill?.totalCarFee || 0) + (bill?.penaltyFee || 0)).toLocaleString("vi-VN")} VND
+                            {((bill?.vatFee || 0) + (bill?.totalCarFee || 0) + (bill?.penaltyFee || 0) - (bill?.depositFee || 0)).toLocaleString("vi-VN")} VND
                         </span>
                     </p>
                 </div>

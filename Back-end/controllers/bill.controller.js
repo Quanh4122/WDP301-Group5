@@ -221,27 +221,22 @@ const adminUpdatePenaltyFee = async (req, res) => {
 
   try {
     if (data) {
-      // const bill = await BillModel.findOneAndUpdate(
-      //   {
-      //     _id: data.billId,
-      //   },
-      //   {
-      //     penaltyFee: data.penaltyFee || 0,
-      //   }
-      // );
-      const bill = await BillModel.findOne({
-        _id: data.billId,
-      });
-      // const requestModal = await RequestModel.findOneAndUpdate(
-      //   {
-      //     _id: bill.request._id,
-      //   },
-      //   {
-      //     requestStatus: "5",
-      //   }
-      const requestModal = await RequestModel.findOne({
-        _id: bill.request._id,
-      }).populate("user", "userName fullName email phoneNumber address avatar");
+      const bill = await BillModel.findOneAndUpdate(
+        {
+          _id: data.billId,
+        },
+        {
+          penaltyFee: data.penaltyFee || 0,
+        }
+      );
+      const requestModal = await RequestModel.findOneAndUpdate(
+        {
+          _id: bill.request._id,
+        },
+        {
+          requestStatus: "5",
+        }
+      ).populate("user", "userName fullName email phoneNumber address avatar");
       const bookingAgainURL = `http://localhost:3000/app/bill-payment?billId=${bill._id}`;
       let total = bill.vatFee + bill.totalCarFee;
       if (bill.depositFee) total = total - bill.depositFee;
