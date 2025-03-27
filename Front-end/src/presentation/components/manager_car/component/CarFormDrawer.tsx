@@ -85,8 +85,8 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
     }, [carDetail, form]);
 
     const onFinish = (value: any) => {
-        console.log(value.images);
         const listImage = value.images?.fileList?.map((item: any) => item.name) || [];
+        const val = form.getFieldValue("numberOfSeat") > 7 ? form.getFieldValue("bunkBed") : false
         const data: CarModelsNoId = {
             carName: form.getFieldValue("carName"),
             color: form.getFieldValue("color"),
@@ -96,13 +96,12 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
             carVersion: form.getFieldValue("carVersion"),
             numberOfSeat: form.getFieldValue("numberOfSeat"),
             carType: {
-                bunkBed: form.getFieldValue("bunkBed"),
+                bunkBed: val,
                 flue: form.getFieldValue("flue"),
                 transmissionType: form.getFieldValue("transmissionType"),
             },
             images: arrFile,
         };
-
         if (carDetail) {
             updateCar(data, carDetail._id);
         } else {
@@ -185,7 +184,7 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
     return (
         <Drawer
             title={
-                <h3 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                <h3 className="text-xl font-semibold text-gray-800 border-gray-200 pb-2">
                     {carDetail ? "Chỉnh sửa xe" : "Tạo xe mới"}
                 </h3>
             }
@@ -194,12 +193,8 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
             open={isDrawerVisible}
             width={600}
             className="rounded-lg"
-            bodyStyle={{ padding: 0, height: "100%", overflow: "auto" }} // Loại bỏ padding và đặt overflow cho toàn bộ Drawer
         >
             <div className="h-full flex flex-col">
-                <div className="text-2xl font-semibold text-sky-600 mb-4">
-                    {carDetail ? "Chỉnh sửa xe" : "Thêm xe"}
-                </div>
                 <div className="flex-1 overflow-y-auto">
                     <Form
                         initialValues={{ remember: true }}
