@@ -1,34 +1,15 @@
 import React, { useState, useCallback } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import {
-  ClassicEditor, Autoformat, AutoImage, Autosave, BlockQuote, Bold, CKBox, CKBoxImageEdit, CloudServices, Emoji, Essentials, Heading, ImageBlock, ImageCaption, ImageInline, ImageInsert, ImageInsertViaUrl, ImageResize, ImageStyle, ImageTextAlternative,
-  ImageToolbar, ImageUpload, Indent, IndentBlock, Italic, Link, LinkImage, List, ListProperties, MediaEmbed, Mention, Paragraph, PasteFromOffice, PictureEditing, Table, TableCaption, TableCellProperties, TableColumnResize, TableProperties,
-  TableToolbar, TextTransformation, TodoList, Underline,
-} from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 import { postBlog } from "../blog/blogAPI";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 // Định nghĩa giao diện BlogFormData
 interface BlogFormData {
   title: string;
   description: string;
-  image: string;
-  content: string;
+  images?: File[]; // Thay đổi từ image thành images, là mảng File
 }
-
-// Thành phần thông báo lỗi
-const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
-    {message}
-  </div>
-);
-
-// Thành phần thông báo thành công
-const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative" role="alert">
-    {message}
-  </div>
-);
 
 // Thành phần tải dữ liệu
 const LoadingSpinner: React.FC = () => (
@@ -39,71 +20,19 @@ const LoadingSpinner: React.FC = () => (
   </div>
 );
 
-// Custom Upload Adapter for CKEditor
-class MyUploadAdapter {
-  loader: any;
-  url: string;
-  constructor(loader: any) {
-    this.loader = loader;
-    this.url = "http://localhost:3030/upload-blog-image";
-  }
-
-  // Starts the upload process.
-  upload() {
-    return this.loader.file.then(
-      (file: File) =>
-        new Promise((resolve, reject) => {
-          const formData = new FormData();
-          // Use "avatar" key as expected by your Multer middleware.
-          formData.append("avatar", file);
-
-          fetch(this.url, {
-            method: "POST",
-            body: formData,
-          })
-            .then((response) => {
-              if (!response.ok) {
-                return Promise.reject("Upload failed");
-              }
-              return response.json();
-            })
-            .then((result) => {
-              // The server returns { imageUrl: '...' }.
-              // Resolve with an object where 'default' holds the URL.
-              resolve({ default: `http://localhost:3030${result.imageUrl}` });
-            })
-            .catch((error) => {
-              console.error("Upload adapter error:", error);
-              reject(error);
-            });
-        })
-    );
-  }
-
-  abort() {
-    // Optional: implement abort functionality if needed.
-  }
-}
-
-// Plugin to integrate the custom upload adapter with CKEditor.
-function MyCustomUploadAdapterPlugin(editor: any) {
-  editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) => {
-    return new MyUploadAdapter(loader);
-  };
-}
-
 const CreateBlog: React.FC = () => {
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
     description: "",
-    image: "",
-    content: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]); // Mảng các file ảnh
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]); // Mảng xem trước ảnh
+  const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -111,12 +40,34 @@ const CreateBlog: React.FC = () => {
     }));
   };
 
+  // Xử lý khi chọn nhiều file ảnh
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+      setImageFiles((prev) => [...prev, ...newFiles]); // Thêm file mới vào mảng
+      setImagePreviews((prev) => [...prev, ...newPreviews]); // Thêm preview mới vào mảng
+    }
+  };
+
+  // Xóa một ảnh khỏi danh sách
+  const removeImage = (index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => {
+      const newPreviews = prev.filter((_, i) => i !== index);
+      // Thu hồi URL preview cũ để tránh rò rỉ bộ nhớ
+      URL.revokeObjectURL(prev[index]);
+      return newPreviews;
+    });
+  };
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       if (!formData.title.trim() || !formData.description.trim()) {
-        setError("Tiêu đề và mô tả là các trường bắt buộc");
+        toast.error("Tiêu đề và mô tả là các trường bắt buộc");
         return;
       }
 
@@ -124,60 +75,32 @@ const CreateBlog: React.FC = () => {
         title: formData.title.trim(),
         description: formData.description.trim(),
         dateCreate: new Date().toISOString(),
-        author: "67bb8e06a5fe4f4fe85dc19f", // Nên làm động trong thực tế
-        image: formData.image.trim(),
-        content: formData.content,
+        images: imageFiles.length > 0 ? imageFiles : undefined, // Gửi mảng images
       };
 
       try {
         setLoading(true);
-        setError(null);
-        setSuccess(null);
 
         await postBlog(blogData);
-        setSuccess("Đã tạo bài viết thành công!");
 
+        // Reset form sau khi thành công
         setFormData({
           title: "",
           description: "",
-          image: "",
-          content: "",
         });
+        setImageFiles([]);
+        setImagePreviews((prev) => {
+          prev.forEach((url) => URL.revokeObjectURL(url)); // Thu hồi tất cả URL preview
+          return [];
+        });
+        navigate("/app/dashboard/blogManager");
       } catch (err) {
-        setError("Không thể tạo bài viết. Vui lòng thử lại.");
-        console.error("Lỗi khi tạo bài viết:", err);
       } finally {
         setLoading(false);
       }
     },
-    [formData]
+    [formData, imageFiles]
   );
-
-  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const formDataForUpload = new FormData();
-      // "thumbnail" is the key expected by your backend middleware.
-      formDataForUpload.append("thumbnail", file);
-
-      try {
-        const response = await fetch("http://localhost:3030/upload-blog-thumbnail", {
-          method: "POST",
-          body: formDataForUpload,
-        });
-        if (!response.ok) {
-          throw new Error("Thumbnail upload failed");
-        }
-        const result = await response.json();
-        // Prepend the full domain to the returned relative URL.
-        const fullImageUrl = `http://localhost:3030${result.url}`;
-        // Update the image field in your form state.
-        setFormData((prev) => ({ ...prev, image: fullImageUrl }));
-      } catch (error) {
-        console.error("Error uploading thumbnail:", error);
-      }
-    }
-  };
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl min-h-screen">
@@ -186,20 +109,20 @@ const CreateBlog: React.FC = () => {
           Tạo Bài Viết Mới
         </h1>
 
-        {error && <ErrorMessage message={error} />}
-        {success && <SuccessMessage message={success} />}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Tiêu đề
             </label>
             <input
               type="text"
               id="title"
-              name="title"
+              name="title" // Đã thêm name="title"
+              onChange={handleInputChange}
               value={formData.title}
-              onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
               placeholder="Nhập tiêu đề bài viết"
               disabled={loading}
@@ -207,15 +130,17 @@ const CreateBlog: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Mô tả
             </label>
-            <input
-              type="text"
+            <textarea
               id="description"
               name="description"
               value={formData.description}
-              onChange={handleChange}
+              onChange={handleInputChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50 placeholder-gray-400"
               placeholder="Nhập mô tả bài viết"
               disabled={loading}
@@ -223,67 +148,50 @@ const CreateBlog: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-700 mb-2">
-              Ảnh đại diện
+            <label
+              htmlFor="imageUpload"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Tải lên hình ảnh
             </label>
-            <input
-              type="file"
-              id="thumbnail"
-              name="thumbnail"
-              onChange={handleThumbnailUpload}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50"
-              disabled={loading}
-            />
-            {/* Optionally, display the uploaded image preview */}
-            {formData.image && (
-              <div className="mt-4">
-                <img src={formData.image} alt="Thumbnail preview" className="max-w-xs rounded" />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nội dung</label>
-            <div className="rounded-lg border border-gray-300 shadow-sm">
-              <CKEditor
-                editor={ClassicEditor}
-                config={{
-                  extraPlugins: [MyCustomUploadAdapterPlugin],
-                  licenseKey: "GPL",
-                  plugins: [
-                    Autoformat, AutoImage, Autosave, BlockQuote, Bold, CKBox, CKBoxImageEdit, CloudServices, Emoji, Essentials, Heading, ImageBlock, ImageCaption, ImageInline, ImageInsert, ImageInsertViaUrl, ImageResize,
-                    ImageStyle, ImageTextAlternative, ImageToolbar, ImageUpload, Indent, IndentBlock, Italic, Link, LinkImage, List, ListProperties, MediaEmbed, Mention, Paragraph, PasteFromOffice,
-                    PictureEditing, Table, TableCaption, TableCellProperties, TableColumnResize, TableProperties, TableToolbar, TextTransformation, TodoList, Underline,
-                  ],
-                  toolbar: [
-                    "heading",
-                    "|",
-                    "bold",
-                    "italic",
-                    "underline",
-                    "|",
-                    "emoji",
-                    "link",
-                    "insertImage",
-                    "ckbox",
-                    "insertTable",
-                    "blockQuote",
-                    "|",
-                    "bulletedList",
-                    "numberedList",
-                    "todoList",
-                    "outdent",
-                    "indent",
-                  ],
-                }}
-                data={formData.content}
-                onChange={(event, editor) => {
-                  const data = editor.getData();
-                  setFormData((prev) => ({ ...prev, content: data }));
-                }}
+            <div className="flex items-center gap-4 flex-wrap">
+              <input
+                type="file"
+                id="imageUpload"
+                name="imageUpload"
+                accept="image/*"
+                multiple // Thêm thuộc tính multiple để chọn nhiều ảnh
+                onChange={handleImageChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 disabled:opacity-50"
                 disabled={loading}
               />
+              {imagePreviews.length > 0 && (
+                <div className="flex flex-wrap gap-4 mt-2">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={preview}
+                        alt={`Xem trước ${index + 1}`}
+                        className="w-24 h-24 object-cover rounded-lg shadow-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                        disabled={loading}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+            {imageFiles.length > 0 && (
+              <p className="text-sm text-gray-500 mt-2">
+                Đã chọn: {imageFiles.map((file) => file.name).join(", ")}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-center pt-6">

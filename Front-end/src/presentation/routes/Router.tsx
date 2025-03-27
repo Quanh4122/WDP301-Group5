@@ -37,7 +37,6 @@ import ManagerCar from "../components/manager_car";
 import RequestInExpire from "../components/request_list/component/RequestInExpire";
 import BillDetailPage from "../components/request_list/component/BillPayment";
 import DriverBill from "../components/driver/DriverBill";
-import EditBlog from "../components/blog/editBlog";
 import AccountDetail from "../components/admin/AccountDetail";
 import DriverDetail from "../components/admin/DriverDetail";
 import CarDetails from "../components/manager_car/component/CarDetails";
@@ -111,12 +110,8 @@ const Router = () => {
       element: <Checkout />,
     },
     {
-      path: PRIVATE_ROUTES.PATH + "/createBlog",
+      path: PRIVATE_ROUTES.PATH + "/dashboard/createBlog",
       element: <ProtectedRoute requiredRole="Admin"><CreateBlog /></ProtectedRoute>,
-    },
-    {
-      path: PRIVATE_ROUTES.PATH + "/editBlog/:postId",
-      element: <ProtectedRoute requiredRole="Admin"><EditBlog /></ProtectedRoute>,
     },
     {
       path: PRIVATE_ROUTES.PATH + "/dashboard/blogManager",
