@@ -139,11 +139,30 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
         formData.append("bunkBed", String(value.carType.bunkBed));
         formData.append("flue", String(value.carType.flue));
         formData.append("transmissionType", String(value.carType.transmissionType));
-        value.images?.forEach((element) => {
-            formData.append("images", element);
-        });
+        if (fileList && fileList.length > 0) {
+            const imageFiles = await Promise.all(
+                fileList.map(async (file, index) => {
+                    if (file.url && file.path) {
+                        // Ảnh cũ (URL)
+                        const fullUrl = `http://localhost:3030${file.path}`;
+                        return await urlToFile(fullUrl, `image-${index}.jpg`);
+                    } else if (file.originFileObj) {
+                        // Ảnh mới (File)
+                        return file.originFileObj;
+                    }
+                    return null;
+                })
+            );
+            imageFiles
+                .filter((file): file is File => file !== null) // Loại bỏ null
+                .forEach((file) => {
+                    formData.append("images", file);
+                });
+        }
         await axiosInstance
-            .post("/car/createCar", formData)
+            .post("/car/createCar", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
             .then((res) => {
                 toast.success("Tạo xe thành công !!");
                 handleCancel();
@@ -301,13 +320,13 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                                 />
                             </Form.Item>
                             <Form.Item
-                                label="Giá thuê 4h"
+                                label="Giá thuê 1h"
                                 rules={[{ required: true, message: "Vui lòng nhập giá thuê 4h!" }]}
                                 name="price"
                             >
                                 <InputNumber
                                     className="w-full h-10 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                                    placeholder="Giá thuê 4h"
+                                    placeholder="Giá thuê 1h"
                                     suffix={<GradeIcon className="text-red-600" style={{ fontSize: 10 }} />}
                                 />
                             </Form.Item>
