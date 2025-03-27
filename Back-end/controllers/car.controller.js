@@ -124,7 +124,7 @@ const createCar = async (req, res) => {
   if (req.files.length == 0) {
     const error = new Error("Please choose files");
     error.httpStatusCode = 400;
-    return res.status(301).json({message: error.message});
+    return res.status(301).json({ message: error.message });
   } else {
     const arrImages = req.files.map((item) => {
       return `/images/${item.filename}`;
@@ -231,8 +231,6 @@ const updateCar = async (req, res) => {
 
   const { carId } = req.params;
 
-  console.log(carId);
-
   const carTypeModel = await CarTypeModel.findOne({
     bunkBed: bunkBed,
     flue: flue,
@@ -241,34 +239,35 @@ const updateCar = async (req, res) => {
   if (req.files.length == 0) {
     const error = new Error("Please choose files");
     error.httpStatusCode = 400;
-    return res.status(301).json({message: error.message});
+    return res.status(301).json({ message: error.message });
   } else {
     const arrImages = req.files.map((item) => {
       return `/images/${item.filename}`;
     });
-    const carFindByLicensePlateNumber = await CarModel.findOne({
-      licensePlateNumber: licensePlateNumber,
-    });
-    if (carFindByLicensePlateNumber) {
-      return res.status(401).json({ message: "This car is existed !!!" });
-    } else {
-      await CarModel.updateOne(
-        { _id: carId },
-        {
-          carName,
-          carStatus,
-          carType: carTypeModel._id,
-          carVersion,
-          color,
-          images: arrImages,
-          licensePlateNumber,
-          numberOfSeat,
-          price,
-        }
-      );
-      return res.status(200).json({ message: "Create Successfull !!!" });
-    }
-    
+    // const carFindByLicensePlateNumber = await CarModel.findOne({
+    //   licensePlateNumber: licensePlateNumber,
+    // });
+    // if (carFindByLicensePlateNumber) {
+
+    // } else {
+    //   return res.status(401).json({ message: "This car is existed !!!" })
+    // }
+    await CarModel.updateOne(
+      { _id: carId },
+      {
+        carName: carName,
+        carStatus: carStatus,
+        carType: carTypeModel._id,
+        carVersion: carVersion,
+        color: color,
+        images: arrImages,
+        licensePlateNumber: licensePlateNumber,
+        numberOfSeat: numberOfSeat,
+        price: price,
+        carType: carTypeModel.id,
+      }
+    );
+    return res.status(200).json({ message: "Create Successfull !!!" });
   }
 };
 

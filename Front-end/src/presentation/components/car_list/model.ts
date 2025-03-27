@@ -27,5 +27,5 @@ export type CarModelsNoId = {
     licensePlateNumber: string,
     numberOfSeat: string,
     price: number[],
-    images?: File[]
+    images?: File[] | string[]
 }
