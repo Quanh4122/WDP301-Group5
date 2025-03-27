@@ -269,7 +269,7 @@ const BlogManager: React.FC = () => {
                         <div className="flex justify-center gap-3">
                           <Link
                             to={`/app/dashboard/blogManager/edit/${post._id}`}
-                            className="bg-sky-500 hover:bg-sky-600 text-white p-3 rounded-lg transition-all duration-200"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-lg transition-all duration-200"
                           >
                             <button>Sửa</button>
                           </Link>

@@ -5,6 +5,7 @@ import {
   fetchUsersAndDrivers,
   UpdateUserRole,
 } from "../redux/slices/Authentication";
+import { toast } from "react-toastify";
 
 const ChangeRoleAccount = () => {
   const { userId } = useParams();
@@ -35,6 +36,7 @@ const ChangeRoleAccount = () => {
     if (selectedRole && selectedRole !== user?.role?.roleName) {
       dispatch(UpdateUserRole(userId, selectedRole))
         .then(() => {
+          toast.success(`Cập nhật vai trò ${user.fullName} thành công!`);
           navigate("/app/dashboard/manage-account");
         })
         .catch((err) => {
