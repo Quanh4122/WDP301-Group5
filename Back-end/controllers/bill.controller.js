@@ -173,7 +173,9 @@ const useBookingBill = async (req, res) => {
 };
 const userConfirmDoneBill = async (req, res) => {
   const data = req.body;
-  const image = `/images/${req.file.filename}`;
+  const images = req.files.map((item) => {
+    return `/images/${item.filename}`;
+  });
   try {
     await BillModel.updateOne(
       {
@@ -182,7 +184,7 @@ const userConfirmDoneBill = async (req, res) => {
       {
         realLocationDrop: data.realDropLocation,
         realTimeDrop: dayjs(data.realTimeDrop),
-        realImage: image,
+        realImage: images,
       }
     );
     await RequestModel.updateOne({ _id: data.request }, { requestStatus: "4" });
