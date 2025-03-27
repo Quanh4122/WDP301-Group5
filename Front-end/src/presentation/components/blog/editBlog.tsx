@@ -1,14 +1,55 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import {
-  ClassicEditor, Autoformat, AutoImage, Autosave, BlockQuote, Bold, CKBox, CKBoxImageEdit, CloudServices, Emoji, Essentials, Heading, ImageBlock, ImageCaption, ImageInline, ImageInsert, ImageInsertViaUrl, ImageResize, ImageStyle, ImageTextAlternative,
-  ImageToolbar, ImageUpload, Indent, IndentBlock, Italic, Link, LinkImage, List, ListProperties, MediaEmbed, Mention, Paragraph, PasteFromOffice, PictureEditing, Table, TableCaption, TableCellProperties, TableColumnResize, TableProperties,
-  TableToolbar, TextTransformation, TodoList, Underline,
+  ClassicEditor,
+  Autoformat,
+  AutoImage,
+  Autosave,
+  BlockQuote,
+  Bold,
+  CKBox,
+  CKBoxImageEdit,
+  CloudServices,
+  Emoji,
+  Essentials,
+  Heading,
+  ImageBlock,
+  ImageCaption,
+  ImageInline,
+  ImageInsert,
+  ImageInsertViaUrl,
+  ImageResize,
+  ImageStyle,
+  ImageTextAlternative,
+  ImageToolbar,
+  ImageUpload,
+  Indent,
+  IndentBlock,
+  Italic,
+  Link,
+  LinkImage,
+  List,
+  ListProperties,
+  MediaEmbed,
+  Mention,
+  Paragraph,
+  PasteFromOffice,
+  PictureEditing,
+  Table,
+  TableCaption,
+  TableCellProperties,
+  TableColumnResize,
+  TableProperties,
+  TableToolbar,
+  TextTransformation,
+  TodoList,
+  Underline,
 } from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
-import { postBlog } from "../blog/blogAPI";
+import { getBlogDetail, updateBlog } from "../blog/blogAPI";
 
-// Định nghĩa giao diện BlogFormData
+// Define the blog form data interface.
 interface BlogFormData {
   title: string;
   description: string;
@@ -16,21 +57,19 @@ interface BlogFormData {
   content: string;
 }
 
-// Thành phần thông báo lỗi
+// Reusable error and success messages.
 const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
+  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl" role="alert">
     {message}
   </div>
 );
 
-// Thành phần thông báo thành công
 const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative" role="alert">
+  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl" role="alert">
     {message}
   </div>
 );
 
-// Thành phần tải dữ liệu
 const LoadingSpinner: React.FC = () => (
   <div className="flex justify-center py-10">
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500">
@@ -39,7 +78,7 @@ const LoadingSpinner: React.FC = () => (
   </div>
 );
 
-// Custom Upload Adapter for CKEditor
+// Custom upload adapter (for CKEditor inline images).
 class MyUploadAdapter {
   loader: any;
   url: string;
@@ -47,14 +86,11 @@ class MyUploadAdapter {
     this.loader = loader;
     this.url = "http://localhost:3030/upload-blog-image";
   }
-
-  // Starts the upload process.
   upload() {
     return this.loader.file.then(
       (file: File) =>
         new Promise((resolve, reject) => {
           const formData = new FormData();
-          // Use "avatar" key as expected by your Multer middleware.
           formData.append("avatar", file);
 
           fetch(this.url, {
@@ -68,9 +104,8 @@ class MyUploadAdapter {
               return response.json();
             })
             .then((result) => {
-              // The server returns { imageUrl: '...' }.
-              // Resolve with an object where 'default' holds the URL.
-              resolve({ default: `http://localhost:3030${result.imageUrl}` });
+              // Prepend the full URL for the uploaded image.
+              resolve({ default: `http://localhost:3030${result.url}` });
             })
             .catch((error) => {
               console.error("Upload adapter error:", error);
@@ -79,20 +114,20 @@ class MyUploadAdapter {
         })
     );
   }
-
   abort() {
-    // Optional: implement abort functionality if needed.
+    // Optional: Implement abort functionality if needed.
   }
 }
 
-// Plugin to integrate the custom upload adapter with CKEditor.
 function MyCustomUploadAdapterPlugin(editor: any) {
   editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) => {
     return new MyUploadAdapter(loader);
   };
 }
 
-const CreateBlog: React.FC = () => {
+const EditBlog: React.FC = () => {
+  const { postId } = useParams<{ postId: string }>(); // Expecting a route param, e.g., /edit-blog/:id
+
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
     description: "",
@@ -100,9 +135,33 @@ const CreateBlog: React.FC = () => {
     content: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Fetch blog data on mount.
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        setInitialLoading(true);
+        const blog = await getBlogDetail(postId);
+        setFormData({
+          title: blog.title,
+          description: blog.description,
+          image: blog.image, // assume this is the full URL already.
+          content: blog.content,
+        });
+      } catch (err) {
+        setError("Không thể tải bài viết. Vui lòng thử lại.");
+        console.error("Error fetching blog:", err);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchBlog();
+  }, [postId]);
+
+  // Handler for text field changes.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -111,53 +170,11 @@ const CreateBlog: React.FC = () => {
     }));
   };
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      if (!formData.title.trim() || !formData.description.trim()) {
-        setError("Tiêu đề và mô tả là các trường bắt buộc");
-        return;
-      }
-
-      const blogData = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        dateCreate: new Date().toISOString(),
-        author: "67bb8e06a5fe4f4fe85dc19f", // Nên làm động trong thực tế
-        image: formData.image.trim(),
-        content: formData.content,
-      };
-
-      try {
-        setLoading(true);
-        setError(null);
-        setSuccess(null);
-
-        await postBlog(blogData);
-        setSuccess("Đã tạo bài viết thành công!");
-
-        setFormData({
-          title: "",
-          description: "",
-          image: "",
-          content: "",
-        });
-      } catch (err) {
-        setError("Không thể tạo bài viết. Vui lòng thử lại.");
-        console.error("Lỗi khi tạo bài viết:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [formData]
-  );
-
+  // Handler for thumbnail file upload.
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const formDataForUpload = new FormData();
-      // "thumbnail" is the key expected by your backend middleware.
       formDataForUpload.append("thumbnail", file);
 
       try {
@@ -169,22 +186,59 @@ const CreateBlog: React.FC = () => {
           throw new Error("Thumbnail upload failed");
         }
         const result = await response.json();
-        // Prepend the full domain to the returned relative URL.
         const fullImageUrl = `http://localhost:3030${result.url}`;
-        // Update the image field in your form state.
         setFormData((prev) => ({ ...prev, image: fullImageUrl }));
       } catch (error) {
         console.error("Error uploading thumbnail:", error);
+        setError("Lỗi khi tải ảnh đại diện lên. Vui lòng thử lại.");
       }
     }
   };
 
+  // Handle form submission.
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!formData.title.trim() || !formData.description.trim()) {
+        setError("Tiêu đề và mô tả là các trường bắt buộc");
+        return;
+      }
+
+      const updatedBlogData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        dateUpdate: new Date().toISOString(), // You might want to record update time.
+        image: formData.image.trim(),
+        content: formData.content,
+      };
+
+      try {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+
+        await updateBlog(postId, updatedBlogData);
+        setSuccess("Bài viết đã được cập nhật thành công!");
+
+        
+      } catch (err) {
+        console.error("Lỗi khi cập nhật bài viết:", err);
+        setError("Không thể cập nhật bài viết. Vui lòng thử lại.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [formData, postId]
+  );
+
+  if (initialLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl min-h-screen">
       <div className="bg-white rounded-xl shadow-lg p-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-          Tạo Bài Viết Mới
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">Chỉnh Sửa Bài Viết</h1>
 
         {error && <ErrorMessage message={error} />}
         {success && <SuccessMessage message={success} />}
@@ -234,7 +288,6 @@ const CreateBlog: React.FC = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 bg-gray-50"
               disabled={loading}
             />
-            {/* Optionally, display the uploaded image preview */}
             {formData.image && (
               <div className="mt-4">
                 <img src={formData.image} alt="Thumbnail preview" className="max-w-xs rounded" />
@@ -251,9 +304,48 @@ const CreateBlog: React.FC = () => {
                   extraPlugins: [MyCustomUploadAdapterPlugin],
                   licenseKey: "GPL",
                   plugins: [
-                    Autoformat, AutoImage, Autosave, BlockQuote, Bold, CKBox, CKBoxImageEdit, CloudServices, Emoji, Essentials, Heading, ImageBlock, ImageCaption, ImageInline, ImageInsert, ImageInsertViaUrl, ImageResize,
-                    ImageStyle, ImageTextAlternative, ImageToolbar, ImageUpload, Indent, IndentBlock, Italic, Link, LinkImage, List, ListProperties, MediaEmbed, Mention, Paragraph, PasteFromOffice,
-                    PictureEditing, Table, TableCaption, TableCellProperties, TableColumnResize, TableProperties, TableToolbar, TextTransformation, TodoList, Underline,
+                    Autoformat,
+                    AutoImage,
+                    Autosave,
+                    BlockQuote,
+                    Bold,
+                    CKBox,
+                    CKBoxImageEdit,
+                    CloudServices,
+                    Emoji,
+                    Essentials,
+                    Heading,
+                    ImageBlock,
+                    ImageCaption,
+                    ImageInline,
+                    ImageInsert,
+                    ImageInsertViaUrl,
+                    ImageResize,
+                    ImageStyle,
+                    ImageTextAlternative,
+                    ImageToolbar,
+                    ImageUpload,
+                    Indent,
+                    IndentBlock,
+                    Italic,
+                    Link,
+                    LinkImage,
+                    List,
+                    ListProperties,
+                    MediaEmbed,
+                    Mention,
+                    Paragraph,
+                    PasteFromOffice,
+                    PictureEditing,
+                    Table,
+                    TableCaption,
+                    TableCellProperties,
+                    TableColumnResize,
+                    TableProperties,
+                    TableToolbar,
+                    TextTransformation,
+                    TodoList,
+                    Underline,
                   ],
                   toolbar: [
                     "heading",
@@ -298,7 +390,7 @@ const CreateBlog: React.FC = () => {
                   Đang gửi...
                 </>
               ) : (
-                "Tạo Bài Viết"
+                "Cập nhật Bài Viết"
               )}
             </button>
           </div>
@@ -314,4 +406,4 @@ const CreateBlog: React.FC = () => {
   );
 };
 
-export default CreateBlog;
+export default EditBlog;

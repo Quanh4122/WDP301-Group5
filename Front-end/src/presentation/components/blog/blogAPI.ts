@@ -52,5 +52,14 @@ export const deletePost = async (postId : any) => {
 };
 
 
+export const updateBlog = async (postId : any, updatedBlogData :any) => {
+  try {
+    const response = await axios.put(`http://localhost:3030/update-blog/${postId}`, updatedBlogData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating posts:", error);
+  }
+};
+
 
   
