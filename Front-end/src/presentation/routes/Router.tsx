@@ -38,6 +38,11 @@ import RequestInExpire from "../components/request_list/component/RequestInExpir
 import BillDetailPage from "../components/request_list/component/BillPayment";
 import DriverBill from "../components/driver/DriverBill";
 import EditBlog from "../components/blog/editBlog";
+import AccountDetail from "../components/admin/AccountDetail";
+import DriverDetail from "../components/admin/DriverDetail";
+import CarDetails from "../components/manager_car/component/CarDetails";
+import ManageBlogDetail from "../components/blog/ManageBlogDetail";
+import UpdateBlog from "../components/blog/UpdateBlog";
 
 const Router = () => {
   const privateRoutes: any[] = [
@@ -118,6 +123,14 @@ const Router = () => {
       element: <ProtectedRoute requiredRole="Admin"><BlogManager /></ProtectedRoute>,
     },
     {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/blogManager/:id",
+      element: <ProtectedRoute requiredRole="Admin"><ManageBlogDetail /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/blogManager/edit/:id",
+      element: <ProtectedRoute requiredRole="Admin"><UpdateBlog /></ProtectedRoute>,
+    },
+    {
       path: PRIVATE_ROUTES.PATH + "/blog/:postId",
       element: <BlogDetail />,
     },
@@ -162,8 +175,16 @@ const Router = () => {
       element: <ProtectedRoute requiredRole="Admin"><ManageAccount /></ProtectedRoute>,
     },
     {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_DRIVER_ACCEPT + "/:id",
+      element: <ProtectedRoute requiredRole="Admin"><DriverDetail /></ProtectedRoute>,
+    },
+    {
       path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT,
       element: <ProtectedRoute requiredRole="Admin"><UserList /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGE_ACCOUNT + "/:id",
+      element: <ProtectedRoute requiredRole="Admin"><AccountDetail /></ProtectedRoute>,
     },
     {
       path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.CHANGE_ROLE_ACCOUNT + "/:userId",
@@ -176,6 +197,10 @@ const Router = () => {
     {
       path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGER_CAR,
       element: <ProtectedRoute requiredRole="Admin"><ManagerCar /></ProtectedRoute>,
+    },
+    {
+      path: PRIVATE_ROUTES.PATH + "/dashboard/" + PRIVATE_ROUTES.SUB.MANAGER_CAR + "/:id",
+      element: <ProtectedRoute requiredRole="Admin"><CarDetails /></ProtectedRoute>,
     },
     {
       path: PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.REQUEST_IN_EXPIRE,

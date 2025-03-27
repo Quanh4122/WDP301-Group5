@@ -45,7 +45,7 @@ const ListRequestPending = ({ requestList }: Props) => {
                         <div className="flex items-center space-x-4">
                             {item.user?.avatar ? (
                                 <img
-                                    src={`http://localhost:3030${item.user?.avatar}`}
+                                    src={`${item.user?.avatar}`}
                                     alt="Avatar Preview"
                                     className="w-12 h-12 rounded-full object-cover border border-blue-200" // Light blue border
                                 />

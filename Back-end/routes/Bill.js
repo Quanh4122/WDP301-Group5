@@ -8,7 +8,7 @@ router.patch("/bill/:billId", billController.toggleBillStatus);
 router.post("/bill/userBookingBill", billController.useBookingBill);
 router.post(
   "/bill/userConfirmDoneBill",
-  upload.single("images", 1),
+  upload.array("images", 10),
   billController.userConfirmDoneBill
 );
 router.get("/bill/getBillByReuqestId", billController.getBillByRequestId);

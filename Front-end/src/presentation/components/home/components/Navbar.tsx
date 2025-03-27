@@ -10,7 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LogoutIcon from '@mui/icons-material/Logout';
-import ReceiptIcon from '@mui/icons-material/Receipt'; // Thêm icon cho bill
+import ReceiptIcon from '@mui/icons-material/Receipt';
 
 const Navbar: React.FC = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
 
   const { isLoggedIn, user, tokenExpiration } = useSelector((state: RootState) => state.auth) as {
     isLoggedIn: boolean;
-    user: { userId: string; userName: string; avatar: string; role: string } | null;
+    user: { userId: string; userName: string; avatar: string; role: { _id: string; roleName: string } | string } | null;
     tokenExpiration: number | null;
   };
 
@@ -36,6 +36,7 @@ const Navbar: React.FC = () => {
         : "";
       setAvatarPreview(avatarUrl);
       setUserIdPreview(user.userId);
+      console.log("user.role sau khi cập nhật:", user.role); // Debug role
     } else {
       setAvatarPreview("");
       setUserIdPreview("");
@@ -93,6 +94,13 @@ const Navbar: React.FC = () => {
     }
   };
 
+  // Hàm lấy roleName từ user.role
+  const getRoleName = () => {
+    if (!user?.role) return "Không xác định";
+    if (typeof user.role === "string") return user.role;
+    return user.role.roleName || "Không xác định";
+  };
+
   return (
     <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-b border-neutral-700/80 px-4 md:px-32">
       <div className="container mx-auto relative text-sm">
@@ -122,14 +130,14 @@ const Navbar: React.FC = () => {
                 <button className="text-lg hover:text-sky-500 transition-colors duration-200">B-Car Blog</button>
               </Link>
             </li>
-            {isLoggedIn && user?.role === "Admin" && (
+            {isLoggedIn && getRoleName() === "Admin" && (
               <li>
                 <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DASH_BOARD}`}>
-                  <button className="text-lg hover:text-sky-500 transition-colors duration-200">Thống kê</button>
+                  <button className="text-lg hover:text-sky-500 transition-colors duration-200">Bảng điều khiển</button>
                 </Link>
               </li>
             )}
-            {isLoggedIn && user?.role === "User" && (
+            {isLoggedIn && getRoleName() === "User" && (
               <>
                 <li>
                   <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.APPLY_DRIVER}/${user?.userId}`}>
@@ -143,21 +151,12 @@ const Navbar: React.FC = () => {
                 </li>
               </>
             )}
-            {/* Thêm nút Xem Bill cho Driver */}
-            {isLoggedIn && user?.role === "Driver" && (
-              <>
+            {isLoggedIn && getRoleName() === "Driver" && (
               <li>
-                  <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.CAR_LIST}`}>
-                    <button className="text-lg hover:text-sky-500 transition-colors duration-200">Danh sách xe</button>
-                  </Link>
-                </li>
-              <li>
-              <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`}>
-                <button className="text-lg hover:text-sky-500 transition-colors duration-200">Xem Chuyến Xe</button>
-              </Link>
-            </li>
-            </>
-              
+                <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`}>
+                  <button className="text-lg hover:text-sky-500 transition-colors duration-200">Xem Chuyến Xe</button>
+                </Link>
+              </li>
             )}
           </ul>
 
@@ -168,29 +167,27 @@ const Navbar: React.FC = () => {
                 <div className="relative">
                   <button onClick={toggleModal} className="focus:outline-none"></button>
                   <div className="flex">
-                  <button onClick={toggleModal} className="flex items-center"
-                  >
-                    {avatarPreview ? (
-                      <img
-                        src={avatarPreview}
-                        alt="Avatar Preview"
-                        className="w-10 h-10 rounded-full border object-cover hover:border-sky-500 transition-all duration-200"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <PersonIcon className="text-gray-700 hover:text-sky-500 transition-colors duration-200" />
-                      </div>
-                    )}
-                  </button>
-                  {user.role === "User" && (
-                    <button
-                      className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-800 transition-colors duration-200 flex items-center space-x-3"
-                      onClick={onViewListRequest}
-                    >
-                      <ShoppingCartIcon className="text-gray-500" />
-                      <span className="font-medium">Giỏ hàng</span>
+                    <button onClick={toggleModal} className="flex items-center w-full">
+                      {avatarPreview ? (
+                        <img
+                          src={avatarPreview}
+                          alt="Avatar Preview"
+                          className="w-10 h-10 rounded-full border object-cover hover:border-sky-500 transition-all duration-200"
+                        />
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <PersonIcon className="text-gray-700 hover:text-sky-500 transition-colors duration-200" />
+                        </div>
+                      )}
                     </button>
-                  )}
+                    {getRoleName() === "User" && (
+                      <button
+                        className="w-full text-left px-6 py-3 text-gray-700 hover:bg-sky-50 hover:text-sky-800 transition-colors duration-200 flex items-center"
+                        onClick={onViewListRequest}
+                      >
+                        <ShoppingCartIcon className="text-gray-500" />
+                      </button>
+                    )}
                   </div>
                   {isModalOpen && (
                     <div className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-xl z-50 border border-gray-200 overflow-hidden">
@@ -206,7 +203,7 @@ const Navbar: React.FC = () => {
                         )}
                         <div className="text-white">
                           <p className="text-lg font-semibold">{user.userName}</p>
-                          <p className="text-sm opacity-80">{user.role}</p>
+                          <p className="text-sm opacity-80">{getRoleName()}</p>
                         </div>
                       </div>
                       <ul className="py-2">
@@ -219,7 +216,7 @@ const Navbar: React.FC = () => {
                             <span className="font-medium">Hồ sơ</span>
                           </button>
                         </li>
-                        {user.role === "User" && (
+                        {getRoleName() === "User" && (
                           <li>
                             <button
                               onClick={onViewListRequest}
@@ -230,8 +227,7 @@ const Navbar: React.FC = () => {
                             </button>
                           </li>
                         )}
-                        {/* Thêm nút Xem Bill trong dropdown cho Driver */}
-                        {user.role === "Driver" && (
+                        {getRoleName() === "Driver" && (
                           <li>
                             <Link
                               to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`}
@@ -293,16 +289,16 @@ const Navbar: React.FC = () => {
                 B-Car Blog
               </button>
             </Link>
-            {isLoggedIn && user?.role === "Admin" && (
+            {isLoggedIn && getRoleName() === "Admin" && (
               <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DASH_BOARD}`} onClick={() => setMobileDrawerOpen(false)}>
                 <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
-                  Thống kê
+                  Bảng điều khiển
                 </button>
               </Link>
             )}
-            {isLoggedIn && user?.role === "User" && (
+            {isLoggedIn && getRoleName() === "User" && (
               <Link
-                to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.APPLY_DRIVER}/${userIdPreview}`}
+                to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.APPLY_DRIVER}/${user?.userId}`}
                 onClick={() => setMobileDrawerOpen(false)}
               >
                 <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
@@ -310,8 +306,7 @@ const Navbar: React.FC = () => {
                 </button>
               </Link>
             )}
-            {/* Thêm nút Xem Bill cho Driver trong Mobile Drawer */}
-            {isLoggedIn && user?.role === "Driver" && (
+            {isLoggedIn && getRoleName() === "Driver" && (
               <Link to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.DRIVER_BILL}`} onClick={() => setMobileDrawerOpen(false)}>
                 <button className="w-full text-left px-4 py-2 hover:text-sky-500 transition-colors duration-200">
                   Xem Chuyến Xe
@@ -321,7 +316,7 @@ const Navbar: React.FC = () => {
             {isLoggedIn && user ? (
               <>
                 <Link
-                  to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${userIdPreview}`}
+                  to={`${PRIVATE_ROUTES.PATH}/${PRIVATE_ROUTES.SUB.PROFILE}/${user?.userId}`}
                   className="flex items-center px-4 py-2 hover:text-sky-500 transition-colors duration-200"
                   onClick={() => setMobileDrawerOpen(false)}
                 >
@@ -332,13 +327,15 @@ const Navbar: React.FC = () => {
                   )}
                   <span>Hồ sơ</span>
                 </Link>
-                <button
-                  onClick={onViewListRequest}
-                  className="w-full text-left px-4 py-2 flex items-center space-x-2 hover:text-sky-500 transition-colors duration-200"
-                >
-                  <ShoppingCartIcon />
-                  <span>Giỏ hàng</span>
-                </button>
+                {getRoleName() === "User" && (
+                  <button
+                    onClick={onViewListRequest}
+                    className="w-full text-left px-4 py-2 flex items-center space-x-2 hover:text-sky-500 transition-colors duration-200"
+                  >
+                    <ShoppingCartIcon />
+                    <span>Giỏ hàng</span>
+                  </button>
+                )}
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 border-t hover:text-sky-500 transition-colors duration-200"

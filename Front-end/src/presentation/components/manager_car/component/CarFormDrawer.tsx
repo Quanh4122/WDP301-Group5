@@ -29,10 +29,16 @@ interface Car {
 interface CarFormDrawerProps {
     isDrawerVisible: boolean;
     setIsDrawerVisible: (visible: boolean) => void;
-    form: any; // Sử dụng any để tương thích với Form instance của Ant Design
+    form: any;
     carDetail?: Car | undefined;
     setCarList: (cars: Car[] | undefined) => void;
 }
+
+const urlToFile = async (url: string, fileName: string): Promise<File> => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new File([blob], fileName, { type: blob.type });
+};
 
 const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
     isDrawerVisible,
@@ -41,7 +47,8 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
     carDetail,
     setCarList,
 }) => {
-    const [arrFile, setArrFile] = useState<File[]>();
+    const [arrFile, setArrFile] = useState<File[]>([]);
+    const [fileList, setFileList] = useState<any[]>([]);
     const [isDisplayBunkbed, setIsDisplayBunkbed] = useState<boolean>(false);
 
     const radioBunkBed = [
@@ -63,9 +70,8 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
         { label: 9, value: 9 },
     ];
 
-    // Điền giá trị mặc định vào form khi carDetail thay đổi
     useEffect(() => {
-        if (carDetail) {
+        if (isDrawerVisible && carDetail) {
             form.setFieldsValue({
                 carName: carDetail.carName,
                 color: carDetail.color,
@@ -76,17 +82,29 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                 flue: carDetail.carType.flue,
                 transmissionType: carDetail.carType.transmissionType,
                 bunkBed: carDetail.carType.bunkBed,
+                images: carDetail.images,
             });
             setIsDisplayBunkbed(carDetail.numberOfSeat > 7);
-        } else {
+
+            const defaultFileList = carDetail.images.map((url, index) => ({
+                uid: `-${index}`,
+                name: `image-${index}`,
+                status: "done",
+                url: `http://localhost:3030${url}`,
+                path: url, // Lưu path gốc để so sánh sau
+            }));
+            setFileList(defaultFileList);
+            setArrFile([]);
+        } else if (!carDetail) {
             form.resetFields();
+            setFileList([]);
+            setArrFile([]);
             setIsDisplayBunkbed(false);
         }
-    }, [carDetail, form]);
+    }, [carDetail, form, isDrawerVisible]);
 
     const onFinish = (value: any) => {
-        console.log(value.images);
-        const listImage = value.images?.fileList?.map((item: any) => item.name) || [];
+        const val = form.getFieldValue("numberOfSeat") > 7 ? form.getFieldValue("bunkBed") : false;
         const data: CarModelsNoId = {
             carName: form.getFieldValue("carName"),
             color: form.getFieldValue("color"),
@@ -96,13 +114,12 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
             carVersion: form.getFieldValue("carVersion"),
             numberOfSeat: form.getFieldValue("numberOfSeat"),
             carType: {
-                bunkBed: form.getFieldValue("bunkBed"),
+                bunkBed: val,
                 flue: form.getFieldValue("flue"),
                 transmissionType: form.getFieldValue("transmissionType"),
             },
-            images: arrFile,
+            images: fileList.map((file) => file.path || file), // Kết hợp ảnh cũ và mới
         };
-
         if (carDetail) {
             updateCar(data, carDetail._id);
         } else {
@@ -146,11 +163,32 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
         formData.append("bunkBed", String(value.carType.bunkBed));
         formData.append("flue", String(value.carType.flue));
         formData.append("transmissionType", String(value.carType.transmissionType));
-        value.images?.forEach((element) => {
-            formData.append("images", element);
-        });
+
+        if (fileList && fileList.length > 0) {
+            const imageFiles = await Promise.all(
+                fileList.map(async (file, index) => {
+                    if (file.url && file.path) {
+                        // Ảnh cũ (URL)
+                        const fullUrl = `http://localhost:3030${file.path}`;
+                        return await urlToFile(fullUrl, `image-${index}.jpg`);
+                    } else if (file.originFileObj) {
+                        // Ảnh mới (File)
+                        return file.originFileObj;
+                    }
+                    return null;
+                })
+            );
+            imageFiles
+                .filter((file): file is File => file !== null) // Loại bỏ null
+                .forEach((file) => {
+                    formData.append("images", file);
+                });
+        }
+
         await axiosInstance
-            .put(`/car/updateCar/${carId}`, formData)
+            .put(`/car/updateCar/${carId}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
             .then((res) => {
                 toast.success("Cập nhật xe thành công !!");
                 handleCancel();
@@ -158,34 +196,34 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
             .catch((err) => console.log(err));
     };
 
-    const handleOk = async (values: any) => {
-        try {
-            await axiosInstance.post("/car/create", values);
-            message.success("Xe đã được tạo thành công!");
-            setIsDrawerVisible(false);
-            form.resetFields();
-            const res = await axiosInstance.get("/car/getAllCar");
-            setCarList(res.data);
-        } catch (err) {
-            message.error("Có lỗi xảy ra khi tạo xe!");
-            console.log(err);
-        }
-    };
+    const onChangeGetFile = (info: any) => {
+        const newFileList = info.fileList.slice(0, 4);
+        setFileList(newFileList);
 
-    const onChangeGetFile = (files: any) => {
-        const arr: File[] = files.fileList.map((item: any) => item.originFileObj);
-        setArrFile(arr);
+        const newFiles: File[] = newFileList
+            .filter((file: any) => file.originFileObj)
+            .map((file: any) => file.originFileObj);
+        setArrFile(newFiles);
+
+        form.setFieldsValue({ images: newFileList });
     };
 
     const handleCancel = () => {
         setIsDrawerVisible(false);
-        form.resetFields();
+    };
+
+    const validateImages = (_: any, value: any) => {
+        const currentFiles = fileList.length;
+        if (currentFiles < 4) {
+            return Promise.reject(new Error("Vui lòng tải lên ít nhất 4 ảnh!"));
+        }
+        return Promise.resolve();
     };
 
     return (
         <Drawer
             title={
-                <h3 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                <h3 className="text-xl font-semibold text-gray-800 border-gray-200 pb-2">
                     {carDetail ? "Chỉnh sửa xe" : "Tạo xe mới"}
                 </h3>
             }
@@ -194,12 +232,8 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
             open={isDrawerVisible}
             width={600}
             className="rounded-lg"
-            bodyStyle={{ padding: 0, height: "100%", overflow: "auto" }} // Loại bỏ padding và đặt overflow cho toàn bộ Drawer
         >
             <div className="h-full flex flex-col">
-                <div className="text-2xl font-semibold text-sky-600 mb-4">
-                    {carDetail ? "Chỉnh sửa xe" : "Thêm xe"}
-                </div>
                 <div className="flex-1 overflow-y-auto">
                     <Form
                         initialValues={{ remember: true }}
@@ -211,8 +245,8 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <Form.Item
-                                label="Tên xe"
                                 rules={[{ required: true, message: "Vui lòng nhập tên xe!" }]}
+                                label="Tên xe"
                                 name="carName"
                             >
                                 <Input
@@ -283,10 +317,7 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                                 name="flue"
                                 className="col-span-2"
                             >
-                                <Radio.Group
-                                    options={radioFlue}
-                                    className="flex flex-wrap gap-2"
-                                />
+                                <Radio.Group options={radioFlue} className="flex flex-wrap gap-2" />
                             </Form.Item>
                             <Form.Item
                                 label="Loại truyền động"
@@ -294,10 +325,7 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                                 name="transmissionType"
                                 className="col-span-2"
                             >
-                                <Radio.Group
-                                    options={radioTransmissionType}
-                                    className="flex flex-wrap gap-2"
-                                />
+                                <Radio.Group options={radioTransmissionType} className="flex flex-wrap gap-2" />
                             </Form.Item>
                             {isDisplayBunkbed && (
                                 <Form.Item
@@ -306,34 +334,36 @@ const CarFormDrawer: React.FC<CarFormDrawerProps> = ({
                                     name="bunkBed"
                                     className="col-span-2"
                                 >
-                                    <Radio.Group
-                                        options={radioBunkBed}
-                                        className="flex flex-wrap gap-2"
-                                    />
+                                    <Radio.Group options={radioBunkBed} className="flex flex-wrap gap-2" />
                                 </Form.Item>
                             )}
                         </div>
                         <Form.Item
                             label="Thêm ảnh"
-                            rules={[{ required: !carDetail, message: "Vui lòng tải lên hình ảnh!" }]}
                             name="images"
+                            rules={[
+                                { required: true, message: "Vui lòng tải lên ảnh!" },
+                                { validator: validateImages },
+                            ]}
                             className="mt-4"
                         >
                             <Upload.Dragger
                                 multiple
-                                onChange={(files) => onChangeGetFile(files)}
+                                fileList={fileList}
+                                onChange={onChangeGetFile}
+                                beforeUpload={() => false}
+                                maxCount={4}
                                 className="border-2 border-dashed border-gray-300 bg-white rounded-lg p-4 text-center hover:border-blue-500 transition duration-200 max-h-40 overflow-y-auto"
                             >
                                 <p className="ant-upload-drag-icon">
                                     <InboxOutlined className="text-blue-500 text-3xl" />
                                 </p>
                                 <p className="ant-upload-text text-gray-600 text-sm">
-                                    Click or drag file to this area to upload
+                                    Click or drag file to this area to upload (Tối đa 4 ảnh)
                                 </p>
                                 <p className="text-xs text-gray-400">Support multiple files</p>
                             </Upload.Dragger>
                         </Form.Item>
-                        {/* Cố định nút "Tạo xe" hoặc "Lưu" ở dưới cùng */}
                         <div className="sticky bottom-0 bg-white p-4 border-t border-gray-200">
                             <Form.Item>
                                 <Button

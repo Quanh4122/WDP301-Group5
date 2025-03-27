@@ -89,11 +89,11 @@ export default function SessionsChart() {
             }}
           >
             <Typography variant="h4" component="p">
-              {inUseCount} in use
+              {inUseCount} người sử dụng
             </Typography>
           </Stack>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Car utilization for the next 30 days
+            Xe được sử dụng trong 30 ngày tới
           </Typography>
         </Stack>
         <LineChart

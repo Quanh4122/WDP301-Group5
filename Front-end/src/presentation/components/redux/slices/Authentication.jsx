@@ -679,6 +679,8 @@ export function UpdateProfile(userId, formData) {
       dispatch(
         slice.actions.updateIsLoading({ isLoading: false, error: false })
       );
+
+      return response.data;
     } catch (error) {
       console.error("Update Profile error:", error);
       dispatch(

@@ -40,7 +40,6 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       const requestResponse = await axiosInstance.get("/bill/getBillByReuqestId", {
         params: { key: requestId },
       });
-      console.log("check data : ", requestResponse.data.bill)
       setBillData(requestResponse.data.bill);
 
       // Tính toán phí phạt mặc định nếu realTimeDrop muộn hơn endDate
@@ -75,15 +74,18 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
           penaltyFee: values.penaltyFee
         }
         // Gửi dữ liệu lên server
-        const response = await axiosInstance.put("/bill/adminUpdatePenaltyFee", dataSubmit);
-        toast.success("Cập nhật phí phạt thành công!");
-        form.resetFields();
-        onClose(); // Đóng modal
-        if (onSuccess) onSuccess(); // Gọi callback nếu có
+        await axiosInstance.put("/bill/adminUpdatePenaltyFee", dataSubmit)
+          .then(res => {
+            toast.success("Cập nhật phí phạt thành công!");
+            form.resetFields();
+            onClose(); // Đóng modal
+            if (onSuccess) onSuccess(); // Gọi callback nếu có
+          }).catch(err => {
+            toast.error(err.response.data.message);
+          })
       } else {
         console.log("Have no bill")
       }
-
     } catch (error) {
       console.error(error);
       toast.error("Đã có lỗi xảy ra, vui lòng thử lại.");
@@ -143,13 +145,18 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
         {billData?.realImage && (
           <div>
             <Text strong>Ảnh xác nhận:</Text>
-            <Image
-              src={`http://localhost:3030${billData?.realImage}`}
-              alt={`Real Image`}
-              className="w-10 h-10 object-cover rounded-md shadow-sm"
-              width={40}
-              height={40}
-            />
+            {
+              billData.realImage.map((item, idx) => (
+                <Image
+                  src={`http://localhost:3030${item}`}
+                  alt={`Real Image`}
+                  className="w-10 h-10 object-cover rounded-md shadow-sm"
+                  width={40}
+                  height={40}
+                />
+              ))
+            }
+
           </div>
         )}
 

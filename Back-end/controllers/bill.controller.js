@@ -173,7 +173,9 @@ const useBookingBill = async (req, res) => {
 };
 const userConfirmDoneBill = async (req, res) => {
   const data = req.body;
-  const image = `/images/${req.file.filename}`;
+  const images = req.files.map((item) => {
+    return `/images/${item.filename}`;
+  });
   try {
     await BillModel.updateOne(
       {
@@ -182,7 +184,7 @@ const userConfirmDoneBill = async (req, res) => {
       {
         realLocationDrop: data.realDropLocation,
         realTimeDrop: dayjs(data.realTimeDrop),
-        realImage: image,
+        realImage: images,
       }
     );
     await RequestModel.updateOne({ _id: data.request }, { requestStatus: "4" });
@@ -238,8 +240,11 @@ const adminUpdatePenaltyFee = async (req, res) => {
         }
       ).populate("user", "userName fullName email phoneNumber address avatar");
       const bookingAgainURL = `http://localhost:3000/app/bill-payment?billId=${bill._id}`;
-      const total = bill.vatFee + bill.totalCarFee - bill.depositFee;
-      const emailContent = await NotifyPayment(
+      let total = bill.vatFee + bill.totalCarFee;
+      if (bill.depositFee) total = total - bill.depositFee;
+
+      if (bill.penaltyFee) total = total + bill.penaltyFee;
+      const emailContent = NotifyPayment(
         `${requestModal.user.userName}`,
         bookingAgainURL,
         bill.vatFee.toLocaleString("vi-VN", {
@@ -250,10 +255,18 @@ const adminUpdatePenaltyFee = async (req, res) => {
           style: "currency",
           currency: "VND",
         }),
-        bill.penaltyFee.toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }),
+        bill.depositFee
+          ? bill.depositFee.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })
+          : 0,
+        bill.penaltyFee
+          ? bill.penaltyFee.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })
+          : 0,
         total.toLocaleString("vi-VN", {
           style: "currency",
           currency: "VND",
@@ -269,10 +282,9 @@ const adminUpdatePenaltyFee = async (req, res) => {
         message: "Successfull !!!",
       });
     }
-
     return res.status(401).json({ message: "Have no data to update !!" });
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(400).json({ message: "check" + error });
   }
 };
 

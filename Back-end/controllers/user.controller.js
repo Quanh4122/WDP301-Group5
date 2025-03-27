@@ -406,7 +406,7 @@ const login = async (req, res) => {
         phoneNumber: user.phoneNumber,
       },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "4h" }
     );
 
     res.cookie("token", token, {
@@ -487,7 +487,7 @@ const googleLogin = async (req, res) => {
         role: user.role.roleName, // Lấy roleName thay vì toàn bộ object role
       },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "4h" }
     );
 
     res.cookie("token", token, {
@@ -722,7 +722,7 @@ const editProfile = async (req, res) => {
 
     const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
       new: true,
-    });
+    }).populate("role");
 
     if (!updatedUser) {
       return res.status(404).json({ message: "Không tìm thấy user!" });

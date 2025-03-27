@@ -110,7 +110,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             .catch((err) => toast.error("Số lượng tài xế không đủ bạn có thể bớt xe hoặc thuê không tài xế !!"));
     };
 
-    const onBooking = async () => {
+    const onBooking = async (amount: number) => {
         const dataCheckRequest = {
             requestId: requestData._id,
             startDate: dayjs(formatDate(dateValue[0]) + " " + timeValue[0]),
@@ -120,7 +120,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
             const dataDuplicate = await axiosInstance.post("/request/handleCheckAdminAcceptRequest", dataCheckRequest);
             setDataCheck(dataDuplicate.data);
             if (!dataDuplicate.data.isExisted) {
-                handleBooking();
+                handleSubmit(amount);
+            } else {
+                toast.error("Có xe đã được thuê trong khoảng thời gian bạn muốn thuê")
             }
         } catch (error) {
             console.log(error);
@@ -131,7 +133,7 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
     const [totalTime, setTotalTime] = useState(
         dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour")
     );
-    const [totalPrice, setTotalPrice] = useState(arrPrice * totalTime);
+    const [totalPrice, setTotalPrice] = useState<number>(arrPrice * totalTime);
     const [dpIsRequestDriver, setDpIsRequestDriver] = useState(false)
     useEffect(() => {
         const val = dayjs(formatDate(dateValue[1]) + " " + timeValue[1]).diff(dayjs(formatDate(dateValue[0]) + " " + timeValue[0]), "hour");
@@ -311,8 +313,9 @@ const RequestInSelected: React.FC<Props> = ({ requestModal }) => {
                     <ModalDeposit
                         isOpen={isModalDepositOpen}
                         onCancel={() => setIsModalDepositOpen(false)}
-                        onSubmit={handleSubmit}
-                        amoutDefault={totalPrice * 0.1}
+                        onSubmit={onBooking}
+                        amountDefault={totalPrice * 0.1}
+                        maxAmonut={totalPrice}
                     />
                 </div>
 

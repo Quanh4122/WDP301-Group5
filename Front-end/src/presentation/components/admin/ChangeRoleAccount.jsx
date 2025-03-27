@@ -35,7 +35,7 @@ const ChangeRoleAccount = () => {
     if (selectedRole && selectedRole !== user?.role?.roleName) {
       dispatch(UpdateUserRole(userId, selectedRole))
         .then(() => {
-          navigate("/app/manage-account");
+          navigate("/app/dashboard/manage-account");
         })
         .catch((err) => {
           console.error("Failed to update role:", err);

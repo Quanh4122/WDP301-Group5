@@ -291,7 +291,7 @@ const handleCheckRequest = async (req, res) => {
     const listReqInRangeTime = await RequestModel.find(
       {
         _id: { $ne: dataRequest._id },
-        requestStatus: { $in: ["1", "5"] },
+        requestStatus: { $nin: ["1", "6"] },
         $and: [
           { startDate: { $lt: dt.endDate } },
           { endDate: { $gt: dt.startDate } },
@@ -392,7 +392,9 @@ const getRequestsByDriverId = async (req, res) => {
   }
 
   try {
-    const requestList = await RequestModel.find({ driver: new mongoose.Types.ObjectId(driverId) })
+    const requestList = await RequestModel.find({
+      driver: new mongoose.Types.ObjectId(driverId),
+    })
       .populate("user", "userName fullName email phoneNumber address avatar")
       .populate(
         "car",
@@ -555,5 +557,5 @@ module.exports = {
   getRequestById,
   selectFavoriteCar,
   getRequestsByDriverId,
-  getAllRequests
+  getAllRequests,
 };
