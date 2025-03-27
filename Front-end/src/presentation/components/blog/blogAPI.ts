@@ -7,8 +7,8 @@ interface Post {
   title: string;
   description: string;
   dateCreate: string;
-  image?: string | File; // Có thể là URL (string) hoặc File khi upload
-  dateUpdated?: string; // Thêm trường dateUpdated (tùy chọn)
+  images?: (string | File)[]; // Thay đổi từ image thành images, là mảng
+  dateUpdated?: string;
 }
 
 // Hàm tạo bài viết
@@ -16,24 +16,28 @@ export const postBlog = async ({
   title,
   description,
   dateCreate,
-  image,
+  images, // Thay đổi từ image thành images
 }: Post): Promise<any> => {
   try {
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('dateCreate', dateCreate);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("dateCreate", dateCreate);
 
-    // Nếu image là File (từ input file), thêm vào FormData
-    if (image instanceof File) {
-      formData.append('image', image);
-    } else if (typeof image === 'string' && image) {
-      formData.append('image', image); // Nếu là URL (ít xảy ra trong create)
+    // Xử lý mảng images
+    if (images && Array.isArray(images)) {
+      images.forEach((img) => {
+        if (img instanceof File) {
+          formData.append("images", img); // Thêm từng file vào FormData
+        } else if (typeof img === "string" && img) {
+          formData.append("images", img); // Nếu là URL (ít xảy ra trong create)
+        }
+      });
     }
 
-    const response = await axios.post('http://localhost:3030/postBlog', formData, {
+    const response = await axios.post("http://localhost:3030/postBlog", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
 
@@ -50,22 +54,28 @@ export const postBlog = async ({
 // Hàm putBlog với type cụ thể hơn
 export const putBlog = async (
   postId: string,
-  { title, description, dateCreate, image }: Partial<Post>
+  { title, description, dateCreate, images }: Partial<Post> // Thay đổi từ image thành images
 ): Promise<Post> => {
   try {
     const formData = new FormData();
-    if (title) formData.append('title', title);
-    if (description) formData.append('description', description);
-    if (dateCreate) formData.append('dateCreate', dateCreate);
-    if (image instanceof File) {
-      formData.append('image', image);
-    } else if (typeof image === 'string' && image) {
-      formData.append('image', image);
+    if (title) formData.append("title", title);
+    if (description) formData.append("description", description);
+    if (dateCreate) formData.append("dateCreate", dateCreate);
+
+    // Xử lý mảng images
+    if (images && Array.isArray(images)) {
+      images.forEach((img) => {
+        if (img instanceof File) {
+          formData.append("images", img); // Thêm file mới
+        } else if (typeof img === "string" && img) {
+          formData.append("existingImages", img); // Gửi ảnh cũ dưới dạng chuỗi
+        }
+      });
     }
 
     const response = await axios.put(`http://localhost:3030/putBlog/${postId}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
 
