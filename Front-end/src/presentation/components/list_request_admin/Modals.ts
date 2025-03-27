@@ -5,7 +5,7 @@ export type BillModal = {
     totalCarFee: number,
     depositFee: number,
     penaltyFee: number,
-    realImage:string,
+    realImage:string[],
     realTimeDrop: string,
     realLocationDrop: string,
     request: RequestModal
