@@ -10,7 +10,6 @@ const UpdateBlog = () => {
     title: "",
     description: "",
     dateCreate: "",
-    content: "",
     dateUpdated: "",
   });
   const [imageFile, setImageFile] = useState(null);
@@ -28,7 +27,6 @@ const UpdateBlog = () => {
             title: post.title || "",
             description: post.description || "",
             dateCreate: post.dateCreate ? post.dateCreate.split("T")[0] : "",
-            content: post.content || "",
             dateUpdated: post.dateUpdated ? new Date(post.dateUpdated).toLocaleString("vi-VN") : "",
           });
           if (post.image && typeof post.image === "string") {
@@ -71,7 +69,6 @@ const UpdateBlog = () => {
       const blogData = {
         title: formData.title,
         description: formData.description,
-        content: formData.content,
         image: imageFile || undefined,
       };
 
@@ -174,18 +171,6 @@ const UpdateBlog = () => {
               {imageFile && (
                 <p className="text-sm text-gray-500 mt-2">Đã chọn: {imageFile.name}</p>
               )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Nội dung</label>
-              <textarea
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 h-32"
-                placeholder="Nhập nội dung bài viết"
-                required
-              />
             </div>
 
             <div className="flex gap-4">

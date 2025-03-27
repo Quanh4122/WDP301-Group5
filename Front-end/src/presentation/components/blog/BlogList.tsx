@@ -223,7 +223,7 @@ const BlogList: React.FC = () => {
               >
                 <div className="relative h-56 overflow-hidden rounded-t-xl bg-gray-100">
                   <img
-                    src={post.image}
+                    src={`http://localhost:3030${post.image}`}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                     alt={post.title}
                     loading="lazy"

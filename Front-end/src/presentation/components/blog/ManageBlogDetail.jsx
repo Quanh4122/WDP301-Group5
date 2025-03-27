@@ -73,7 +73,7 @@ const ManageBlogDetail = () => {
             {/* Hình ảnh */}
             <div className="md:col-span-1">
               <img
-                src={post.image}
+                src={`http://localhost:3030${post.image}`}
                 alt={post.title}
                 className="w-full h-64 object-cover rounded-lg shadow-sm"
                 onError={(e) => {

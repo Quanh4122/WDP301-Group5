@@ -3,11 +3,11 @@ const PostModel = require('../models/blog.model');
 
 const createPost = async (req, res) => {
   try {
-    const { title, content, dateCreate, description } = req.body;
+    const { title, dateCreate, description } = req.body;
     const image = req.file ? `/images/${req.file.filename}` : null; // Lấy đường dẫn ảnh từ multer
 
     // Kiểm tra các trường bắt buộc
-    if (!title || !content) {
+    if (!title ) {
       return res.status(400).json({ message: "Tiêu đề và nội dung là bắt buộc" });
     }
 
@@ -22,8 +22,7 @@ const createPost = async (req, res) => {
       title,
       description,
       image, // Đường dẫn ảnh từ upload
-      dateCreate: dateCreate || new Date(), // Nếu không cung cấp, dùng thời gian hiện tại
-      content,
+      dateCreate: dateCreate || new Date(), // Nếu không cung cấp, dùng thời gian hiện tại,
     });
 
     // Lưu vào cơ sở dữ liệu
@@ -99,7 +98,7 @@ const deleteBlog = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, dateCreate, description } = req.body;
+    const { title, dateCreate, description } = req.body;
 
     // Debug để kiểm tra dữ liệu gửi lên
     console.log("req.file:", req.file);
@@ -130,7 +129,6 @@ const updatePost = async (req, res) => {
     // Chuẩn bị dữ liệu cập nhật
     const updateData = {};
     if (title) updateData.title = title;
-    if (content) updateData.content = content;
     if (image) updateData.image = image; // Ảnh mới hoặc ảnh cũ
     if (dateCreate) updateData.dateCreate = dateCreate;
     if (description) updateData.description = description;

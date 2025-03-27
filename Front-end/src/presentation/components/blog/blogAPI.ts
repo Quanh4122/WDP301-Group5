@@ -8,7 +8,6 @@ interface Post {
   description: string;
   dateCreate: string;
   image?: string | File; // Có thể là URL (string) hoặc File khi upload
-  content: string;
   dateUpdated?: string; // Thêm trường dateUpdated (tùy chọn)
 }
 
@@ -18,14 +17,12 @@ export const postBlog = async ({
   description,
   dateCreate,
   image,
-  content,
 }: Post): Promise<any> => {
   try {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
     formData.append('dateCreate', dateCreate);
-    formData.append('content', content);
 
     // Nếu image là File (từ input file), thêm vào FormData
     if (image instanceof File) {
@@ -53,14 +50,13 @@ export const postBlog = async ({
 // Hàm putBlog với type cụ thể hơn
 export const putBlog = async (
   postId: string,
-  { title, description, dateCreate, image, content }: Partial<Post>
+  { title, description, dateCreate, image }: Partial<Post>
 ): Promise<Post> => {
   try {
     const formData = new FormData();
     if (title) formData.append('title', title);
     if (description) formData.append('description', description);
     if (dateCreate) formData.append('dateCreate', dateCreate);
-    if (content) formData.append('content', content);
     if (image instanceof File) {
       formData.append('image', image);
     } else if (typeof image === 'string' && image) {
