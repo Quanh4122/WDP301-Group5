@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchUsersAndDrivers } from "../redux/slices/Authentication";
+import { FaUser } from "react-icons/fa";
 
 const AccountDetail = () => {
   const { id } = useParams(); // Lấy userId từ URL
@@ -43,6 +44,16 @@ const AccountDetail = () => {
     );
   }
 
+  const getAvatarUrl = (avatar) => {
+    if (!avatar || avatar.trim() === "") {
+      return null; // Không có ảnh, sẽ dùng icon
+    }
+    if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
+      return avatar; // URL tuyệt đối từ Google hoặc bên ngoài
+    }
+    return `http://localhost:3030${avatar.startsWith("/") ? "" : "/"}${avatar}`; // Ảnh từ backend
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -59,20 +70,27 @@ const AccountDetail = () => {
           <div className="bg-gradient-to-r from-sky-500 to-blue-600 p-6 flex items-center gap-6">
             {/* Avatar */}
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-2xl font-semibold shadow-md">
-              <img
-                src={user.avatar ?? "/images/avatar.png"}
-                alt={user.userName ?? "N/A"}
-                className="w-20 h-20 rounded-full object-cover mx-auto"
-              />            </div>
+              {getAvatarUrl(user.avatar) ? (
+                <img
+                  src={getAvatarUrl(user.avatar)}
+                  alt={user.userName ?? "Người dùng"}
+                  className="w-20 h-20 rounded-full object-cover mx-auto"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
+                  <FaUser className="text-gray-500 text-2xl" />
+                </div>
+              )}
+            </div>
             {/* User Name and Role */}
             <div>
               <h2 className="text-2xl font-semibold text-white">{user.userName ?? "N/A"}</h2>
               <span
                 className={`inline-flex mt-1 px-3 py-1 text-sm font-medium rounded-full text-white ${user.role?.roleName === "Admin"
-                    ? "bg-blue-800"
-                    : user.role?.roleName === "Driver"
-                      ? "bg-green-800"
-                      : "bg-gray-600"
+                  ? "bg-blue-800"
+                  : user.role?.roleName === "Driver"
+                    ? "bg-green-800"
+                    : "bg-gray-600"
                   }`}
               >
                 {user.role?.roleName ?? "N/A"}

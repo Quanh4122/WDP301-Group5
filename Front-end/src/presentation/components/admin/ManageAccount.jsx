@@ -43,7 +43,7 @@ const ManageAccount = () => {
     ...pendingDriverApplications,
     ...approvedDriverApplications,
     ...rejectedDriverApplications,
-  ].filter((app) => app.user && app.user.role?.roleName !== "User"); // Loại bỏ các tài khoản đã giáng cấp thành User
+  ]; // Loại bỏ các tài khoản đã giáng cấp thành User
 
   const filteredApplications = allApplications.filter((application) => {
     const matchesFilter = filter === "all" || application.status === filter;
