@@ -7,8 +7,7 @@ interface Blog {
   _id: string;
   title: string;
   description: string;
-  content: string;
-  image: string;
+  image?: string; // Optional image field
   dateCreate: string;
 }
 
@@ -31,6 +30,10 @@ const BlogDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [imageError, setImageError] = useState<boolean>(false);
+
+  const BASE_URL = "http://localhost:3030"; // Define base URL as constant
+  const FALLBACK_IMAGE = "/placeholder-image.jpg"; // Define fallback image
 
   const fetchBlog = useCallback(async () => {
     if (!postId) {
@@ -40,28 +43,26 @@ const BlogDetail: React.FC = () => {
 
     try {
       setLoading(true);
+      setImageError(false); // Reset image error state
 
-      // 1. Kiểm tra dữ liệu từ localStorage trước
+      // Check localStorage first
       const storedPosts = localStorage.getItem("posts");
       if (storedPosts) {
         const posts: Blog[] = JSON.parse(storedPosts);
         const localBlog = posts.find((post) => post._id === postId);
         if (localBlog) {
-          console.log("Blog từ localStorage:", localBlog);
-          console.log("Blog image từ localStorage:", localBlog.image);
           setBlog(localBlog);
           setLoading(false);
-          return; // Nếu tìm thấy trong localStorage, không gọi API
+          return;
         }
       }
 
-      // 2. Nếu không tìm thấy trong localStorage, gọi API
+      // Fetch from API if not in localStorage
       const blogData = await getBlogDetail(postId);
-      console.log("Blog data từ API:", blogData);
-      console.log("Blog image từ API:", blogData?.image);
       setBlog(blogData);
     } catch (err) {
-      toast.error("Không thể tải bài viết. Hãy thử lại");
+      console.error("Failed to fetch blog:", err);
+      toast.error("Không thể tải bài viết. Vui lòng thử lại sau.");
     } finally {
       setLoading(false);
     }
@@ -71,32 +72,32 @@ const BlogDetail: React.FC = () => {
     fetchBlog();
   }, [fetchBlog]);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!blog) {
-    return <NotFound />;
-  }
-
-  const imageUrl = blog.image
-    ? blog.image.startsWith("http")
-      ? blog.image
-      : `http://localhost:3030${blog.image}`
-    : "/placeholder-image.jpg";
+  // Function to get the correct image URL
+  const getImageUrl = (): string => {
+    if (!blog?.image || imageError) return FALLBACK_IMAGE;
     
+    // If image is already a full URL, return it
+    if (blog.image.startsWith("http")) return blog.image;
+    
+    // Construct full URL if it's a relative path
+    return `${BASE_URL}${blog.image.startsWith("/") ? "" : "/"}${blog.image}`;
+  };
+
+  if (loading) return <LoadingSpinner />;
+  if (!blog) return <NotFound />;
 
   return (
     <div className="container mx-auto px-4 py-10">
       <article className="bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
         <p className="text-gray-500 text-sm text-right p-3">
-          <span className="font-semibold">Ngày tạo:</span>{" "}
+          <span className="font-semibold">Ngày tạo: </span>
           {new Date(blog.dateCreate).toLocaleDateString("vi-VN", {
             year: "numeric",
             month: "long",
             day: "numeric",
           })}
         </p>
+        
         <div className="p-6 md:p-8">
           <header className="mb-6">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-4">
@@ -107,21 +108,16 @@ const BlogDetail: React.FC = () => {
 
           <div className="relative mb-6 rounded-lg overflow-hidden shadow-md">
             <img
-              src={imageUrl}
+              src={getImageUrl()}
               alt={blog.title}
               className="w-full h-[300px] md:h-[400px] object-cover transition-transform duration-300 hover:scale-105"
               loading="lazy"
-              onError={(e) => {
-                console.log(`Không tải được ảnh: ${imageUrl}`);
-                e.currentTarget.src = "/placeholder-image.jpg";
+              onError={() => {
+                console.log(`Failed to load image: ${getImageUrl()}`);
+                setImageError(true);
               }}
             />
           </div>
-
-          <div className="prose prose-lg max-w-none text-gray-700">
-            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-          </div>
-
           <hr className="my-8 border-gray-200" />
         </div>
       </article>

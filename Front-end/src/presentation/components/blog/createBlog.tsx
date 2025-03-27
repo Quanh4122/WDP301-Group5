@@ -1,50 +1,4 @@
 import React, { useState, useCallback } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import {
-  ClassicEditor,
-  Autoformat,
-  AutoImage,
-  Autosave,
-  BlockQuote,
-  Bold,
-  CKBox,
-  CKBoxImageEdit,
-  CloudServices,
-  Emoji,
-  Essentials,
-  Heading,
-  ImageBlock,
-  ImageCaption,
-  ImageInline,
-  ImageInsert,
-  ImageInsertViaUrl,
-  ImageResize,
-  ImageStyle,
-  ImageTextAlternative,
-  ImageToolbar,
-  ImageUpload,
-  Indent,
-  IndentBlock,
-  Italic,
-  Link,
-  LinkImage,
-  List,
-  ListProperties,
-  MediaEmbed,
-  Mention,
-  Paragraph,
-  PasteFromOffice,
-  PictureEditing,
-  Table,
-  TableCaption,
-  TableCellProperties,
-  TableColumnResize,
-  TableProperties,
-  TableToolbar,
-  TextTransformation,
-  TodoList,
-  Underline,
-} from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 import { postBlog } from "../blog/blogAPI";
 import { toast } from "react-toastify";
@@ -53,7 +7,6 @@ import { toast } from "react-toastify";
 interface BlogFormData {
   title: string;
   description: string;
-  content: string; // Không cần trường image trong formData nữa vì dùng File riêng
 }
 
 // Thành phần tải dữ liệu
@@ -69,7 +22,6 @@ const CreateBlog: React.FC = () => {
   const [formData, setFormData] = useState<BlogFormData>({
     title: "",
     description: "",
-    content: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [imageFile, setImageFile] = useState<File | null>(null); // Lưu file ảnh
@@ -107,7 +59,6 @@ const CreateBlog: React.FC = () => {
         description: formData.description.trim(),
         dateCreate: new Date().toISOString(),
         image: imageFile || "", // Gửi File hoặc chuỗi rỗng nếu không có ảnh
-        content: formData.content,
       };
 
       try {
@@ -119,13 +70,10 @@ const CreateBlog: React.FC = () => {
         setFormData({
           title: "",
           description: "",
-          content: "",
         });
         setImageFile(null);
         setImagePreview(null);
       } catch (err) {
-        toast.error("Không thể tạo bài viết. Vui lòng thử lại.");
-        console.error("Lỗi khi tạo bài viết:", err);
       } finally {
         setLoading(false);
       }
@@ -222,90 +170,6 @@ const CreateBlog: React.FC = () => {
                 Đã chọn: {imageFile.name}
               </p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nội dung
-            </label>
-            <div className="rounded-lg border border-gray-300 shadow-sm">
-              <CKEditor
-                editor={ClassicEditor}
-                config={{
-                  licenseKey: "GPL",
-                  plugins: [
-                    Autoformat,
-                    AutoImage,
-                    Autosave,
-                    BlockQuote,
-                    Bold,
-                    CKBox,
-                    CKBoxImageEdit,
-                    CloudServices,
-                    Emoji,
-                    Essentials,
-                    Heading,
-                    ImageBlock,
-                    ImageCaption,
-                    ImageInline,
-                    ImageInsert,
-                    ImageInsertViaUrl,
-                    ImageResize,
-                    ImageStyle,
-                    ImageTextAlternative,
-                    ImageToolbar,
-                    ImageUpload,
-                    Indent,
-                    IndentBlock,
-                    Italic,
-                    Link,
-                    LinkImage,
-                    List,
-                    ListProperties,
-                    MediaEmbed,
-                    Mention,
-                    Paragraph,
-                    PasteFromOffice,
-                    PictureEditing,
-                    Table,
-                    TableCaption,
-                    TableCellProperties,
-                    TableColumnResize,
-                    TableProperties,
-                    TableToolbar,
-                    TextTransformation,
-                    TodoList,
-                    Underline,
-                  ],
-                  toolbar: [
-                    "heading",
-                    "|",
-                    "bold",
-                    "italic",
-                    "underline",
-                    "|",
-                    "emoji",
-                    "link",
-                    "insertImage",
-                    "ckbox",
-                    "insertTable",
-                    "blockQuote",
-                    "|",
-                    "bulletedList",
-                    "numberedList",
-                    "todoList",
-                    "outdent",
-                    "indent",
-                  ],
-                }}
-                data={formData.content}
-                onChange={(event, editor) => {
-                  const data = editor.getData();
-                  setFormData((prev) => ({ ...prev, content: data }));
-                }}
-                disabled={loading}
-              />
-            </div>
           </div>
 
           <div className="flex justify-center pt-6">
