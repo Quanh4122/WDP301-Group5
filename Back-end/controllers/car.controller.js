@@ -10,7 +10,7 @@ const getAllCar = async (req, res) => {
   if (carList && carList.length > 0) {
     return res.status(200).json(carList);
   } else {
-    res.status(400).json({
+    return res.status(400).json({
       status: "error",
       message: "Car List do not have any element",
     });
@@ -26,7 +26,7 @@ const filterCarByNumberOfSeat = async (req, res) => {
   if (carListFilter && carListFilter.length > 0) {
     return res.status(200).json(carListFilter);
   } else {
-    res.status(200).json([]);
+    return res.status(200).json([]);
   }
 };
 
@@ -54,7 +54,7 @@ const filterCarByTransmissionType = async (req, res) => {
   if (carListFilter && carListFilter.length > 0) {
     return res.status(200).json(carListFilter);
   } else {
-    res.status(200).json([]);
+    return res.status(200).json([]);
   }
 };
 
@@ -82,7 +82,7 @@ const filterCarByFlue = async (req, res) => {
   if (carListFilter && carListFilter.length > 0) {
     return res.status(200).json(carListFilter);
   } else {
-    res.status(200).json([]);
+    return res.status(200).json([]);
   }
 };
 
@@ -95,7 +95,7 @@ const getCarById = async (req, res) => {
   if (car) {
     return res.status(200).json(car);
   } else {
-    res.status(400).json({
+    return res.status(400).json({
       status: "error",
       message: "Car List do not have any element",
     });
@@ -124,7 +124,7 @@ const createCar = async (req, res) => {
   if (req.files.length == 0) {
     const error = new Error("Please choose files");
     error.httpStatusCode = 400;
-    return next(error);
+    return res.status(301).json({message: error.message});
   } else {
     const arrImages = req.files.map((item) => {
       return `/images/${item.filename}`;
@@ -192,7 +192,7 @@ const getAllCarFree = async (req, res) => {
       if (carList && carList.length > 0) {
         return res.status(200).json(carList);
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           status: "error",
           message: "Car List do not have any element",
         });
@@ -205,7 +205,7 @@ const getAllCarFree = async (req, res) => {
       if (carList && carList.length > 0) {
         return res.status(200).json(carList);
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           status: "error",
           message: "Car List do not have any element",
         });
@@ -241,34 +241,34 @@ const updateCar = async (req, res) => {
   if (req.files.length == 0) {
     const error = new Error("Please choose files");
     error.httpStatusCode = 400;
-    return next(error);
+    return res.status(301).json({message: error.message});
   } else {
     const arrImages = req.files.map((item) => {
       return `/images/${item.filename}`;
     });
-    // const carFindByLicensePlateNumber = await CarModel.findOne({
-    //   licensePlateNumber: licensePlateNumber,
-    // });
-    // if (carFindByLicensePlateNumber) {
-    //   return res.status(401).json({ message: "This car is existed !!!" });
-    // } else {
-
-    // }
-    await CarModel.updateOne(
-      { _id: carId },
-      {
-        carName,
-        carStatus,
-        carType: carTypeModel._id,
-        carVersion,
-        color,
-        images: arrImages,
-        licensePlateNumber,
-        numberOfSeat,
-        price,
-      }
-    );
-    return res.status(200).json({ message: "Create Successfull !!!" });
+    const carFindByLicensePlateNumber = await CarModel.findOne({
+      licensePlateNumber: licensePlateNumber,
+    });
+    if (carFindByLicensePlateNumber) {
+      return res.status(401).json({ message: "This car is existed !!!" });
+    } else {
+      await CarModel.updateOne(
+        { _id: carId },
+        {
+          carName,
+          carStatus,
+          carType: carTypeModel._id,
+          carVersion,
+          color,
+          images: arrImages,
+          licensePlateNumber,
+          numberOfSeat,
+          price,
+        }
+      );
+      return res.status(200).json({ message: "Create Successfull !!!" });
+    }
+    
   }
 };
 
