@@ -34,7 +34,7 @@ const BlogDetail: React.FC = () => {
 
   const BASE_URL = "http://localhost:3030";
   const FALLBACK_IMAGE = "/placeholder-image.jpg";
-  const MIN_WORDS = 200; // Số từ tối thiểu để hiển thị ảnh thứ hai giữa description
+  const WORDS_PER_IMAGE = 150; // Số từ tối thiểu để chèn thêm một ảnh
 
   const fetchBlog = useCallback(async () => {
     if (!postId) {
@@ -54,9 +54,7 @@ const BlogDetail: React.FC = () => {
         if (localBlog) {
           const normalizedBlog = {
             ...localBlog,
-            images: Array.isArray(localBlog.images)
-              ? localBlog.images
-              : [],
+            images: Array.isArray(localBlog.images) ? localBlog.images : [],
           };
           setBlog(normalizedBlog);
           setImageErrors(new Array(normalizedBlog.images.length).fill(false));
@@ -105,23 +103,36 @@ const BlogDetail: React.FC = () => {
     });
   };
 
-  // Hàm chia nhỏ description theo số từ
-  const splitDescriptionByWords = (text: string, wordLimit: number = MIN_WORDS) => {
+  // Hàm chia nhỏ description thành các đoạn theo số từ và chèn ảnh
+  const splitDescriptionWithImages = (text: string, images: string[], wordsPerImage: number = WORDS_PER_IMAGE) => {
     const words = text.trim().split(/\s+/); // Tách thành mảng các từ
-    if (words.length <= wordLimit) {
-      return { shortText: text, remainingText: "" };
+    const totalWords = words.length;
+    const segments: { text: string; imageIndex?: number }[] = [];
+    let currentWordIndex = 0;
+    let imageIndex = 1; // Bắt đầu từ ảnh thứ hai (ảnh đầu tiên hiển thị ở đầu bài)
+
+    // Ảnh đầu tiên luôn hiển thị ở đầu bài, nên không cần chia đoạn cho nó
+    while (currentWordIndex < totalWords) {
+      const segmentWords = words.slice(currentWordIndex, currentWordIndex + wordsPerImage);
+      segments.push({ text: segmentWords.join(" ") });
+      
+      currentWordIndex += wordsPerImage;
+      
+      // Nếu còn ảnh và chưa hết đoạn, chèn ảnh xen kẽ
+      if (imageIndex < images.length && currentWordIndex < totalWords) {
+        segments.push({ text: "", imageIndex });
+        imageIndex++;
+      }
     }
-    const shortText = words.slice(0, wordLimit).join(" ") + "...";
-    const remainingText = words.slice(wordLimit).join(" ");
-    return { shortText, remainingText };
+
+    return segments;
   };
 
   if (loading) return <LoadingSpinner />;
   if (!blog) return <NotFound />;
 
-  const { shortText, remainingText } = splitDescriptionByWords(blog.description);
-  const wordCount = blog.description.trim().split(/\s+/).length; // Đếm số từ trong description
-  const showSecondImageBetween = wordCount >= MIN_WORDS; // Kiểm tra nếu đủ 50 từ
+  const segments = splitDescriptionWithImages(blog.description, blog.images);
+  const wordCount = blog.description.trim().split(/\s+/).length;
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -142,7 +153,7 @@ const BlogDetail: React.FC = () => {
             </h1>
           </header>
 
-          {/* Ảnh đầu tiên */}
+          {/* Ảnh đầu tiên (luôn hiển thị ở đầu) */}
           {blog.images && blog.images.length > 0 && (
             <div className="relative mb-6 rounded-lg overflow-hidden shadow-md">
               <img
@@ -155,39 +166,25 @@ const BlogDetail: React.FC = () => {
             </div>
           )}
 
-          {/* Đoạn text ngắn (50 từ đầu tiên hoặc toàn bộ nếu < 50 từ) */}
-          <p className="text-gray-600 text-lg mb-6">{shortText}</p>
-
-          {/* Ảnh thứ hai (hiển thị giữa nếu >= 50 từ) */}
-          {showSecondImageBetween && blog.images && blog.images.length > 1 && (
-            <div className="relative mb-6 rounded-lg overflow-hidden shadow-md">
-              <img
-                src={getImageUrl(1)}
-                alt={`${blog.title} - Ảnh 2`}
-                className="w-full h-[300px] md:h-[400px] object-cover transition-transform duration-300 hover:scale-105"
-                loading="lazy"
-                onError={() => handleImageError(1)}
-              />
+          {/* Nội dung xen kẽ với ảnh */}
+          {segments.map((segment, index) => (
+            <div key={index}>
+              {segment.text && (
+                <p className="text-gray-600 text-lg mb-6">{segment.text}</p>
+              )}
+              {segment.imageIndex !== undefined && blog.images[segment.imageIndex] && (
+                <div className="relative mb-6 rounded-lg overflow-hidden shadow-md">
+                  <img
+                    src={getImageUrl(segment.imageIndex)}
+                    alt={`${blog.title} - Ảnh ${segment.imageIndex + 1}`}
+                    className="w-full h-[300px] md:h-[400px] object-cover transition-transform duration-300 hover:scale-105"
+                    loading="lazy"
+                    onError={() => handleImageError(segment.imageIndex ?? 0)}
+                  />
+                </div>
+              )}
             </div>
-          )}
-
-          {/* Phần còn lại của description (nếu có) */}
-          {remainingText && (
-            <p className="text-gray-600 text-lg mb-6">{remainingText}</p>
-          )}
-
-          {/* Ảnh thứ hai (hiển thị cuối nếu < 50 từ) */}
-          {!showSecondImageBetween && blog.images && blog.images.length > 1 && (
-            <div className="relative mb-6 rounded-lg overflow-hidden shadow-md">
-              <img
-                src={getImageUrl(1)}
-                alt={`${blog.title} - Ảnh 2`}
-                className="w-full h-[300px] md:h-[400px] object-cover transition-transform duration-300 hover:scale-105"
-                loading="lazy"
-                onError={() => handleImageError(1)}
-              />
-            </div>
-          )}
+          ))}
 
           <hr className="my-8 border-gray-200" />
         </div>
