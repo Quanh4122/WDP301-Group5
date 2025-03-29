@@ -42,4 +42,10 @@ router.get("/getRequestById", VerifyToken, RequestController.getRequestById);
 
 router.get("/selectFavoriteCar", RequestController.selectFavoriteCar);
 
+router.post(
+  "/handleCheckDriver",
+  VerifyToken,
+  RequestController.handleCheckDriver
+);
+
 module.exports = router;

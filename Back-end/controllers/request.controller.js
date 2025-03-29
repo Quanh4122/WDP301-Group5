@@ -8,6 +8,7 @@ const mailService = require("../services/sendMail");
 const dayjs = require("dayjs");
 const mongoose = require("mongoose");
 const BillModel = require("../models/bill.model");
+const RoleModel = require("../models/role.model");
 
 const createRequest = async (req, res) => {
   const data = req.body;
@@ -335,7 +336,86 @@ const handleCheckRequest = async (req, res) => {
   }
 };
 
-const handleCheckCar = async (req, res) => {};
+const handleCheckDriver = async (req, res) => {
+  try {
+    const dt = req.body;
+    const dataRequest = await RequestModel.findOne({ _id: dt.requestId });
+
+    const driverRole = await RoleModel.findOne({ roleName: "Driver" });
+    if (!driverRole) {
+      return res
+        .status(404)
+        .json({ message: "Không có vai trò tài xế trong hệ thống!" });
+    }
+
+    // Bước 4: Lấy danh sách tài xế theo vai trò
+    const availableDrivers = await UserModel.find({
+      role: driverRole._id,
+    }).exec();
+    if (availableDrivers.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Không có tài xế trong hệ thống!" });
+    }
+
+    // Bước 5: Xác định số lượng xe và kiểm tra tài xế đủ hay không
+    const requiredCars = dataRequest.car.length; // Số lượng xe trong request
+    if (availableDrivers.length < requiredCars) {
+      return res.status(400).json({
+        message:
+          "Số lượng tài xế của hệ thống không đủ để thuê. Vui lòng bỏ bớt xe !!",
+      });
+    }
+
+    const listDriverInAcceptRequest = await RequestModel.find(
+      {
+        requestStatus: { $nin: ["2", "7", "8", "5"] },
+        $or: [
+          {
+            startDate: { $lte: dt.startDate },
+            endDate: { $gte: dt.startDate },
+          },
+          {
+            startDate: { $lte: dt.endDate },
+            endDate: { $gte: dt.endDate },
+          },
+          {
+            startDate: { $gte: dt.startDate },
+            endDate: { $lte: dt.endDate },
+          },
+        ],
+      },
+      "driver -_id"
+    );
+
+    if (listDriverInAcceptRequest.length > 0) {
+      const arrStr = listDriverInAcceptRequest.flatMap((item) =>
+        item.car.map((objectId) => objectId.toString())
+      );
+
+      const newArrStr = arrStr.filter(
+        (item, index) => arrStr.indexOf(item) == index
+      );
+
+      const driverList = await UserModel.find({
+        _id: { $nin: newArrStr },
+      });
+
+      if (driverList && driverList.length > 0) {
+        return res.status(200).json(driverList);
+      } else {
+        return res.status(400).json({
+          status: "error",
+          message: "Không đủ tài xế, vui lòng xóa bớt xe",
+        });
+      }
+    } else {
+      return res.status(200).json(availableDrivers);
+    }
+  } catch (error) {
+    return res.status(400).json({ message: error });
+  }
+};
 
 const getAddress = async (req, res) => {
   const query = req.query.q; // Từ khóa người dùng nhập
@@ -558,4 +638,5 @@ module.exports = {
   selectFavoriteCar,
   getRequestsByDriverId,
   getAllRequests,
+  handleCheckDriver,
 };
