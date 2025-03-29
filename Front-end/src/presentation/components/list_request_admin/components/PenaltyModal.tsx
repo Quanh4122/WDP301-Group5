@@ -270,6 +270,8 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
                 parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
                 className="w-full"
                 placeholder="Nhập số tiền khách thanh toán"
+                value={billData.totalCarFee + billData.vatFee + 3000000}
+                readOnly
               />
             </Form.Item>
           </Form>
