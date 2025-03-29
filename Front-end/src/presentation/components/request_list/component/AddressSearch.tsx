@@ -77,7 +77,7 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
     return (
         <div className="max-w-md bg-white">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                {title} {isRequire && <span className="text-red-500">*</span>}
+                {title && title + " *"} {isRequire && <span className="text-red-500"></span>}
             </label>
             <Input
                 value={value}

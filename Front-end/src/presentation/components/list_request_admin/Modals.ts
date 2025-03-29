@@ -8,7 +8,8 @@ export type BillModal = {
     realImage:string[],
     realTimeDrop: string,
     realLocationDrop: string,
-    request: RequestModal
+    request: RequestModal,
+    userPayStatus3?: number
 }
 
 export type RequestModal = {
@@ -21,7 +22,7 @@ export type RequestModal = {
     endDate: string,
     pickUpLocation: string,
     startDate: string,
-    user : UserModel | string,
+    user : UserModel,
     car: [CarModel],
 }
 

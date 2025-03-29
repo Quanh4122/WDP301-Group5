@@ -48,14 +48,14 @@ const PaymentDeposit: React.FC<Props> = ({ dataPayment, dataRequest, handleNext 
 
     return (
         <div className="flex justify-between">
-            <div className="w-1/2 bg-white">
+            {/* <div className="w-1/2 bg-white">
                 <h5>Thanh toán phí giữ chỗ {displayMoney(depositFee)}</h5>
                 <p>Vui lòng quét mã QRCode hoặc chụp ảnh màn hình QRCode để thanh toán bằng ứng dụng ngân hàng</p>
                 <div>
                     ảnh qr
                 </div>
-            </div>
-            <div className="w-1/2">
+            </div> */}
+            <div className="w-full">
                 <div className="bg-white border-b-2 border-sky-500">
                     <div><h4>Thông tin đơn thuê</h4></div>
                     <div className="py-4">

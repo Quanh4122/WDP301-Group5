@@ -3,14 +3,21 @@ import React, { useEffect, useState } from 'react';
 import { RequestModelFull } from '../checkout/models';
 import axiosInstance from '../utils/axios';
 import ListRequestPending from './components/ListRequestPending';
+import { statusRequestAdminView } from '../../../constants';
 
 const AdminRequest = () => {
-    const [requestDataInBooking, setRequestInBooking] = useState<RequestModelFull[]>([]);
+    const [requestst2, setRequestSt2] = useState<RequestModelFull[]>([]);
+    const [requestst3, setRequestSt3] = useState<RequestModelFull[]>([]);
+    const [requestst4, setRequestSt4] = useState<RequestModelFull[]>([]);
+    const [requestst5, setRequestSt5] = useState<RequestModelFull[]>([]);
+    const [requestst6, setRequestSt6] = useState<RequestModelFull[]>([]);
+    const [requestst7, setRequestSt7] = useState<RequestModelFull[]>([]);
+    const [requestst8, setRequestSt8] = useState<RequestModelFull[]>([]);
     const [requestDataInAdminFee, setRequestInAdminFee] = useState<RequestModelFull[]>([]);
     const [requestDataInAdminWaitToPay, setRequestInAdminWaitToPay] = useState<RequestModelFull[]>([]);
     const [requestDataDoneBill, setRequestDoneBill] = useState<RequestModelFull[]>([]);
     const [dataDisplay, setDataDisplay] = useState<RequestModelFull[]>([]);
-    const [selectedFilter, setSelectedFilter] = useState<string>('Đang thực hiện'); // Quản lý trạng thái chọn
+    const [selectedFilter, setSelectedFilter] = useState<string>('Đã cọc tiền giữ chỗ'); // Quản lý trạng thái chọn
 
     const optionRequest = [
         { label: 'Đang thực hiện', value: 'Đang thực hiện' },
@@ -33,55 +40,40 @@ const AdminRequest = () => {
     };
 
     const setListRequest = (listRequest: RequestModelFull[]) => {
-        const inBooking = listRequest.filter((item) => item.requestStatus === '2');
-        const inAdminFee = listRequest.filter((item) => item.requestStatus === '4' || item.requestStatus === '3');
-        const inAdminWaitToPay = listRequest.filter((item) => item.requestStatus === '5');
-        const doneBill = listRequest.filter((item) => item.requestStatus === '6');
+        const requestSt2 = listRequest.filter((item) => item.requestStatus == '2');
+        const requestSt3 = listRequest.filter((item) => item.requestStatus == '3');
+        const requestSt4 = listRequest.filter((item) => item.requestStatus == '4');
+        const requestSt5 = listRequest.filter((item) => item.requestStatus == '5');
+        const requestSt6 = listRequest.filter((item) => item.requestStatus == '6');
+        const requestSt7 = listRequest.filter((item) => item.requestStatus == '7');
+        const requestSt8 = listRequest.filter((item) => item.requestStatus == '8');
 
-        setRequestInBooking(inBooking);
-        setRequestInAdminFee(inAdminFee);
-        setRequestInAdminWaitToPay(inAdminWaitToPay);
-        setRequestDoneBill(doneBill);
+        setRequestSt2(requestSt2)
+        setRequestSt3(requestSt3)
+        setRequestSt4(requestSt4)
+        setRequestSt5(requestSt5)
+        setRequestSt6(requestSt6)
+        setRequestSt7(requestSt7)
+        setRequestSt8(requestSt8)
 
-        // Cập nhật dataDisplay dựa trên selectedFilter hiện tại
-        updateDataDisplay(selectedFilter, {
-            inBooking,
-            inAdminFee,
-            inAdminWaitToPay,
-            doneBill,
-        });
-    };
-
-    const updateDataDisplay = (
-        value: string,
-        data: {
-            inBooking: RequestModelFull[];
-            inAdminFee: RequestModelFull[];
-            inAdminWaitToPay: RequestModelFull[];
-            doneBill: RequestModelFull[];
-        }
-    ) => {
-        if (value === 'Đang thực hiện') {
-            setDataDisplay(data.inBooking);
-        } else if (value === 'Đang chờ đánh giá') {
-            setDataDisplay(data.inAdminFee);
-        } else if (value === 'Đang chờ người dùng thanh toán') {
-            setDataDisplay(data.inAdminWaitToPay);
-        } else {
-            setDataDisplay(data.doneBill);
-        }
     };
 
     const onChangeValue = (value: string) => {
         setSelectedFilter(value);
-        if (value === 'Đang thực hiện') {
-            setDataDisplay(requestDataInBooking);
-        } else if (value === 'Đang chờ đánh giá') {
-            setDataDisplay(requestDataInAdminFee);
-        } else if (value === 'Đang chờ người dùng thanh toán') {
-            setDataDisplay(requestDataInAdminWaitToPay);
+        if (value === 'Đã cọc tiền giữ chỗ') {
+            setDataDisplay(requestst2);
+        } else if (value === 'Đến thời gian giao xe') {
+            setDataDisplay(requestst3);
+        } else if (value === 'Đã giao xe và nhận tiền') {
+            setDataDisplay(requestst4);
+        } else if (value === "Khách hàng bỏ thuê xe") {
+            setDataDisplay(requestst5);
+        } else if (value === 'Đến thời gian trả xe') {
+            setDataDisplay(requestst6);
+        } else if (value == 'Đã trả xe chờ đánh giá') {
+            setDataDisplay(requestst7);
         } else {
-            setDataDisplay(requestDataDoneBill);
+            setDataDisplay(requestst8);
         }
     };
 
@@ -89,8 +81,8 @@ const AdminRequest = () => {
         <div className="w-full min-h-screen p-5 bg-gray-100">
             <div className="mb-4 bg-white shadow-md p-4 rounded-md">
                 <Select
-                    options={optionRequest}
-                    defaultValue={'Đang thực hiện'}
+                    options={statusRequestAdminView}
+                    defaultValue={'Đã cọc tiền giữ chỗ'}
                     onChange={onChangeValue}
                     className="w-48"
                 />

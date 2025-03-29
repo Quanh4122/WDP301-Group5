@@ -239,7 +239,7 @@ const userConfirmDoneBill = async (req, res) => {
         realImage: images,
       }
     );
-    await RequestModel.updateOne({ _id: data.request }, { requestStatus: "4" });
+    await RequestModel.updateOne({ _id: data.request }, { requestStatus: "7" });
     return res.status(200).json({ message: "Confirm successfull !!!" });
   } catch (error) {
     console.log(error);
@@ -393,6 +393,95 @@ const userAcceptPayment = async (req, res) => {
   }
 };
 
+const userPayStatus3 = async (req, res) => {
+  const data = req.body;
+  try {
+    if (data) {
+      const bill = await BillModel.findOneAndUpdate(
+        {
+          _id: data.billId,
+        },
+        {
+          userPayStatus3: data.userPayStatus3 || 0,
+        }
+      );
+      await RequestModel.updateOne(
+        {
+          _id: bill.request._id,
+        },
+        {
+          requestStatus: "4",
+        }
+      );
+      return res
+        .status(200)
+        .json({ message: "Update người dùng thanh toán thành công !!" });
+    }
+    return res.status(401).json({ message: "Have no data to update !!" });
+  } catch (error) {
+    return res.status(400).json({ message: "check" + error });
+  }
+};
+
+const userStatus4 = async (req, res) => {
+  const data = req.body;
+
+  try {
+    if (data) {
+      const bill = await BillModel.findOne({
+        _id: data.billId,
+      });
+
+      const reqData = await RequestModel.findOneAndUpdate(
+        {
+          _id: bill.request,
+        },
+        {
+          requestStatus: "5",
+        }
+      ).populate("user", "userName fullName email phoneNumber address avatar");
+      return res.status(200).json({
+        message: `Xác nhận ${reqData.user.email} không đến nơi nhận xe và thanh toán thành công !! `,
+      });
+    }
+    return res.status(401).json({ message: "Have no data to update !!" });
+  } catch (error) {
+    return res.status(400).json({ message: "check" + error });
+  }
+};
+
+const userStatus8 = async (req, res) => {
+  const data = req.body;
+
+  try {
+    if (data) {
+      const bill = await BillModel.findOneAndUpdate(
+        {
+          _id: data.billId,
+        },
+        {
+          billStatus: true,
+        }
+      );
+
+      const reqData = await RequestModel.findOneAndUpdate(
+        {
+          _id: bill.request,
+        },
+        {
+          requestStatus: "8",
+        }
+      ).populate("user", "userName fullName email phoneNumber address avatar");
+      return res.status(200).json({
+        message: `Xác nhận ${reqData.user.email} nhận xe thành công và hoàn tiền thế chấp !! `,
+      });
+    }
+    return res.status(401).json({ message: "Have no data to update !!" });
+  } catch (error) {
+    return res.status(400).json({ message: "check" + error });
+  }
+};
+
 module.exports = {
   getAllBill,
   toggleBillStatus,
@@ -402,4 +491,7 @@ module.exports = {
   adminUpdatePenaltyFee,
   getBillById,
   userAcceptPayment,
+  userPayStatus3,
+  userStatus4,
+  userStatus8,
 };
