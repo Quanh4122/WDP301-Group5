@@ -35,7 +35,7 @@ const InforPaymentCar = ({ requestData, handleNext, handleGetData }: props) => {
     ]);
 
     const [timeValue, setTimeValue] = useState<string[]>([
-        `${dayjs().hour()}:00`,
+        `${dayjs().add(2, 'hour').hour()}:00`,
         `${dayjs().hour()}:00`,
     ]);
     const depositFee = 500000
@@ -125,8 +125,15 @@ const InforPaymentCar = ({ requestData, handleNext, handleGetData }: props) => {
             const dataDuplicate = await axiosInstance.post("/request/handleCheckAdminAcceptRequest", dataCheckRequest);
             setDataCheck(dataDuplicate.data);
             if (!dataDuplicate.data.isExisted) {
-                handleSetData()
-                toast.success("Oke")
+                if (form.getFieldValue('isRequestDriver') == true) {
+                    await axiosInstance.post('/request/handleCheckDriver', dataCheckRequest)
+                        .then(res => {
+                            handleSetData()
+                        })
+                        .catch(err =>
+                            toast.error(err.response.data.message)
+                        )
+                }
             } else {
                 toast.error("Có xe đã được thuê trong khoảng thời gian bạn muốn thuê")
             }

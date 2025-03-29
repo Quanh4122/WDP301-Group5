@@ -15,7 +15,7 @@ import Checkout2 from "../checkout2/Checkout";
 const RequestList: React.FC = () => {
     const [requestInSelected, setRequestInSelected] = useState<RequestModelFull | undefined>(undefined);
     const [requestInPending, setRequestPending] = useState<RequestModelFull[] | undefined>(undefined);
-    const [display, setDisplay] = useState<boolean>(false);
+    const [display, setDisplay] = useState<boolean>(true);
     const [isDisplayReject, setIsDisplayReject] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -103,13 +103,16 @@ const RequestList: React.FC = () => {
     return (
         <section className="w-full min-h-screen pt-12 bg-slate-100">
             <div className="w-full px-6 md:px-20 py-4 flex justify-between items-center">
-                <Button
-                    type="primary"
-                    onClick={() => setDisplay(!display)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
-                >
-                    <span>{display ? "Xem danh sách" : "Xem chi tiết đang đặt"}</span>
-                </Button>
+                {
+                    requestInSelected &&
+                    <Button
+                        type="primary"
+                        onClick={() => setDisplay(!display)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+                    >
+                        <span>{display ? "Xem chi tiết đang đặt" : "Xem danh sách"}</span>
+                    </Button>
+                }
                 {display && requestInPending && requestInPending.length > 0 && (
                     <Button
                         onClick={handleSortByTime}

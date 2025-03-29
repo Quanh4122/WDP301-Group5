@@ -32,7 +32,7 @@ const AdminRequest: React.FC = () => {
 
     const getListRequest = async (): Promise<void> => {
         try {
-            const res = await axiosInstance.get<RequestModelFull[]>('request/getListAdminRequest');
+            const res = await axiosInstance.get<RequestModelFull[]>('/request/getListAdminRequest');
             setListRequest(res.data);
         } catch (err) {
             console.error(err);
