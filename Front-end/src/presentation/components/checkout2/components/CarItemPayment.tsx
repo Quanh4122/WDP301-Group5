@@ -13,8 +13,16 @@ const CarItemPayment = ({ carData, isBusy, onDelete, small }: props) => {
     return (
         <div className="w-full h-12 mb-2">
             <div className="flex items-center justify-between">
-                <div className="flex items-center w-2/12">
-                    <img src={`http://localhost:3030${carData?.images[0]}`} alt={carData.carName} className="w-12 h-12 object-cover rounded-md" />
+                <div className="flex items-center w-2/12 relative">
+                    <img
+                        src={`http://localhost:3030${carData?.images[0]}`} alt={carData.carName}
+                        className="w-12 h-12 object-cover rounded-lg shadow-sm"
+                    />
+                    {isBusy &&
+                        <span className="absolute top-0 left-0 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-br-lg rounded-tl-lg shadow-md">
+                            Bận
+                        </span>
+                    }
                 </div>
                 <div className="flex items-center justify-between w-10/12">
                     <p className="text-xs font-semibold text-blue-800">
