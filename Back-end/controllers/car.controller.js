@@ -238,6 +238,8 @@ const getBusyCar = async (req, res) => {
       "car -_id"
     );
     return res.status(200).json(listCarInAcceptRequest[0].car);
+  } else {
+    return res.status(400).json({ message: "Chưa có khoảng thời gian!!" });
   }
 };
 
