@@ -3,6 +3,7 @@ import axiosInstance from "../utils/axios";
 import { message, Form } from "antd";
 import CarTable from "./component/CarTable";
 import CarFormDrawer from "./component/CarFormDrawer";
+import dayjs from "dayjs";
 
 
 interface CarType {
@@ -27,6 +28,7 @@ interface Car {
 
 const CarList: React.FC = () => {
     const [carList, setCarList] = useState<Car[] | undefined>(undefined);
+    const [carBussy, setCarBussy] = useState<string[]>([])
     const [isDrawerVisible, setIsDrawerVisible] = useState(false);
     const [form] = Form.useForm();
     const [selectedCar, setSelectedCar] = useState<Car | undefined>(undefined);
@@ -38,7 +40,16 @@ const CarList: React.FC = () => {
     const fetchData = async () => {
         try {
             const res = await axiosInstance.get("/car/getAllCar");
+            const resBussy = await axiosInstance.get("/car/getBusyCar", {
+                params: {
+                    key: [
+                        dayjs().toDate(),
+                        dayjs().add(1, 'hour').toDate(),
+                    ],
+                },
+            });
             setCarList(res.data);
+            setCarBussy(resBussy.data)
         } catch (err) {
             console.log(err);
         }
@@ -65,6 +76,7 @@ const CarList: React.FC = () => {
             {carList ? (
                 <CarTable
                     cars={carList}
+                    busy={carBussy}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onCreate={handleCreate}

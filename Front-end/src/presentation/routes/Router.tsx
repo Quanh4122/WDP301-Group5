@@ -42,6 +42,7 @@ import DriverDetail from "../components/admin/DriverDetail";
 import CarDetails from "../components/manager_car/component/CarDetails";
 import ManageBlogDetail from "../components/blog/ManageBlogDetail";
 import UpdateBlog from "../components/blog/UpdateBlog";
+import Checkout2 from "../components/checkout2/Checkout";
 
 const Router = () => {
   const privateRoutes: any[] = [

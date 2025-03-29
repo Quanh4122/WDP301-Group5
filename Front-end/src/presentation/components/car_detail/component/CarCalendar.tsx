@@ -6,14 +6,12 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Button, Select } from "antd";
 
-// Định nghĩa interface cho props
 interface Props {
     setDateValue: (value: DateRange<Dayjs>) => void;
     setTimeValue: (value: [string, string]) => void;
     onSubmit?: () => void;
 }
 
-// Định nghĩa interface cho option của Select
 interface TimeOption {
     label: string;
     value: string;
@@ -25,42 +23,41 @@ const CarCalendar: React.FC<Props> = ({ setDateValue, setTimeValue, onSubmit }) 
         dayjs().format('DD/MM/YYYY'),
         dayjs().add(1, 'day').format('DD/MM/YYYY')
     ]);
-    const [timeStart, setTimeStart] = useState<string>(dayjs().format('HH:00'));
+    const [timeStart, setTimeStart] = useState<string>(dayjs().add(2, 'hour').format('HH:00'));
     const [timeEnd, setTimeEnd] = useState<string>(dayjs().format('HH:00'));
+    const [optionSelectTimeStart, setOptionSelectTimeStart] = useState<TimeOption[]>([]);
+    const [optionSelectTimeEnd, setOptionSelectTimeEnd] = useState<TimeOption[]>([]);
 
-    // Lấy giờ hiện tại
     const currentHour: number = dayjs().hour();
 
-    // Danh sách giờ cho Giờ nhận (có disable trước giờ hiện tại)
-    const optionSelectTimeStart: TimeOption[] = [
-        { label: "00:00", value: "00:00", disabled: currentHour > 0 },
-        { label: "01:00", value: "01:00", disabled: currentHour > 1 },
-        { label: "02:00", value: "02:00", disabled: currentHour > 2 },
-        { label: "03:00", value: "03:00", disabled: currentHour > 3 },
-        { label: "04:00", value: "04:00", disabled: currentHour > 4 },
-        { label: "05:00", value: "05:00", disabled: currentHour > 5 },
-        { label: "06:00", value: "06:00", disabled: currentHour > 6 },
-        { label: "07:00", value: "07:00", disabled: currentHour > 7 },
-        { label: "08:00", value: "08:00", disabled: currentHour > 8 },
-        { label: "09:00", value: "09:00", disabled: currentHour > 9 },
-        { label: "10:00", value: "10:00", disabled: currentHour > 10 },
-        { label: "11:00", value: "11:00", disabled: currentHour > 11 },
-        { label: "12:00", value: "12:00", disabled: currentHour > 12 },
-        { label: "13:00", value: "13:00", disabled: currentHour > 13 },
-        { label: "14:00", value: "14:00", disabled: currentHour > 14 },
-        { label: "15:00", value: "15:00", disabled: currentHour > 15 },
-        { label: "16:00", value: "16:00", disabled: currentHour > 16 },
-        { label: "17:00", value: "17:00", disabled: currentHour > 17 },
-        { label: "18:00", value: "18:00", disabled: currentHour > 18 },
-        { label: "19:00", value: "19:00", disabled: currentHour > 19 },
-        { label: "20:00", value: "20:00", disabled: currentHour > 20 },
-        { label: "21:00", value: "21:00", disabled: currentHour > 21 },
-        { label: "22:00", value: "22:00", disabled: currentHour > 22 },
-        { label: "23:00", value: "23:00", disabled: currentHour > 23 },
+    const defaultTimeStartOptions: TimeOption[] = [
+        { label: "00:00", value: "00:00" },
+        { label: "01:00", value: "01:00" },
+        { label: "02:00", value: "02:00" },
+        { label: "03:00", value: "03:00" },
+        { label: "04:00", value: "04:00" },
+        { label: "05:00", value: "05:00" },
+        { label: "06:00", value: "06:00" },
+        { label: "07:00", value: "07:00" },
+        { label: "08:00", value: "08:00" },
+        { label: "09:00", value: "09:00" },
+        { label: "10:00", value: "10:00" },
+        { label: "11:00", value: "11:00" },
+        { label: "12:00", value: "12:00" },
+        { label: "13:00", value: "13:00" },
+        { label: "14:00", value: "14:00" },
+        { label: "15:00", value: "15:00" },
+        { label: "16:00", value: "16:00" },
+        { label: "17:00", value: "17:00" },
+        { label: "18:00", value: "18:00" },
+        { label: "19:00", value: "19:00" },
+        { label: "20:00", value: "20:00" },
+        { label: "21:00", value: "21:00" },
+        { label: "22:00", value: "22:00" },
+        { label: "23:00", value: "23:00" },
     ];
 
-    // Danh sách giờ cho Giờ trả (không disable)
-    const optionSelectTimeEnd: TimeOption[] = [
+    const defaultTimeEndOptions: TimeOption[] = [
         { label: "00:00", value: "00:00" },
         { label: "01:00", value: "01:00" },
         { label: "02:00", value: "02:00" },
@@ -91,6 +88,54 @@ const CarCalendar: React.FC<Props> = ({ setDateValue, setTimeValue, onSubmit }) 
         setTimeValue([timeStart, timeEnd]);
     }, [timeStart, timeEnd, setTimeValue]);
 
+    const updateTimeStartOptions = (startDate: Dayjs | null) => {
+        const isToday = startDate ? dayjs().isSame(startDate, 'day') : true;
+        const disableUntilHour = currentHour + 1;
+
+        if (isToday) {
+            const updatedOptions = defaultTimeStartOptions.map(option => {
+                const hour = parseInt(option.value.split(':')[0], 10);
+                return {
+                    ...option,
+                    disabled: hour <= disableUntilHour
+                };
+            });
+            setOptionSelectTimeStart(updatedOptions);
+
+            const currentStartHour = parseInt(timeStart.split(':')[0], 10);
+            if (currentStartHour <= disableUntilHour) {
+                const nextAvailableHour = disableUntilHour + 1 > 23 ? 23 : disableUntilHour + 1;
+                setTimeStart(`${nextAvailableHour}:00`);
+            }
+        } else {
+            setOptionSelectTimeStart(defaultTimeStartOptions);
+        }
+    };
+
+    const updateTimeEndOptions = (endDate: Dayjs | null) => {
+        const isToday = endDate ? dayjs().isSame(endDate, 'day') : false;
+        const disableUntilHour = currentHour + 3;
+
+        if (isToday) {
+            const updatedOptions = defaultTimeEndOptions.map(option => {
+                const hour = parseInt(option.value.split(':')[0], 10);
+                return {
+                    ...option,
+                    disabled: hour <= disableUntilHour
+                };
+            });
+            setOptionSelectTimeEnd(updatedOptions);
+
+            const currentEndHour = parseInt(timeEnd.split(':')[0], 10);
+            if (currentEndHour <= disableUntilHour) {
+                const nextAvailableHour = disableUntilHour + 1 > 23 ? 23 : disableUntilHour + 1;
+                setTimeEnd(`${nextAvailableHour}:00`);
+            }
+        } else {
+            setOptionSelectTimeEnd(defaultTimeEndOptions);
+        }
+    };
+
     const formatData = (value: DateRange<Dayjs>) => {
         const arrDt: string[] = [
             value[0] ? dayjs(value[0].toLocaleString()).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY'),
@@ -98,7 +143,23 @@ const CarCalendar: React.FC<Props> = ({ setDateValue, setTimeValue, onSubmit }) 
         ];
         setDateDisplayModal(arrDt);
         setDateValue(value);
+
+        // Cập nhật options và timeStart/timeEnd
+        updateTimeStartOptions(value[0]);
+        updateTimeEndOptions(value[1]);
+
+        // Nếu ngày bắt đầu là hôm nay, đặt timeStart = hiện tại + 2 giờ
+        const isStartToday = value[0] ? dayjs().isSame(value[0], 'day') : true;
+        if (isStartToday) {
+            const newStartHour = Math.min(currentHour + 2, 23);
+            setTimeStart(`${newStartHour}:00`);
+        }
     };
+
+    useEffect(() => {
+        updateTimeStartOptions(dayjs()); // Khởi tạo với ngày hiện tại
+        updateTimeEndOptions(dayjs().add(1, 'day')); // Khởi tạo với ngày mai
+    }, []);
 
     return (
         <div>
@@ -107,6 +168,7 @@ const CarCalendar: React.FC<Props> = ({ setDateValue, setTimeValue, onSubmit }) 
                     <DateRangeCalendar
                         onChange={(newValue: DateRange<Dayjs>) => formatData(newValue)}
                         minDate={dayjs()}
+                        defaultValue={[dayjs(), dayjs().add(1, 'day')]}
                     />
                 </LocalizationProvider>
             </div>

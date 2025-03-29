@@ -40,6 +40,10 @@ const BillSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
+  userPayStatus3: {
+    type: Number,
+    required: false,
+  },
   total: {
     type: Number,
     // no static default here; we'll compute it in a pre-save hook

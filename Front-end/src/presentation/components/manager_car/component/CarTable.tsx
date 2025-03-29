@@ -7,10 +7,9 @@ import Pagination from "../../home/components/Pagination";
 import { toast } from "react-toastify";
 
 // Component con để hiển thị carousel ảnh
-const CarImageCarousel: React.FC<{ images: string[] }> = ({ images }) => {
+const CarImageCarousel: React.FC<{ images: string[]; isBusy?: boolean }> = ({ images, isBusy }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Tự động chuyển ảnh mỗi 3 giây
   useEffect(() => {
     if (images.length > 1) {
       const interval = setInterval(() => {
@@ -22,7 +21,6 @@ const CarImageCarousel: React.FC<{ images: string[] }> = ({ images }) => {
     }
   }, [images]);
 
-  // Xử lý nhấp vào chấm để chuyển ảnh
   const handleDotClick = (index: number) => {
     setCurrentImageIndex(index);
   };
@@ -37,15 +35,19 @@ const CarImageCarousel: React.FC<{ images: string[] }> = ({ images }) => {
             className="w-full h-24 object-cover rounded-lg shadow-sm"
             onError={() => console.log("Error loading image:", images[currentImageIndex])}
           />
+          {isBusy && (
+            <span className="absolute top-0 left-0 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-br-lg rounded-tl-lg shadow-md">
+              Bận
+            </span>
+          )}
           {images.length > 1 && (
             <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1">
               {images.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => handleDotClick(index)}
-                  className={`w-2 h-2 rounded-full ${
-                    currentImageIndex === index ? "bg-sky-600" : "bg-gray-300"
-                  }`}
+                  className={`w-2 h-2 rounded-full ${currentImageIndex === index ? "bg-sky-600" : "bg-gray-300"
+                    }`}
                 />
               ))}
             </div>
@@ -80,12 +82,13 @@ interface Car {
 
 interface CarTableProps {
   cars: Car[];
+  busy: string[];
   onEdit: (car: Car) => void;
   onDelete?: (carId: string) => Promise<any>;
   onCreate?: () => void;
 }
 
-const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate }) => {
+const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate, busy }) => {
   const [searchText, setSearchText] = useState<string>("");
   const [flueFilter, setFlueFilter] = useState<number>(0);
   const [seatFilter, setSeatFilter] = useState<number>(0);
@@ -190,7 +193,12 @@ const CarTable: React.FC<CarTableProps> = ({ cars, onEdit, onDelete, onCreate })
     {
       title: "Ảnh",
       key: "images",
-      render: (record: Car) => <CarImageCarousel images={record.images.map(image => `http://localhost:3030${image}`)} />,
+      render: (record: Car) => (
+        <CarImageCarousel
+          images={record.images.map((image) => `http://localhost:3030${image}`)}
+          isBusy={busy?.includes(record._id)} // Truyền isBusy dựa trên busy
+        />
+      ),
       width: 130,
     },
     {

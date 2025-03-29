@@ -10,11 +10,12 @@ import { PRIVATE_ROUTES } from "../../routes/CONSTANTS";
 import { RootState } from "../redux/Store";
 import { useSelector } from "react-redux";
 import dayjs from 'dayjs';
+import Checkout2 from "../checkout2/Checkout";
 
 const RequestList: React.FC = () => {
     const [requestInSelected, setRequestInSelected] = useState<RequestModelFull | undefined>(undefined);
     const [requestInPending, setRequestPending] = useState<RequestModelFull[] | undefined>(undefined);
-    const [display, setDisplay] = useState<boolean>(false);
+    const [display, setDisplay] = useState<boolean>(true);
     const [isDisplayReject, setIsDisplayReject] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -100,15 +101,18 @@ const RequestList: React.FC = () => {
     }
 
     return (
-        <section className="w-full min-h-screen pt-12 bg-gray-50">
+        <section className="w-full min-h-screen pt-12 bg-slate-100">
             <div className="w-full px-6 md:px-20 py-4 flex justify-between items-center">
-                <Button
-                    type="primary"
-                    onClick={() => setDisplay(!display)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
-                >
-                    <span>{display ? "Xem danh sách" : "Xem chi tiết đang đặt"}</span>
-                </Button>
+                {
+                    requestInSelected &&
+                    <Button
+                        type="primary"
+                        onClick={() => setDisplay(!display)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+                    >
+                        <span>{display ? "Xem chi tiết đang đặt" : "Xem danh sách"}</span>
+                    </Button>
+                }
                 {display && requestInPending && requestInPending.length > 0 && (
                     <Button
                         onClick={handleSortByTime}
@@ -128,34 +132,9 @@ const RequestList: React.FC = () => {
                         </div>
                     </div>
                 ) : display === false ? (
-                    requestInSelected ? (
-                        <RequestInSelected requestModal={requestInSelected} />
-                    ) : (
-                        <div className="flex items-center justify-center h-[calc(100vh-200px)] bg-white">
-                            <div className="bg-white p-8 rounded-xl shadow-2xl text-center max-w-md transform transition-all duration-300 hover:shadow-3xl">
-                                <AlertTriangle className="text-red-500 w-20 h-20 mx-auto animate-pulse" />
-                                <h1 className="text-3xl font-bold text-gray-900 mt-6">Opps !!</h1>
-                                <p className="text-gray-600 mt-4 text-lg">
-                                    Hiện tại bạn chưa thêm xe nào vào giỏ hàng
-                                </p>
-                                <div className="mt-8 flex gap-6 justify-center">
-                                    <Button
-                                        onClick={() => navigate(-1)}
-                                        className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-lg shadow transition duration-300"
-                                    >
-                                        Quay lại
-                                    </Button>
-                                    <Button
-                                        onClick={() =>
-                                            navigate(PRIVATE_ROUTES.PATH + "/" + PRIVATE_ROUTES.SUB.CAR_LIST)
-                                        }
-                                        className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg shadow transition duration-300"
-                                    >
-                                        Xem xe
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
+                    requestInSelected && (
+                        // <RequestInSelected requestModal={requestInSelected} />
+                        <Checkout2 requestModal={requestInSelected} />
                     )
                 ) : (
                     <div className="w-full h-auto space-y-6">

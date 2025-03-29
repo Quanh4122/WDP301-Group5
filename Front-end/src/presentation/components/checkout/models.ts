@@ -20,13 +20,14 @@ export type RequestModelFull = {
     _id: any,
     user?: UserModel,
     car: [CarModel],
-    driver?: [DriverModel],
+    driver?: [UserModel],
     startDate: any,
     endDate: any,
     requestStatus: string,
     isRequestDriver?: Boolean,
     timeCreated? : string,
     pickUpLocation: string,
+    emailRequest?: string,
 }
 
 export type RequestModalForCallApi = {

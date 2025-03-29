@@ -12,6 +12,7 @@ const BillModel = require("./models/bill.model");
 const http = require("http");
 const moment = require("moment-timezone");
 const NotifyExtendBill = require("./Templates/Mail/notifyExtentionBill");
+const NotifyGetCar = require("./Templates/Mail/notifyGetCar");
 const mailService = require("./services/sendMail");
 const dayjs = require("dayjs");
 
@@ -57,11 +58,11 @@ const broadcast = (data) => {
 
 const sendEmailRequestStatus3 = async (item) => {
   const now = dayjs();
-  const hoursLater = now.add(2, "hour");
   const start = dayjs(item.startDate);
   const end = dayjs(item.endDate);
+  const mortGateFee = 3000000;
   // Kiểm tra nếu end nằm trong khoảng từ now đến 2 tiếng sau (hoursLater)
-  if (now.isAfter(end) && now.isBefore(end.add(1, "hour"))) {
+  if (now.isAfter(start.subtract(1, "hour")) && now.isBefore(start)) {
     console.log("check");
     const startDate = start.format("HH:mm, DD/MM/YYYY");
     const endDate = end.format("HH:mm, DD/MM/YYYY");
@@ -78,7 +79,53 @@ const sendEmailRequestStatus3 = async (item) => {
     const bill = await BillModel.findOne({ request: item._id });
     if (bill) {
       const detailRequestURL = `http://localhost:3000/app/request-in-expire?requestId=${item._id}&billId=${bill._id}`;
-      const emailContent = await NotifyExtendBill(
+      const emailContent = NotifyGetCar(
+        `${item.user.userName}`,
+        startDate,
+        endDate,
+        item.pickUpLocation,
+        bill.totalCarFee.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }),
+        mortGateFee.toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        })
+      );
+      await mailService.sendEmail({
+        to: item.user.email,
+        subject: "Thông báo yêu cầu đặt xe",
+        html: emailContent,
+      });
+    }
+  }
+};
+
+const sendEmailRequestStatus6 = async (item) => {
+  const now = dayjs();
+  const start = dayjs(item.startDate);
+  const end = dayjs(item.endDate);
+
+  // Kiểm tra nếu end nằm trong khoảng từ now đến 2 tiếng sau (hoursLater)
+  if (now.isAfter(end) && now.isBefore(end.add(1, "hour"))) {
+    console.log("check2");
+    const startDate = start.format("HH:mm, DD/MM/YYYY");
+    const endDate = end.format("HH:mm, DD/MM/YYYY");
+
+    await RequestModel.updateOne(
+      {
+        _id: item._id,
+      },
+      {
+        requestStatus: "6",
+      }
+    );
+
+    const bill = await BillModel.findOne({ request: item._id });
+    if (bill) {
+      const detailRequestURL = `http://localhost:3000/app/request-in-expire?requestId=${item._id}&billId=${bill._id}`;
+      const emailContent = NotifyExtendBill(
         `${item.user.userName}`,
         startDate,
         endDate,
@@ -107,9 +154,22 @@ const getListRequestStatus2AndSendMail = async () => {
   request.map((item) => sendEmailRequestStatus3(item));
 };
 
+const getListRequestStatus4AndSendMail = async () => {
+  const request = await RequestModel.find({
+    requestStatus: "4",
+  })
+    .populate("user", "userName fullName email phoneNumber address avatar")
+    .populate(
+      "car",
+      "carName color licensePlateNumber price carVersion images numberOfSeat"
+    );
+  request.map((item) => sendEmailRequestStatus6(item));
+};
+
 setInterval(async () => {
   try {
     getListRequestStatus2AndSendMail();
+    getListRequestStatus4AndSendMail();
   } catch (error) {}
 }, 10000);
 

@@ -110,6 +110,7 @@ const createCar = async (req, res) => {
     color,
     licensePlateNumber,
     numberOfSeat,
+    images,
     price,
     bunkBed,
     flue,
@@ -124,7 +125,7 @@ const createCar = async (req, res) => {
   if (req.files.length == 0) {
     const error = new Error("Please choose files");
     error.httpStatusCode = 400;
-    return res.status(301).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   } else {
     const arrImages = req.files.map((item) => {
       return `/images/${item.filename}`;
@@ -157,7 +158,7 @@ const getAllCarFree = async (req, res) => {
   if (data[0] && data[1]) {
     const listCarInAcceptRequest = await RequestModel.find(
       {
-        requestStatus: { $nin: ["1", "5"] },
+        requestStatus: { $nin: ["2", "7", "8", "5"] },
         $or: [
           {
             startDate: { $lte: data[0] },
@@ -188,7 +189,6 @@ const getAllCarFree = async (req, res) => {
         _id: { $nin: newArrStr },
         carStatus: false,
       }).populate("carType", "bunkBed flue transmissionType");
-      console.log(newArrStr);
       if (carList && carList.length > 0) {
         return res.status(200).json(carList);
       } else {
@@ -211,6 +211,46 @@ const getAllCarFree = async (req, res) => {
         });
       }
     }
+  }
+};
+
+const getBusyCar = async (req, res) => {
+  const data = req.query.key;
+  if (data[0] && data[1]) {
+    const listCarInAcceptRequest = await RequestModel.find(
+      {
+        requestStatus: { $nin: ["2", "7", "8", "5"] },
+        $or: [
+          {
+            startDate: { $lte: data[0] },
+            endDate: { $gte: data[0] },
+          },
+          {
+            startDate: { $lte: data[1] },
+            endDate: { $gte: data[1] },
+          },
+          {
+            startDate: { $gte: data[0] },
+            endDate: { $lte: data[1] },
+          },
+        ],
+      },
+      "car -_id"
+    );
+    if (listCarInAcceptRequest.length > 0) {
+      const arrStr = listCarInAcceptRequest.flatMap((item) =>
+        item.car.map((objectId) => objectId.toString())
+      );
+
+      const newArrStr = arrStr.filter(
+        (item, index) => arrStr.indexOf(item) == index
+      );
+      return res.status(200).json(newArrStr);
+    } else {
+      return res.status(200).json([]);
+    }
+  } else {
+    return res.status(400).json({ message: "Chưa có khoảng thời gian!!" });
   }
 };
 
@@ -291,4 +331,5 @@ module.exports = {
   getAllCarFree,
   updateCar,
   onDeleteCar,
+  getBusyCar,
 };

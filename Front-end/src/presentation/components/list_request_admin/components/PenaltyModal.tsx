@@ -23,8 +23,8 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
 }) => {
   const [billData, setBillData] = useState<BillModal | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [penaltyFee, setPenaltyFee] = useState<number | null>(null);
   const [form] = useForm();
+  const mortgateFee = 3000000
 
   useEffect(() => {
     if (visible && requestId) {
@@ -49,12 +49,9 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       const endDate = dayjs(requestResponse.data.bill.request.endDate);
       if (realTimeDrop && realTimeDrop.isAfter(endDate)) {
         const timeLate = realTimeDrop.diff(endDate, "hour");
-        console.log(timeLate)
         const defaultPenalty = timeLate * 500000; // Ví dụ: 50,000 VNĐ/ngày
-        setPenaltyFee(defaultPenalty);
         form.setFieldsValue({ penaltyFee: defaultPenalty });
       } else {
-        setPenaltyFee(0);
         form.setFieldsValue({ penaltyFee: 0 });
       }
     } catch (error) {
@@ -65,18 +62,74 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
     }
   };
 
-  const onSubmit = async (values: { penaltyFee: number }) => {
+  const onSubmit = async (values: { userPayStatus3: number }) => {
     setLoading(true);
     try {
       if (billData?._id) {
         const dataSubmit = {
           billId: billData?._id,
-          penaltyFee: values.penaltyFee
+          userPayStatus3: values.userPayStatus3
         }
         // Gửi dữ liệu lên server
-        await axiosInstance.put("/bill/adminUpdatePenaltyFee", dataSubmit)
+        await axiosInstance.put("/bill/userPayStatus3", dataSubmit)
           .then(res => {
-            toast.success("Cập nhật phí phạt thành công!");
+            toast.success(res.data.message);
+            form.resetFields();
+            onClose(); // Đóng modal
+            if (onSuccess) onSuccess(); // Gọi callback nếu có
+          }).catch(err => {
+            toast.error(err.response.data.message);
+          })
+      } else {
+        console.log("Have no bill")
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Đã có lỗi xảy ra, vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmit2 = async () => {
+    setLoading(true);
+    try {
+      if (billData?._id) {
+        const dataSubmit = {
+          billId: billData?._id,
+        }
+        // Gửi dữ liệu lên server
+        await axiosInstance.put("/bill/userStatus4", dataSubmit)
+          .then(res => {
+            toast.success(res.data.message);
+            form.resetFields();
+            onClose(); // Đóng modal
+            if (onSuccess) onSuccess(); // Gọi callback nếu có
+          }).catch(err => {
+            toast.error(err.response.data.message);
+          })
+      } else {
+        console.log("Have no bill")
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Đã có lỗi xảy ra, vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmit8 = async () => {
+    setLoading(true);
+    try {
+      if (billData?._id) {
+        const dataSubmit = {
+          billId: billData?._id,
+        }
+        // Gửi dữ liệu lên server
+        await axiosInstance.put("/bill/userStatus8", dataSubmit)
+          .then(res => {
+            toast.success(res.data.message);
             form.resetFields();
             onClose(); // Đóng modal
             if (onSuccess) onSuccess(); // Gọi callback nếu có
@@ -112,9 +165,28 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
             <p>{billData?.vatFee && billData?.vatFee.toLocaleString()} VNĐ</p>
           </div>
           <div>
-            <Text strong>Deposit Fee:</Text>
-            <p>{billData?.depositFee?.toLocaleString() || "Chưa có"} VNĐ</p>
+            <Text strong>Số tiền thuê xe:</Text>
+            <p>{billData?.totalCarFee && billData?.totalCarFee.toLocaleString()} VNĐ</p>
           </div>
+          <div>
+            <Text strong>Số tiền cọc: </Text>
+            <p>{mortgateFee.toLocaleString()} VNĐ</p>
+          </div>
+          {
+            billData?.request.requestStatus != "2" && billData?.request.requestStatus != "3" &&
+            <div>
+              <Text strong>Số tiền người dùng đã thanh toán:</Text>
+              <p>{billData?.userPayStatus3?.toLocaleString() || "Chưa có"} VNĐ</p>
+            </div>
+          }
+          {
+            billData?.request.requestStatus == "8" &&
+            <div>
+              <Text strong>Doanh thu:</Text>
+              <p>{((billData?.totalCarFee || 0) + (billData?.vatFee || 0)).toLocaleString() || "Chưa có"} VNĐ</p>
+            </div>
+          }
+
           <div>
             <Text strong>Thời gian trả xe thực tế:</Text>
             <p>
@@ -123,16 +195,37 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
                 : "Chưa có"}
             </p>
           </div>
+
+          {
+            billData?.request.requestStatus == "8" &&
+            <div>
+              <Text strong>Địa điểm trả xe thực tế:</Text>
+              <p>
+                {billData?.realLocationDrop
+                  ? billData.realLocationDrop
+                  : "Chưa có"}
+              </p>
+            </div>
+          }
+
           <div>
-            <Text strong>Địa điểm trả xe thực tế:</Text>
-            <p>{billData?.realLocationDrop || "Chưa có"}</p>
+            <Text strong>Địa điểm nhận xe</Text>
+            <p>{billData?.request.pickUpLocation || "Chưa có"}</p>
           </div>
           <div>
             <Text strong>Địa điểm trả xe dự kiến:</Text>
             <p>{billData?.request.dropLocation || "Chưa có"}</p>
           </div>
           <div>
-            <Text strong>Ngày kết thúc dự kiến:</Text>
+            <Text strong>Ngày bắt đầu :</Text>
+            <p>
+              {billData?.request?.startDate
+                ? dayjs(billData?.request?.startDate).format("DD/MM/YYYY HH:mm")
+                : "Chưa có"}
+            </p>
+          </div>
+          <div>
+            <Text strong>Ngày kết thúc :</Text>
             <p>
               {billData?.request?.endDate
                 ? dayjs(billData?.request?.endDate).format("DD/MM/YYYY HH:mm")
@@ -142,15 +235,15 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
         </div>
 
         {/* Hiển thị ảnh */}
-        {billData?.realImage && (
-          <div>
-            <Text strong>Ảnh xác nhận:</Text>
+        {billData?.realImage && (billData.request.requestStatus == "7" || billData.request.requestStatus == "8") && (
+          <div className="flex items-center">
+            <Text strong className="mr-3">Ảnh xác nhận:</Text>
             {
               billData.realImage.map((item, idx) => (
                 <Image
                   src={`http://localhost:3030${item}`}
                   alt={`Real Image`}
-                  className="w-10 h-10 object-cover rounded-md shadow-sm"
+                  className="w-10 h-10 object-cover rounded-md shadow-sm mr-3"
                   width={40}
                   height={40}
                 />
@@ -160,25 +253,24 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
           </div>
         )}
 
-        {/* Form nhập phí phạt */}
+        {/* Form submit tiền thanh toán */}
         {
-          billData?.request.requestStatus == "4" &&
+          billData?.request.requestStatus == "3" &&
           <Form form={form} onFinish={onSubmit} layout="vertical">
             <Form.Item
-              name="penaltyFee"
-              label={<span className="font-medium text-gray-700">Phí phạt (VNĐ)</span>}
+              name="userPayStatus3"
+              label={<span className="font-medium text-gray-700">Số tiền khách đã thanh toán : VND</span>}
               rules={[
-                { required: true, message: "Vui lòng nhập số tiền phạt" },
+                { required: true, message: "Vui lòng nhập số tiền Khách thanh toán" },
                 { type: "number", min: 0, message: "Phí phạt không thể âm" },
               ]}
             >
               <InputNumber
-                value={penaltyFee}
-                onChange={(value) => setPenaltyFee(value)}
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
                 className="w-full"
-                placeholder="Nhập số tiền phạt"
+                placeholder="Nhập số tiền khách thanh toán"
+                value={billData.totalCarFee + billData.vatFee + 3000000}
                 readOnly
               />
             </Form.Item>
@@ -191,12 +283,12 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
 
   return (
     <Modal
-      title={<span className="text-xl font-bold">Thông Tin Hóa Đơn và Phí Phạt</span>}
+      title={<span className="text-xl font-bold">Thông Tin Hóa Đơn</span>}
       open={visible}
       onCancel={onClose}
-      footer={billData?.request.requestStatus == "4" && [
-        <Button key="cancel" onClick={onClose} disabled={loading}>
-          Hủy
+      footer={billData?.request.requestStatus == "3" ? [
+        <Button key="cancel" onClick={() => onSubmit2()} disabled={loading}>
+          Người dùng không nhận xe
         </Button>,
         <Button
           key="submit"
@@ -207,6 +299,15 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
         >
           Xác nhận
         </Button>,
+      ] : billData?.request.requestStatus == "7" && [
+        <Button
+          key="submit"
+          type="primary"
+          loading={loading}
+          onClick={() => onSubmit8()}
+        >
+          Xác nhận tình trạng xe và trả cọc
+        </Button>
       ]}
       width={800}
       centered

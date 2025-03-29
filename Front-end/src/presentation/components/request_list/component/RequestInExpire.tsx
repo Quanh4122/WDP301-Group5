@@ -8,8 +8,11 @@ import { toast } from 'react-toastify';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AddressSearch from './AddressSearch';
 import dayjs from 'dayjs';
+import { BillModal } from '../../list_request_admin/Modals';
+import CarItemPayment from '../../checkout2/components/CarItemPayment';
 
 const RequestInExpire: React.FC = () => {
+    const [billData, setBillData] = useState<BillModal | undefined>(undefined);
     const [requestData, setRequestData] = useState<RequestModelFull | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -26,17 +29,18 @@ const RequestInExpire: React.FC = () => {
         const billId = queryParams.get('billId');
         setRequestId(requestId);
         setBillId(billId);
-        getRequestById(requestId);
+        getBillById(billId);
     }, [location.search]);
 
-    const getRequestById = async (requestId?: string | null) => {
+    const getBillById = async (requestId?: string | null) => {
         if (requestId) {
             try {
                 setLoading(true);
-                const res = await axiosInstance.get<RequestModelFull>('/request/getRequestById', {
+                const res = await axiosInstance.get('/bill/getBillById', {
                     params: { key: requestId },
                 });
-                setRequestData(res.data);
+                setBillData(res.data);
+                setRequestData(res.data.request)
             } catch (err) {
                 console.log(err);
                 toast.error('Không thể tải thông tin yêu cầu');
@@ -49,6 +53,10 @@ const RequestInExpire: React.FC = () => {
     const onChangeGetFile = ({ fileList }: any) => {
         const files: File[] = fileList.map((item: any) => item.originFileObj);
         setArrFile(files);
+    };
+
+    const displayMoney = (value: number): string => {
+        return value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
     };
 
     const onBooking = async (value: any) => {
@@ -90,6 +98,30 @@ const RequestInExpire: React.FC = () => {
                         <Spin size="large" />
                     </div>
                 )}
+
+                <div className="w-full">
+                    <div className="bg-white border-b-2 border-sky-500">
+                        <div><h4>Thông tin đơn thuê</h4></div>
+                        <div className="py-4">
+                            <div className="flex justify-between">
+                                <p>Email: </p><span>{billData?.request.emailRequest}</span>
+                            </div>
+                            <div className="flex justify-between border-b-2 border-gray-300">
+                                <p>Số điện thoại: </p><span>{billData?.request?.user.userName}</span>
+                            </div>
+                            <div className='mt-2'>
+                                {billData?.request.car && billData?.request.car.map((ele, inx) => (
+                                    <CarItemPayment
+                                        carData={ele}
+                                        key={inx}
+                                        small={true}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 <Form
                     form={form}

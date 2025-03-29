@@ -315,10 +315,32 @@ export const TranmissionType = [
   { lable: "Số sàn", value: false },
 ]
 
+export const statusRequestAdmin = [
+  { lable: "Đã cọc tiền giữ chỗ", value: "2" },
+  { lable: "Đến thời gian giao xe", value: "3" },
+  { lable: "Đã giao xe và nhận tiền", value: "4" },
+  { lable: "Khách hàng bỏ thuê xe", value: "5" },
+  { lable: "Đến thời gian trả xe", value: "6" },
+  { lable: "Đã trả xe chờ đánh giá", value: "7" },
+  { lable: "Hoàn thành nhận xe và thanh tóan", value: "8" },
+]
+
 export const statusRequestAdminView = [
-  { lable: "Trong thời gian thực hiện", value: "2" },
-  { lable: "Đợi người dùng trả xe", value: "3" },
-  { lable: "Đợi admin đánh giá", value: "4" },
-  { lable: "Chờ người dùng thanh toán", value: "5" },
-  { lable: "Đã thanh toán thành công", value: "6" },
+  { lable: "Đã cọc tiền giữ chỗ", value: "Đã cọc tiền giữ chỗ" },
+  { lable: "Đến thời gian giao xe", value: "Đến thời gian giao xe" },
+  { lable: "Đã giao xe và nhận tiền", value: "Đã giao xe và nhận tiền" },
+  { lable: "Khách hàng bỏ thuê xe", value: "Khách hàng bỏ thuê xe" },
+  { lable: "Đến thời gian trả xe", value: "Đến thời gian trả xe" },
+  { lable: "Đã trả xe chờ đánh giá", value: "Đã trả xe chờ đánh giá" },
+  { lable: "Hoàn thành nhận xe và thanh tóan", value: "Hoàn thành nhận xe và thanh tóan" },
+]
+
+export const statusRequestUser = [
+  { lable: "Đã cọc tiền", value: "2" },
+  { lable: "Đến thời gian nhận xe", value: "3" },
+  { lable: "Đang thuê xe", value: "4" },
+  { lable: "Bỏ thuê", value: "5" },
+  { lable: "Đến thời gian trả xe", value: "6" },
+  { lable: "Đã trả xe", value: "7" },
+  { lable: "Hoàn thành trả xe và thanh tóan", value: "8" },
 ]

@@ -20,5 +20,6 @@ router.put(
   CarController.updateCar
 );
 router.delete("/deleteCar/:carId", CarController.onDeleteCar);
+router.get("/getBusyCar", CarController.getBusyCar);
 
 module.exports = router;
