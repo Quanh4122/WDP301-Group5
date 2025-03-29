@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { statusRequestDriver } from "../../../constants";
 
 const DriverBill = () => {
   const [driverRequests, setDriverRequests] = useState([]);
@@ -19,32 +18,33 @@ const DriverBill = () => {
   const getRequestStatusLabel = (status) => {
     switch (Number(status)) {
       case 2:
-        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đang chạy</span>;
+        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đã nhận cọc</span>;
       case 3:
-        return <span className="text-green-600">Đến hạn trả xe</span>;
+        return <span className="text-green-600">Đến thời gian nhận xe</span>;
       case 4:
-        return <span className="text-green-600">Sau khi trả xe</span>;
+        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đang chạy</span>;
       case 5:
-        return <span className="text-green-600">Khách đã thanh toán, đơn hoàn tất</span>;
+        return <span className="text-red-600">Đã hủy</span>;
+      case 6:
+        return <span className="text-orange-600 bg-orange-200 px-2 py-1 rounded-full">Đến thời gian trả xe</span>;
+      case 7:
+        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đã trả xe</span>;
+      case 8:
+        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đã thanh toán, đơn hoàn tất</span>;
       default:
         return <span className="text-red-600">Không xác định</span>;
     }
   };
 
   useEffect(() => {
-    console.log("Auth State:", { isLoggedIn, user, driverId });
-
     const fetchRequests = async () => {
-      console.log("Fetching requests for driverId:", driverId);
       setIsLoading(true);
       try {
         const response = await axios.get(
           `http://localhost:3030/request/getRequestsByDriverId?driverId=${driverId}`
         );
-        console.log("API Response:", response.data);
         setDriverRequests(response.data);
       } catch (err) {
-        console.error("Fetch Error:", err.response || err);
         setError(err.response?.data?.message || "Error fetching requests");
       } finally {
         setIsLoading(false);
@@ -65,10 +65,8 @@ const DriverBill = () => {
       const response = await axios.get(
         `http://localhost:3030/getUserById?key=${userId}`
       );
-      console.log("User Details Response:", response.data);
       setUserDetails(response.data);
     } catch (err) {
-      console.error("User Fetch Error:", err.response || err);
       setUserError(err.response?.data?.message || "Error fetching user details");
     } finally {
       setUserLoading(false);
@@ -91,9 +89,74 @@ const DriverBill = () => {
     setUserError(null);
   };
 
-  // Separate active (status 2) and other requests
-  const activeRequests = driverRequests.filter((req) => Number(req.requestStatus) === 2);
-  const otherRequests = driverRequests.filter((req) => Number(req.requestStatus) !== 2);
+  // Chia danh sách theo nhóm trạng thái
+  const runningRequests = driverRequests.filter((req) => Number(req.requestStatus) === 4);
+  const activeRequests = driverRequests.filter((req) => [2, 3].includes(Number(req.requestStatus)));
+  const pendingReturnRequests = driverRequests.filter((req) => Number(req.requestStatus) === 6);
+  const completedRequests = driverRequests.filter((req) => [7, 8].includes(Number(req.requestStatus)));
+  const canceledRequests = driverRequests.filter((req) => Number(req.requestStatus) === 5);
+  const unknownRequests = driverRequests.filter((req) => ![2, 3, 4, 5, 6, 7, 8].includes(Number(req.requestStatus)));
+
+  // Hàm render bảng dữ liệu
+  const renderTable = (requests, title, isHighlighted = false, showId = true) => {
+    if (requests.length === 0) return null;
+    return (
+      <div className={`mb-8 ${isHighlighted ? "border-2 border-green-500 rounded-lg shadow-xl bg-green-50" : ""}`}>
+        <h2
+          className={`text-2xl font-semibold mb-4 ${
+            isHighlighted ? "text-green-700 inline-block px-4 py-2 rounded-md" : "text-gray-800"
+          }`}
+        >
+          {title}
+        </h2>
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  {showId && <th className="py-4 px-6">ID</th>}
+                  <th className="py-4 px-6">Người Dùng</th>
+                  <th className="py-4 px-6">Ngày Bắt Đầu</th>
+                  <th className="py-4 px-6">Ngày Kết Thúc</th>
+                  <th className="py-4 px-6">Trạng Thái</th>
+                  <th className="py-4 px-6">Hành Động</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {requests.map((request, index) => (
+                  <tr key={request._id} className="hover:bg-gray-50 transition-colors duration-200">
+                    {showId && <td className="py-4 px-6 text-gray-900 font-medium">{index + 1}</td>}
+                    <td className="py-4 px-6 text-gray-700">{request.user?.userName || "N/A"}</td>
+                    <td className="py-4 px-6 text-gray-700">
+                      {request.startDate
+                        ? new Date(request.startDate).toLocaleDateString("vi-VN")
+                        : "N/A"}
+                    </td>
+                    <td className="py-4 px-6 text-gray-700">
+                      {request.endDate
+                        ? new Date(request.endDate).toLocaleDateString("vi-VN")
+                        : "N/A"}
+                    </td>
+                    <td className="py-4 px-6 text-gray-700">
+                      {getRequestStatusLabel(request.requestStatus)}
+                    </td>
+                    <td className="py-4 px-6">
+                      <button
+                        onClick={() => showRequestDetails(request)}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Xem chi tiết
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (!isLoggedIn || !driverId) {
     return (
@@ -153,116 +216,20 @@ const DriverBill = () => {
           <h1 className="text-4xl font-extrabold text-gray-900">Yêu Cầu Của Tôi</h1>
         </header>
 
-        {/* Active Requests Section */}
-        {activeRequests.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Đang Chạy</h2>
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      <th className="py-4 px-6">ID</th>
-                      <th className="py-4 px-6">Người Dùng</th>
-                      <th className="py-4 px-6">Ngày Bắt Đầu</th>
-                      <th className="py-4 px-6">Ngày Kết Thúc</th>
-                      <th className="py-4 px-6">Trạng Thái</th>
-                      <th className="py-4 px-6">Hành Động</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {activeRequests.map((request, index) => (
-                      <tr key={request._id} className="hover:bg-gray-50 transition-colors duration-200">
-                        <td className="py-4 px-6 text-gray-900 font-medium">{index + 1}</td>
-                        <td className="py-4 px-6 text-gray-700">{request.user?.userName || "N/A"}</td>
-                        <td className="py-4 px-6 text-gray-700">
-                          {request.startDate
-                            ? new Date(request.startDate).toLocaleDateString("vi-VN")
-                            : "N/A"}
-                        </td>
-                        <td className="py-4 px-6 text-gray-700">
-                          {request.endDate
-                            ? new Date(request.endDate).toLocaleDateString("vi-VN")
-                            : "N/A"}
-                        </td>
-                        <td className="py-4 px-6 text-gray-700">
-                          {statusRequestDriver.find(val => val.value == request.requestStatus).lable}
-                        </td>
-                        <td className="py-4 px-6">
-                          <button
-                            onClick={() => showRequestDetails(request)}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            Xem chi tiết
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Render các nhóm trạng thái */}
+        {renderTable(runningRequests, "Đang Chạy", true, false)} {/* Bỏ ID */}
+        {renderTable(activeRequests, "Yêu Cầu Sắp Tới")}
+        {renderTable(pendingReturnRequests, "Yêu Cầu Chờ Trả Xe")}
+        {renderTable(completedRequests, "Yêu Cầu Hoàn Tất")}
+        {renderTable(canceledRequests, "Yêu Cầu Đã Hủy")}
+        {renderTable(unknownRequests, "Yêu Cầu Không Xác Định")}
 
-        {/* Other Requests Section */}
-        {otherRequests.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Yêu Cầu Cũ</h2>
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      <th className="py-4 px-6">ID</th>
-                      <th className="py-4 px-6">Người Dùng</th>
-                      <th className="py-4 px-6">Ngày Bắt Đầu</th>
-                      <th className="py-4 px-6">Ngày Kết Thúc</th>
-                      <th className="py-4 px-6">Trạng Thái</th>
-                      <th className="py-4 px-6">Hành Động</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {otherRequests.map((request, index) => (
-                      <tr key={request._id} className="hover:bg-gray-50 transition-colors duration-200">
-                        <td className="py-4 px-6 text-gray-900 font-medium">{index + 1}</td>
-                        <td className="py-4 px-6 text-gray-700">{request.user?.userName || "N/A"}</td>
-                        <td className="py-4 px-6 text-gray-700">
-                          {request.startDate
-                            ? new Date(request.startDate).toLocaleDateString("vi-VN")
-                            : "N/A"}
-                        </td>
-                        <td className="py-4 px-6 text-gray-700">
-                          {request.endDate
-                            ? new Date(request.endDate).toLocaleDateString("vi-VN")
-                            : "N/A"}
-                        </td>
-                        <td className="py-4 px-6 text-gray-700">
-                          {getRequestStatusLabel(request.requestStatus)}
-                        </td>
-                        <td className="py-4 px-6">
-                          <button
-                            onClick={() => showRequestDetails(request)}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            Xem chi tiết
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
+        {/* Modal chi tiết */}
         {selectedRequest && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-2xl max-h-[80vh] overflow-y-auto animate-modal-open">
               <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">Chi Tiết Yêu Cầu</h2>
               
-              {/* Thông Tin Người Đặt */}
               <div className="mb-6">
                 <h3 className="text-xl font-semibold text-gray-700 mb-3">Thông Tin Người Đặt</h3>
                 {userLoading ? (
@@ -280,7 +247,6 @@ const DriverBill = () => {
                 )}
               </div>
 
-              {/* Thông Tin Chuyến Xe */}
               <div className="mb-6 border-t pt-4">
                 <h3 className="text-xl font-semibold text-gray-700 mb-3">Thông Tin Chuyến Xe</h3>
                 <ul className="space-y-2">
@@ -293,7 +259,6 @@ const DriverBill = () => {
                 </ul>
               </div>
 
-              {/* Thông Tin Xe */}
               <div className="border-t pt-4">
                 <h3 className="text-xl font-semibold text-gray-700 mb-3">Thông Tin Xe</h3>
                 {selectedRequest.car?.length > 0 ? (
@@ -320,7 +285,6 @@ const DriverBill = () => {
         )}
       </div>
 
-      {/* CSS Inline cho hoạt ảnh */}
       <style jsx>{`
         .animate-modal-open {
           animation: fadeInUp 0.3s ease-out;
