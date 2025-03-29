@@ -40,6 +40,10 @@ router.get("/rejected-drivers", verifyToken, verifyAdmin, userController.getReje
 
 router.put("/update-role/:userId", verifyToken, verifyAdmin, userController.updateUserRole);
 
+router.get("/get-applications-byUser/:userId", verifyToken, userController.getApplicationByUserId);
+
+router.put("/update-pending-application/:userId", verifyToken, upload.single("driversLicensePhoto"), userController.updatePendingApplication)
+
 
 
 module.exports = router;

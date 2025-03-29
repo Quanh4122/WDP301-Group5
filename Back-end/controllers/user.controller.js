@@ -875,6 +875,135 @@ const getUsersAndDrivers = async (req, res) => {
   }
 };
 
+const getApplicationByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Kiểm tra xem userId có được cung cấp không
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        message: "User ID là bắt buộc",
+      });
+    }
+
+    // Tìm user trong database
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy người dùng",
+      });
+    }
+
+
+    const driverApplication = await DriverApplicationModel.findOne(
+      { user: userId },
+      'status appliedAt experience licenseNumber'
+    );
+    
+    if (!driverApplication) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy đơn ứng tuyển tài xế cho người dùng này",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Lấy thông tin đơn ứng tuyển tài xế thành công",
+      data: {
+        userId: user._id,
+        applicationStatus: driverApplication.status,
+        appliedAt: driverApplication.appliedAt,
+        experience: driverApplication.experience,
+        licenseNumber: driverApplication.licenseNumber,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error getting driver application:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi server, vui lòng thử lại sau",
+    });
+  }
+};
+
+const updatePendingApplication = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { licenseNumber, experience } = req.body;
+
+    // Kiểm tra xem userId có được cung cấp không
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        message: "User ID là bắt buộc",
+      });
+    }
+
+    // Tìm user trong database
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy người dùng",
+      });
+    }
+
+    // Tìm ứng tuyển đang ở trạng thái pending
+    const driverApplication = await DriverApplicationModel.findOne({
+      user: userId,
+      status: { $in: ["pending", "rejected"] } // Allow both statuses
+    });
+
+    if (!driverApplication) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy đơn",
+      });
+    }
+
+    // Cập nhật các trường nếu được cung cấp
+    if (licenseNumber) {
+      driverApplication.licenseNumber = licenseNumber;
+    }
+    if (experience) {
+      driverApplication.experience = experience;
+    }
+    // Nếu có file upload mới (giấy phép lái xe)
+    if (req.file) {
+      driverApplication.driversLicensePhoto = `/images/${req.file.filename}`;
+    }
+
+    // Lưu thay đổi
+    await driverApplication.save();
+
+    return res.status(200).json({
+      status: "success",
+      message: "Cập nhật đơn ứng tuyển tài xế thành công",
+      data: {
+        userId: user._id,
+        applicationStatus: driverApplication.status,
+        appliedAt: driverApplication.appliedAt,
+        updatedFields: {
+          licenseNumber: driverApplication.licenseNumber,
+          experience: driverApplication.experience,
+          driversLicensePhoto: driverApplication.driversLicensePhoto
+        }
+      },
+    });
+
+  } catch (error) {
+    console.error("Error updating driver application:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi server, vui lòng thử lại sau",
+    });
+  }
+};
+
 // [POST] Đăng ký ứng tuyển driver
 const applyForDriver = async (req, res) => {
   try {
@@ -905,15 +1034,7 @@ const applyForDriver = async (req, res) => {
       });
     }
 
-    const existingApplication = await DriverApplicationModel.findOne({
-      user: userId,
-    });
-    if (existingApplication) {
-      return res.status(400).json({
-        status: "error",
-        message: "Bạn đã nộp đơn ứng tuyển tài xế trước đó",
-      });
-    }
+
 
     // Tạo mới driver application với đường dẫn ảnh
     const driverApplication = new DriverApplicationModel({
@@ -951,7 +1072,7 @@ const approveDriverApplication = async (req, res) => {
     const { status } = req.body;
 
     if (!["approved", "rejected"].includes(status)) {
-      return res.status(400).json({
+      return res.status(4000).json({
         status: "error",
         message: "Status must be either 'approved' or 'rejected'",
       });
@@ -960,6 +1081,7 @@ const approveDriverApplication = async (req, res) => {
     const driverApplication = await DriverApplicationModel.findOne({
       user: userId,
     });
+    console.log("test",driverApplication)
     if (!driverApplication || driverApplication.status !== "pending") {
       return res.status(400).json({
         status: "error",
@@ -1171,4 +1293,6 @@ module.exports = {
   getRejectedDriverApplications,
   getUsersAndDrivers,
   updateUserRole,
+  getApplicationByUserId,
+  updatePendingApplication
 };

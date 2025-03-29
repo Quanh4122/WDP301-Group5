@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { statusRequestDriver } from "../../../constants";
 
 const DriverBill = () => {
   const [driverRequests, setDriverRequests] = useState([]);
@@ -185,7 +186,7 @@ const DriverBill = () => {
                             : "N/A"}
                         </td>
                         <td className="py-4 px-6 text-gray-700">
-                          {getRequestStatusLabel(request.requestStatus)}
+                          {statusRequestDriver.find(val => val.value == request.requestStatus).lable}
                         </td>
                         <td className="py-4 px-6">
                           <button

@@ -245,6 +245,13 @@ const slice = createSlice({
   name: "Authentication",
   initialState,
   reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    resetApplicationData: (state) => {
+      state.applicationStatus = null;
+      state.applicationData = null;
+    },
     updateIsLoading(state, action) {
       state.isLoading = action.payload.isLoading;
       state.error = action.payload.error;
@@ -421,10 +428,47 @@ const slice = createSlice({
       .addCase(updateUserRole.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(getApplicationByUserId.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getApplicationByUserId.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Check if data exists and has applicationStatus
+        if (action.payload.data && action.payload.data.applicationStatus) {
+          state.applicationStatus = action.payload.data.applicationStatus;
+          state.applicationData = action.payload.data;
+        } else {
+          // Reset state if no application exists
+          state.applicationStatus = null;
+          state.applicationData = null;
+        }
+      })
+      .addCase(getApplicationByUserId.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload.message;
+        // Reset application data on rejection (e.g., 404 not found)
+        state.applicationStatus = null;
+        state.applicationData = null;
+      })
+
+      // Update Pending Application
+      .addCase(updatePendingApplication.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updatePendingApplication.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.applicationStatus = action.payload.data.applicationStatus;
+        state.applicationData = action.payload.data;
+      })
+      .addCase(updatePendingApplication.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload.message;
       });
   },
 });
-
 export default slice.reducer;
 
 export function FetchUsersAndDrivers() {
@@ -730,3 +774,38 @@ export function LogoutUser() {
     dispatch(slice.actions.signOut());
   };
 }
+
+export const getApplicationByUserId = createAsyncThunk(
+  'auth/getApplicationByUserId',
+  async ({ userId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/get-applications-byUser/${userId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: 'Something went wrong' });
+    }
+  }
+);
+
+export const updatePendingApplication = createAsyncThunk(
+  'auth/updatePendingApplication',
+  async (data, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('licenseNumber', data.licenseNumber);
+      formData.append('experience', data.experience);
+      if (data.driversLicensePhoto) {
+        formData.append('driversLicensePhoto', data.driversLicensePhoto);
+      }
+
+      const response = await axios.put(`/update-pending-application/${data.userId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: 'Something went wrong' });
+    }
+  }
+);
