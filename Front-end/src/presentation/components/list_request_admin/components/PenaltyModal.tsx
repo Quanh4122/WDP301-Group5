@@ -26,6 +26,11 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
   const [form] = useForm();
   const mortgateFee = 3000000
 
+  const [money, setMoney] = useState(0);
+
+
+
+
   useEffect(() => {
     if (visible && requestId) {
       fetchData(requestId);
@@ -35,21 +40,21 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
   const fetchData = async (requestId: string) => {
     setLoading(true);
     try {
-
-      // Lấy dữ liệu Request
       const requestResponse = await axiosInstance.get("/bill/getBillByReuqestId", {
         params: { key: requestId },
       });
       setBillData(requestResponse.data.bill);
+      const calculatedMoney = requestResponse.data.bill.vatFee + requestResponse.data.bill.totalCarFee + 3000000;
+      setMoney(calculatedMoney);
+      form.setFieldsValue({ userPayStatus3: calculatedMoney }); // Đồng bộ với form
 
-      // Tính toán phí phạt mặc định nếu realTimeDrop muộn hơn endDate
       const realTimeDrop = requestResponse.data.bill.realTimeDrop
         ? dayjs(requestResponse.data.bill.realTimeDrop)
         : null;
       const endDate = dayjs(requestResponse.data.bill.request.endDate);
       if (realTimeDrop && realTimeDrop.isAfter(endDate)) {
         const timeLate = realTimeDrop.diff(endDate, "hour");
-        const defaultPenalty = timeLate * 500000; // Ví dụ: 50,000 VNĐ/ngày
+        const defaultPenalty = timeLate * 500000;
         form.setFieldsValue({ penaltyFee: defaultPenalty });
       } else {
         form.setFieldsValue({ penaltyFee: 0 });
@@ -61,6 +66,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
       setLoading(false);
     }
   };
+
 
   const onSubmit = async (values: { userPayStatus3: number }) => {
     setLoading(true);
@@ -269,8 +275,7 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 parser={(value) => value?.replace(/\$\s?|(,*)/g, "") as any}
                 className="w-full"
-                placeholder="Nhập số tiền khách thanh toán"
-                value={billData.totalCarFee + billData.vatFee + 3000000}
+                placeholder="Số tiền khách thanh toán"
                 readOnly
               />
             </Form.Item>
