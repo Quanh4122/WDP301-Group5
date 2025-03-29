@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RequestModelFull } from "../../checkout/models";
 import dayjs from "dayjs";
-import { statusRequest, statusRequestAdminView } from "../../../../constants";
+import { statusRequest, statusRequestAdminView, statusRequestUser } from "../../../../constants";
 import PersonIcon from '@mui/icons-material/Person';
 import DetailRequestItem from "./DetailRequestItem";
 import { Button, Divider } from "antd";
@@ -27,7 +27,9 @@ const RequestItem = ({ requestModel }: Props) => {
             <div className="p-4 border-b flex items-center justify-between">
                 <div className="font-semibold text-lg">
                     <div className="text-sm text-gray-600">{dayjs(requestModel.timeCreated).format("DD/MM/YYYY")}</div>
-                    <div className="text-sm text-blue-600">{statusRequestAdminView.find((dt) => dt.value == requestModel.requestStatus)?.lable}</div> {/* Blue text */}
+                    <div className="text-sm text-blue-600">{
+                        statusRequestUser.find((dt) => dt.value == requestModel.requestStatus)?.lable}
+                    </div> {/* Blue text */}
                 </div>
                 <Button onClick={() => setIsOpen(true)}>Xem chi tiết</Button>
             </div>

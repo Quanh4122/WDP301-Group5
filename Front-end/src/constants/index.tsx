@@ -334,3 +334,13 @@ export const statusRequestAdminView = [
   { lable: "Đã trả xe chờ đánh giá", value: "Đã trả xe chờ đánh giá" },
   { lable: "Hoàn thành nhận xe và thanh tóan", value: "Hoàn thành nhận xe và thanh tóan" },
 ]
+
+export const statusRequestUser = [
+  { lable: "Đã cọc tiền", value: "2" },
+  { lable: "Đến thời gian nhận xe", value: "3" },
+  { lable: "Đang thuê xe", value: "4" },
+  { lable: "Bỏ thuê", value: "5" },
+  { lable: "Đến thời gian trả xe", value: "6" },
+  { lable: "Đã trả xe", value: "7" },
+  { lable: "Hoàn thành trả xe và thanh tóan", value: "8" },
+]
