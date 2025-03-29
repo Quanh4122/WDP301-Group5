@@ -134,6 +134,9 @@ const InforPaymentCar = ({ requestData, handleNext, handleGetData }: props) => {
                             toast.error(err.response.data.message)
                         )
                 }
+                else {
+                    handleSetData();
+                }
             } else {
                 toast.error("Có xe đã được thuê trong khoảng thời gian bạn muốn thuê")
             }
