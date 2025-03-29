@@ -36,15 +36,15 @@ const ListRequestPending = ({ requestList }: Props) => {
         // Có thể reload dữ liệu hoặc điều hướng
     };
 
-    const getAvatarUrl = (avatar:any) => {
+    const getAvatarUrl = (avatar: any) => {
         if (!avatar || avatar.trim() === "") {
-          return null; // Không có ảnh, sẽ dùng icon
+            return null; // Không có ảnh, sẽ dùng icon
         }
         if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
-          return avatar; // URL tuyệt đối từ Google hoặc bên ngoài
+            return avatar; // URL tuyệt đối từ Google hoặc bên ngoài
         }
         return `http://localhost:3030${avatar.startsWith("/") ? "" : "/"}${avatar}`; // Ảnh từ backend
-      };
+    };
 
     return (
         <div className="w-full mt-5">
@@ -62,7 +62,7 @@ const ListRequestPending = ({ requestList }: Props) => {
                             ) : (
                                 <PersonIcon className="w-12 h-12 text-blue-500" /> // Light blue icon
                             )}
-                            
+
                             <div>
                                 <div className="font-semibold text-blue-700">{item.user?.userName}</div> {/* Blue text */}
                                 <div className="text-sm text-gray-500">{item.user?.email}</div>
@@ -107,12 +107,19 @@ const ListRequestPending = ({ requestList }: Props) => {
                                         <div className="text-sm text-gray-600">Số chỗ: {carItem.numberOfSeat}</div>
                                         <div className="text-sm text-gray-600">Biển số: {carItem.licensePlateNumber}</div>
                                         <div className="text-sm text-gray-600">
-                                            {(carItem.price).toLocaleString('vi-VN', {
+                                            Giá 1h: {(carItem.price).toLocaleString('vi-VN', {
                                                 style: 'currency',
                                                 currency: 'VND',
                                             })}
                                             /h
                                         </div>
+                                        {
+                                            item.driver && item.driver.length > 0 &&
+                                            <div className="text-sm text-gray-600">
+                                                Tài xế: {item.driver[carIndex].userName}
+                                            </div>
+                                        }
+
                                     </div>
                                 </div>
                             </div>

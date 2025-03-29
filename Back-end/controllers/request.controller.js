@@ -56,7 +56,8 @@ const getListRequest = async (req, res) => {
       .populate(
         "car",
         "carName color licensePlateNumber price carVersion images numberOfSeat"
-      );
+      )
+      .populate("driver", "userName fullName email phoneNumber address avatar");
     return res.status(200).json(requestList);
   } catch (error) {
     console.log(error);
@@ -167,7 +168,8 @@ const listAdminAcceptRequest = async (req, res) => {
       .populate(
         "car",
         "carName color licensePlateNumber price carVersion images numberOfSeat"
-      );
+      )
+      .populate("driver", "userName fullName email phoneNumber address avatar");
     return res.status(200).json(requestList);
   } catch (error) {
     console.log(error);
