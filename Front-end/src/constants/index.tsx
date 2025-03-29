@@ -344,3 +344,12 @@ export const statusRequestUser = [
   { lable: "Đã trả xe", value: "7" },
   { lable: "Hoàn thành trả xe và thanh tóan", value: "8" },
 ]
+export const statusRequestDriver = [
+  { lable: "Đã cọc tiền", value: "2" },
+  { lable: "Đến thời gian nhận xe", value: "3" },
+  { lable: "Đang chạy", value: "4" },
+  { lable: "Bỏ thuê", value: "5" },
+  { lable: "Đến thời gian trả xe", value: "6" },
+  { lable: "Đã trả xe", value: "7" },
+  { lable: "Hoàn thành trả xe và thanh tóan", value: "8" },
+]
