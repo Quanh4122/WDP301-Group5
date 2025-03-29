@@ -85,7 +85,7 @@ const InforPaymentCar = ({ requestData, handleNext, handleGetData }: props) => {
         setTotalTime(val);
         setTotalPriceCar(arrPrice * val);
         setVATFee(arrPrice * val * 0.1);
-
+        setTotalFee(arrPrice * val + arrPrice * val * 0.1)
     }, [timeValue, dateValue, arrPrice]);
 
     const validateForm = () => {

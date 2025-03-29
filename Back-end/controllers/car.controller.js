@@ -247,9 +247,7 @@ const getBusyCar = async (req, res) => {
       );
       return res.status(200).json(newArrStr);
     } else {
-      return res
-        .status(200)
-        .json([]);
+      return res.status(200).json([]);
     }
   } else {
     return res.status(400).json({ message: "Chưa có khoảng thời gian!!" });
