@@ -72,12 +72,11 @@ const CarItem = ({ carModel }: Props) => {
                     </h3>
                     <div className="flex items-center justify-end">
                         <p className="text-md font-bold text-sky-500">
-                            <span className="text-base line-through text-gray-500 mr-1">440K</span>
-                            {carModel?.price}K / 1 Ngày
+                            {carModel?.price.toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            })} / 1 Ngày
                         </p>
-                    </div>
-                    <div className="flex items-center justify-end mt-2">
-                        <p className="text-md font-bold text-gray-800">2 ngày 4 giờ</p>
                     </div>
                     <div className="flex items-center justify-end mt-2">
                         <p className="text-xs text-gray-800">Giá tạm tính chưa bao gồm VAT</p>

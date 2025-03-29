@@ -82,7 +82,7 @@ interface Car {
 
 interface CarTableProps {
   cars: Car[];
-  busy?: string[];
+  busy: string[];
   onEdit: (car: Car) => void;
   onDelete?: (carId: string) => Promise<any>;
   onCreate?: () => void;
