@@ -95,7 +95,7 @@ const sendEmailRequestStatus3 = async (item) => {
       );
       await mailService.sendEmail({
         to: item.user.email,
-        subject: "Thông báo yêu cầu đặt xe",
+        subject: "Thông báo từ B-car",
         html: emailContent,
       });
     }
@@ -135,7 +135,7 @@ const sendEmailRequestStatus6 = async (item) => {
       );
       await mailService.sendEmail({
         to: item.user.email,
-        subject: "Thông báo yêu cầu đặt xe",
+        subject: "Thông báo từ B-Car",
         html: emailContent,
       });
     }
