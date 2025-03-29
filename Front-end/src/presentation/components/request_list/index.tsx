@@ -110,7 +110,7 @@ const RequestList: React.FC = () => {
                         onClick={() => setDisplay(!display)}
                         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
                     >
-                        <span>{display ? "Xem danh sách" : "Xem chi tiết đang đặt"}</span>
+                        <span>{display ? "Xem chi tiết đang đặt" : "Xem danh sách"}</span>
                     </Button>
                 }
                 {display && requestInPending && requestInPending.length > 0 && (

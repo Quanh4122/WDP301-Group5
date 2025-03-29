@@ -59,9 +59,9 @@ const RequestItem = ({ requestModel }: Props) => {
                             Số chỗ: {item.numberOfSeat} | Biển số: {item.licensePlateNumber}
                         </div>
                         {
-                            requestModel.driver && requestModel.driver.length > 0 &&
+                            requestModel?.driver && requestModel?.driver?.length > 0 &&
                             <div className="text-sm text-gray-600">
-                                Tài xế lái: {requestModel.driver[index].userName}
+                                Tài xế lái: {requestModel?.driver[index]?.userName}
                             </div>
                         }
 
