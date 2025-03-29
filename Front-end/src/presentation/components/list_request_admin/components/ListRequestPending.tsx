@@ -114,9 +114,9 @@ const ListRequestPending = ({ requestList }: Props) => {
                                             /h
                                         </div>
                                         {
-                                            item.driver && item.driver.length > 0 &&
+                                            item.driver && item.driver?.length > 0 &&
                                             <div className="text-sm text-gray-600">
-                                                Tài xế: {item.driver[carIndex].userName}
+                                                Tài xế: {item?.driver[carIndex]?.userName}
                                             </div>
                                         }
 

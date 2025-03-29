@@ -61,7 +61,7 @@ const RequestItem = ({ requestModel }: Props) => {
                         {
                             requestModel.driver && requestModel.driver.length > 0 &&
                             <div className="text-sm text-gray-600">
-                                Tài xế lái: {requestModel.driver[index].userName}
+                                Tài xế lái: {requestModel?.driver[index]?.userName}
                             </div>
                         }
 
