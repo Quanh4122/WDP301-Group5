@@ -79,12 +79,7 @@ const RequestItem = ({ requestModel }: Props) => {
 
             {/* Total */}
             <div className="p-4 flex justify-end">
-                <div className="font-semibold text-lg">
-                    Tổng: {(requestModel.car.reduce((acc, car) => acc + car.price, 0)).toLocaleString('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND'
-                    })}
-                </div>
+
             </div>
 
             {/* Detail Modal */}
