@@ -72,7 +72,7 @@ const DetailRequestItem = ({ isOpen, onCancel, title, detailRequest }: Props) =>
                             <span className="font-semibold">{startDate ?? "N/A"}</span>
                         </Descriptions.Item>
                         <Descriptions.Item label="Ngày trả ">
-                            <span className="font-semibold">{dayjs(billData?.realTimeDrop).format("HH:mm DD/MM/YYYY") ?? dayjs(billData?.request.endDate).format("HH:mm DD/MM/YYYY")}</span>
+                            <span className="font-semibold">{dayjs(billData?.request.endDate).format("HH:mm DD/MM/YYYY")}</span>
                         </Descriptions.Item>
                         <Descriptions.Item label="Thuế VAT">
                             <span className="font-semibold">{formattedCurrency(billData?.vatFee)}</span>

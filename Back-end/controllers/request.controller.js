@@ -291,7 +291,7 @@ const handleCheckRequest = async (req, res) => {
     const listReqInRangeTime = await RequestModel.find(
       {
         _id: { $ne: dataRequest._id },
-        requestStatus: { $nin: ["3", "4", "6"] },
+        requestStatus: { $in: ["3", "4", "6"] },
         $and: [
           { startDate: { $lt: dt.endDate } },
           { endDate: { $gt: dt.startDate } },
