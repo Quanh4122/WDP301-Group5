@@ -14,7 +14,6 @@ import Review from './components/Review';
 import AppTheme from '../shared-theme/AppTheme';
 import { RequestModelFull, RequestUserBookingToBill } from '../checkout/models';
 import InforPaymentCar from './components/InfoPaymentCar';
-import { ToastContainer } from 'react-toastify';
 import PaymentDeposit from './components/PaymentDeposit';
 
 interface Props {
@@ -52,7 +51,6 @@ const Checkout2 = ({ requestModal }: Props) => {
   }
   return (
     <AppTheme>
-      <ToastContainer />
       <Grid
         container
         sx={{
