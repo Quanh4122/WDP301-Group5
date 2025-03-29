@@ -35,7 +35,7 @@ const InforPaymentCar = ({ requestData, handleNext, handleGetData }: props) => {
     ]);
 
     const [timeValue, setTimeValue] = useState<string[]>([
-        `${dayjs().hour()}:00`,
+        `${dayjs().add(2, 'hour').hour()}:00`,
         `${dayjs().hour()}:00`,
     ]);
     const depositFee = 500000
