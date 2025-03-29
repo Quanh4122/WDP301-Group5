@@ -125,13 +125,14 @@ const InforPaymentCar = ({ requestData, handleNext, handleGetData }: props) => {
             const dataDuplicate = await axiosInstance.post("/request/handleCheckAdminAcceptRequest", dataCheckRequest);
             setDataCheck(dataDuplicate.data);
             if (!dataDuplicate.data.isExisted) {
-                handleSetData()
                 if (form.getFieldValue('isRequestDriver') == true) {
                     await axiosInstance.post('/request/handleCheckDriver', dataCheckRequest)
                         .then(res => {
                             handleSetData()
                         })
-                        .catch(err => console.log(err))
+                        .catch(err =>
+                            toast.error(err.response.data.message)
+                        )
                 }
             } else {
                 toast.error("Có xe đã được thuê trong khoảng thời gian bạn muốn thuê")
