@@ -11,7 +11,7 @@ module.exports = (
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Sắp đến thời hạn trả xe</title>
+            <title>Sắp đến thời hạn nhận xe</title>
             <style>
                 * {
                     margin: 0;
@@ -133,7 +133,7 @@ module.exports = (
         <body>
             <div class="container">
                 <div class="header">
-                    <h2>Thông báo đặt xe</h2>
+                    <h2>Thông báo nhận xe</h2>
                 </div>
                 <div class="content">
                     <p class="greeting">Chào bạn, ${name},</p>

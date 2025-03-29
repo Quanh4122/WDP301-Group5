@@ -126,7 +126,7 @@ module.exports = (name, start, end, pickUplocation, dropLocation, link) => {
       <body>
           <div class="container">
               <div class="header">
-                  <h2>Thông báo trả xe xe</h2>
+                  <h2>Thông báo trả xe</h2>
               </div>
               <div class="content">
                   <p class="greeting">Chào bạn, ${name},</p>
