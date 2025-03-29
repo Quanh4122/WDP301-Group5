@@ -50,7 +50,6 @@ const Checkout2 = ({ requestModal }: Props) => {
     handleNext()
   }
   return (
-    <AppTheme>
       <Grid
         container
         sx={{
@@ -218,7 +217,6 @@ const Checkout2 = ({ requestModal }: Props) => {
         </Grid>
       </Grid>
 
-    </AppTheme>
   );
 }
 
