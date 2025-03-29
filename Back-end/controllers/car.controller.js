@@ -158,7 +158,7 @@ const getAllCarFree = async (req, res) => {
   if (data[0] && data[1]) {
     const listCarInAcceptRequest = await RequestModel.find(
       {
-        requestStatus: { $nin: ["1", "6"] },
+        requestStatus: { $nin: ["2", "7", "8", "5"] },
         $or: [
           {
             startDate: { $lte: data[0] },
@@ -211,6 +211,35 @@ const getAllCarFree = async (req, res) => {
         });
       }
     }
+  }
+};
+
+const getBusyCar = async (req, res) => {
+  const data = req.query.key;
+  if (data[0] && data[1]) {
+    const listCarInAcceptRequest = await RequestModel.find(
+      {
+        requestStatus: { $nin: ["2", "7", "8", "5"] },
+        $or: [
+          {
+            startDate: { $lte: data[0] },
+            endDate: { $gte: data[0] },
+          },
+          {
+            startDate: { $lte: data[1] },
+            endDate: { $gte: data[1] },
+          },
+          {
+            startDate: { $gte: data[0] },
+            endDate: { $lte: data[1] },
+          },
+        ],
+      },
+      "car -_id"
+    );
+    return res.status(200).json(listCarInAcceptRequest[0].car);
+  } else {
+    return res.status(400).json({ message: "Chưa có khoảng thời gian!!" });
   }
 };
 
@@ -291,4 +320,5 @@ module.exports = {
   getAllCarFree,
   updateCar,
   onDeleteCar,
+  getBusyCar,
 };

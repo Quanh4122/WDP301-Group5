@@ -38,16 +38,16 @@ const Checkout = (props: { disableCustomTheme?: boolean }) => {
 
   useEffect(() => {
     console.log(location.state, userId)
-    getUserById()
+    // getUserById()
   }, [])
 
-  const getUserById = async () => {
-    await axiosInstance.get("/getUserById", {
-      params: { key: userId }
-    })
-      .then((res) => setUserBooking(res.data))
-      .catch(err => console.log(err))
-  }
+  // const getUserById = async () => {
+  //   await axiosInstance.get("/getUserById", {
+  //     params: { key: userId }
+  //   })
+  //     .then((res) => setUserBooking(res.data))
+  //     .catch(err => console.log(err))
+  // }
 
   const fomatDate = (date: string) => {
     const arr = date.split('/')

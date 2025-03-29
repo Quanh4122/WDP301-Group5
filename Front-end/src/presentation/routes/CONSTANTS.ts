@@ -37,5 +37,6 @@ export const PRIVATE_ROUTES = {
             REQUEST_IN_EXPIRE : 'request-in-expire',
             BILL_PAYMENT: 'bill-payment',
             DRIVER_BILL: 'driver-bill',
+            CHECK_OUT2: 'check-out2'
         }
 }

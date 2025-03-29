@@ -75,15 +75,15 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
     };
 
     return (
-        <div className="max-w-md mx-auto bg-white">
+        <div className="max-w-md bg-white">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                {title} {isRequire && <span className="text-red-500">*</span>}
+                {title && title + " *"} {isRequire && <span className="text-red-500"></span>}
             </label>
             <Input
                 value={value}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
                 placeholder="Nhập địa chỉ (ví dụ: Ninh Bình)"
-                className="w-full mb-2 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 size="large"
             />
             {isLoading ? (
