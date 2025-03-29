@@ -237,7 +237,20 @@ const getBusyCar = async (req, res) => {
       },
       "car -_id"
     );
-    return res.status(200).json(listCarInAcceptRequest[0].car);
+    if (listCarInAcceptRequest.length > 0) {
+      const arrStr = listCarInAcceptRequest.flatMap((item) =>
+        item.car.map((objectId) => objectId.toString())
+      );
+
+      const newArrStr = arrStr.filter(
+        (item, index) => arrStr.indexOf(item) == index
+      );
+      return res.status(200).json(newArrStr);
+    } else {
+      return res
+        .status(201)
+        .json({ message: "Không có xe bận trong thời gian hiện tạ" });
+    }
   } else {
     return res.status(400).json({ message: "Chưa có khoảng thời gian!!" });
   }
