@@ -45,7 +45,6 @@ const ManageAccount = () => {
   ];
 
   const filteredApplications = allApplications.filter((application) => {
-    // Chỉ giữ lại các ứng dụng có thông tin người dùng hợp lệ (không null/undefined)
     const hasValidUser = application.user && application.user._id;
     const matchesFilter = filter === "all" || application.status === filter;
     const matchesSearch =
@@ -79,8 +78,8 @@ const ManageAccount = () => {
   }
 
   return (
-    <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="mt-20 mb-20 bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 flex justify-center">
+      <div className="max-w-7xl mx-auto text-center">
         <header className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4">
           <h1 className="text-4xl font-bold text-gray-900">Quản Lý Danh Sách Tài Xế Ứng Tuyển</h1>
           <div className="text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
@@ -88,12 +87,12 @@ const ManageAccount = () => {
           </div>
         </header>
 
-        <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex flex-col sm:flex-row gap-4">
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex flex-col sm:flex-row gap-4 ">
           <div className="relative flex-1">
             <input
               type="text"
               placeholder="Tìm kiếm tên hoặc email..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800 placeholder-gray-400"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg transition-all duration-300 text-gray-800 placeholder-gray-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -112,7 +111,7 @@ const ManageAccount = () => {
             </svg>
           </div>
           <select
-            className="w-full sm:w-48 py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 text-gray-800 bg-white"
+            className="w-full sm:w-48 py-3 px-4 border border-gray-300 rounded-lg transition-all duration-300 text-gray-800 bg-white"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
@@ -130,16 +129,16 @@ const ManageAccount = () => {
         ) : (
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 mx-auto">
                 <thead className="bg-gray-50">
-                  <tr className="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <tr className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     <th className="py-4 px-6 text-center">Ảnh bằng lái</th>
-                    <th className="py-4 px-6">Tên người dùng</th>
-                    <th className="py-4 px-6">Email</th>
-                    <th className="py-4 px-6">Vai trò</th>
-                    <th className="py-4 px-6">Trạng thái</th>
-                    <th className="py-4 px-6">Số bằng lái</th>
-                    <th className="py-4 px-6">Kinh nghiệm</th>
+                    <th className="py-4 px-6 text-center">Tên người dùng</th>
+                    <th className="py-4 px-6 text-center w-32">Email</th>
+                    <th className="py-4 px-6 text-center">Vai trò</th>
+                    <th className="py-4 px-6 text-center w-40">Trạng thái</th>
+                    <th className="py-4 px-6 text-center">Số bằng lái</th>
+                    <th className="py-4 px-6 text-center">Kinh nghiệm</th>
                     <th className="py-4 px-6 text-center">Hành động</th>
                   </tr>
                 </thead>
@@ -154,7 +153,7 @@ const ManageAccount = () => {
                           <img
                             src={`http://localhost:3030${application.driversLicensePhoto}`}
                             alt="Ảnh bằng lái"
-                            className="h-16 w-24 object-cover rounded-lg border border-gray-200 shadow-sm"
+                            className="h-16 w-24 object-cover rounded-lg border border-gray-200 shadow-sm mx-auto"
                             onError={(e) =>
                               (e.currentTarget.src = "/fallback-image.png")
                             }
@@ -163,14 +162,14 @@ const ManageAccount = () => {
                           <span className="text-gray-500 text-sm">N/A</span>
                         )}
                       </td>
-                      <td className="py-4 px-6 text-gray-900 font-medium">
+                      <td className="py-4 px-6 text-gray-900 font-medium text-center">
                         <Link to={`/app/dashboard/manage-driver-accept/${application.user?._id}`} className="hover:text-sky-400">
                           <button>{application.user.userName}</button>
                         </Link>
                       </td>
-                      <td className="py-4 px-6 text-gray-700">{application.user.email}</td>
-                      <td className="py-4 px-6 text-gray-700">{application.user.role.roleName}</td>
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 text-gray-700 text-center">{application.user.email}</td>
+                      <td className="py-4 px-6 text-gray-700 text-center">{application.user.role.roleName}</td>
+                      <td className="py-4 px-6 text-center">
                         <span
                           className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
                             application.status === "approved"
@@ -187,10 +186,10 @@ const ManageAccount = () => {
                             : "Đang chờ"}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-gray-700">
+                      <td className="py-4 px-6 text-gray-700 text-center">
                         {application.licenseNumber ?? "N/A"}
                       </td>
-                      <td className="py-4 px-6 text-gray-700">
+                      <td className="py-4 px-6 text-gray-700 text-center">
                         {application.experience ?? "N/A"}
                       </td>
                       <td className="py-4 px-6 text-center">
@@ -231,7 +230,7 @@ const ManageAccount = () => {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
-          className="mt-8"
+          className="mt-8 flex justify-center"
         />
       </div>
     </div>
