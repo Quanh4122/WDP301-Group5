@@ -217,6 +217,14 @@ const PenaltyModal: React.FC<PenaltyModalProps> = ({
             <p>{billData?.request.dropLocation || "Chưa có"}</p>
           </div>
           <div>
+            <Text strong>Ngày bắt đầu :</Text>
+            <p>
+              {billData?.request?.startDate
+                ? dayjs(billData?.request?.startDate).format("DD/MM/YYYY HH:mm")
+                : "Chưa có"}
+            </p>
+          </div>
+          <div>
             <Text strong>Ngày kết thúc :</Text>
             <p>
               {billData?.request?.endDate
