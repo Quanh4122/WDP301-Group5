@@ -26,9 +26,9 @@ const DriverBill = () => {
       case 5:
         return <span className="text-red-600">Đã hủy</span>;
       case 6:
-        return <span className="text-orange-600 bg-orange-200 px-2 py-1 rounded-full">Đến thời gian trả xe</span>;
+        return <span className="text-orange-600 bg-orange-200 px-2 py-1 rounded-full">Kết thúc chuyến đi</span>;
       case 7:
-        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đã trả xe</span>;
+        return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Khách hàng đã trả xe</span>;
       case 8:
         return <span className="text-green-800 bg-green-200 px-2 py-1 rounded-full">Đã thanh toán, đơn hoàn tất</span>;
       default:

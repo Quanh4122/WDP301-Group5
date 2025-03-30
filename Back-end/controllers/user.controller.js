@@ -406,7 +406,7 @@ const login = async (req, res) => {
         phoneNumber: user.phoneNumber,
       },
       JWT_SECRET,
-      { expiresIn: "4h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
@@ -487,7 +487,7 @@ const googleLogin = async (req, res) => {
         role: user.role.roleName, // Lấy roleName thay vì toàn bộ object role
       },
       JWT_SECRET,
-      { expiresIn: "4h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
@@ -516,6 +516,12 @@ const googleLogin = async (req, res) => {
       return res.status(400).json({
         status: "error",
         message: "Invalid Firebase ID token. Please try again.",
+      });
+    };
+    if (error.code === "auth/id-token-expired") {
+      return res.status(401).json({
+        error: "Token expired",
+        message: "Your session has expired. Please log in again or refresh your token.",
       });
     }
     res.status(500).json({
