@@ -164,6 +164,7 @@ const CreateBlog: React.FC = () => {
                 onChange={handleImageChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 disabled:opacity-50"
                 disabled={loading}
+                required
               />
               {imagePreviews.length > 0 && (
                 <div className="flex flex-wrap gap-4 mt-2">

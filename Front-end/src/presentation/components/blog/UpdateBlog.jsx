@@ -163,6 +163,7 @@ const UpdateBlog = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Nhập mô tả"
+                required
               />
             </div>
 
@@ -179,6 +180,7 @@ const UpdateBlog = () => {
                   onChange={handleImageChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer"
                   disabled={loading}
+                  required
                 />
                 {imagePreviews.length > 0 && (
                   <div className="flex flex-wrap gap-4 mt-2">
